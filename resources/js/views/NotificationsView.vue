@@ -76,8 +76,9 @@
                 </label>
               </div>
 
-              <div v-if="form.targetType === 'category'">
-                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Feedback Group</label>
+              <!-- Segment parameters -->
+              <div v-if="form.targetType === 'category'" class="space-y-1.5">
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider">Feedback Group</label>
                 <select v-model="form.targetValue" class="input-base">
                   <option value="">Select group…</option>
                   <option>Bug</option><option>Suggestion</option>
@@ -85,15 +86,55 @@
                 </select>
               </div>
 
-              <div v-if="form.targetType === 'selected'">
-                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">User IDs (comma-separated)</label>
-                <input v-model="form.targetValue" type="text" placeholder="e.g. 59283749, 12938479" class="input-base" />
+              <!-- Slicing the selector for target type selected subscribers -->
+              <div v-if="form.targetType === 'selected'" class="space-y-3">
+                <div class="flex items-center justify-between">
+                  <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider">Select Target Subscribers</label>
+                  <span class="text-xs font-bold text-primary-600 dark:text-primary-400">
+                    {{ selectedSubscribers.length }} subscriber{{ selectedSubscribers.length !== 1 ? 's' : '' }} selected
+                  </span>
+                </div>
+
+                <!-- Simple internal list wrapper -->
+                <div class="border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden bg-white dark:bg-slate-900">
+                  
+                  <!-- Filter field inside list -->
+                  <div class="p-2 border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 flex gap-2">
+                    <input v-model="subscriberSearch" type="text" placeholder="Search by name or username…"
+                           class="flex-1 px-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-white focus:outline-none focus:border-primary-500 dark:border-slate-700 dark:bg-slate-950 text-slate-700 dark:text-slate-200" />
+                    <button v-if="selectedSubscribers.length" @click="clearSelectedSubscribers" type="button"
+                            class="px-2.5 py-1.5 text-[10px] font-bold text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-lg transition-colors">
+                      Clear Selection
+                    </button>
+                  </div>
+
+                  <!-- Subscribers selection check grid -->
+                  <div class="max-h-56 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800">
+                    <div v-if="!filteredSubscribers.length" class="p-4 text-center text-xs text-slate-400">
+                      No subscribers match search
+                    </div>
+                    <label v-for="sub in filteredSubscribers" :key="sub.id"
+                           class="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-950 cursor-pointer transition-colors">
+                      <input type="checkbox" :value="sub.telegramId" v-model="selectedSubscribers" @change="syncTargetValue"
+                             class="rounded text-primary-600 focus:ring-primary-500/20 w-4 h-4" />
+                      <div class="min-w-0 flex-1">
+                        <p class="text-xs font-bold text-slate-700 dark:text-slate-300 truncate">
+                          {{ sub.firstName }} {{ sub.lastName }}
+                        </p>
+                        <p class="text-[10px] text-slate-400 truncate">
+                          @{{ sub.username || '—' }} (ID: {{ sub.telegramId }})
+                        </p>
+                      </div>
+                    </label>
+                  </div>
+
+                </div>
               </div>
 
-              <div class="flex justify-between">
+              <div class="flex justify-between pt-2">
                 <button @click="step = 1" class="btn-ghost">← Back</button>
                 <button @click="estimateDelivery"
-                        :disabled="form.targetType === 'category' && !form.targetValue"
+                        :disabled="(form.targetType === 'category' && !form.targetValue) || (form.targetType === 'selected' && !selectedSubscribers.length)"
                         class="btn-primary">
                   Estimate Recipients →
                 </button>
@@ -233,7 +274,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, inject } from 'vue';
+import { ref, onMounted, onUnmounted, inject, computed } from 'vue';
 import Sidebar from '../components/Sidebar.vue';
 import Navbar  from '../components/Navbar.vue';
 import axios   from 'axios';
@@ -249,11 +290,16 @@ const showToast        = inject('showToast');
 const form = ref({ title: '', message: '', targetType: 'all', targetValue: '' });
 const estimate = ref({ count: 0, duration: 0 });
 
+// Selection states for target specific users
+const subscribers         = ref([]);
+const subscriberSearch    = ref('');
+const selectedSubscribers = ref([]);
+
 const segments = [
   { value: 'all',      label: 'All Subscribers',   description: 'Send to the entire chatbot network' },
   { value: 'active',   label: 'Active Contacts',    description: 'Only recently active subscribers' },
   { value: 'category', label: 'Feedback Segment',   description: 'Target a specific feedback category group' },
-  { value: 'selected', label: 'Specific Users',     description: 'Manually list Telegram user IDs' },
+  { value: 'selected', label: 'Specific Users',     description: 'Select target users from a searchable list' },
 ];
 
 const tips = [
@@ -262,11 +308,41 @@ const tips = [
   { title: 'Queue Processing', body: 'Campaigns run asynchronously in the background via Laravel queues.' },
 ];
 
+// Computed to filter subscribers list in selection UI
+const filteredSubscribers = computed(() => {
+  if (!subscriberSearch.value.trim()) return subscribers.value;
+  const q = subscriberSearch.value.toLowerCase();
+  return subscribers.value.filter(s => {
+    return (s.firstName ?? '').toLowerCase().includes(q) ||
+           (s.lastName ?? '').toLowerCase().includes(q) ||
+           (s.username ?? '').toLowerCase().includes(q) ||
+           String(s.telegramId ?? '').includes(q);
+  });
+});
+
 const fetchCampaigns = async () => {
   try {
     const res = await axios.get('/notifications');
     campaigns.value = res.data;
   } catch { showToast('Failed to load campaign history', 'error'); }
+};
+
+const fetchSubscribers = async () => {
+  try {
+    const res = await axios.get('/users');
+    subscribers.value = res.data;
+  } catch {
+    console.error('Failed to fetch subscribers for wizard');
+  }
+};
+
+const syncTargetValue = () => {
+  form.value.targetValue = selectedSubscribers.value.join(',');
+};
+
+const clearSelectedSubscribers = () => {
+  selectedSubscribers.value = [];
+  form.value.targetValue = '';
 };
 
 const estimateDelivery = async () => {
@@ -285,6 +361,7 @@ const dispatchBroadcast = async () => {
     await axios.post('/notifications', form.value);
     showToast('Campaign dispatched to queue!');
     form.value = { title: '', message: '', targetType: 'all', targetValue: '' };
+    selectedSubscribers.value = [];
     step.value = 1;
     fetchCampaigns();
   } catch { showToast('Failed to dispatch campaign', 'error'); }
@@ -311,6 +388,10 @@ const campaignStatusClasses = (s) => ({
 const formatDate = (d) => d ? new Date(d).toLocaleDateString() : '—';
 
 let pollTimer;
-onMounted(() => { fetchCampaigns(); pollTimer = setInterval(fetchCampaigns, 10000); });
+onMounted(() => {
+  fetchCampaigns();
+  fetchSubscribers();
+  pollTimer = setInterval(fetchCampaigns, 10000);
+});
 onUnmounted(() => clearInterval(pollTimer));
 </script>
