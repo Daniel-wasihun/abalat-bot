@@ -1,0 +1,176 @@
+@import "tailwindcss";
+
+/* ============================================================
+   Custom dark-mode variant (class-based toggling via .dark)
+   ============================================================ */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ============================================================
+   Design System Tokens
+   ============================================================ */
+@theme {
+  /* Primary brand — vibrant indigo-blue */
+  --color-primary-50:  #eff6ff;
+  --color-primary-100: #dbeafe;
+  --color-primary-200: #bfdbfe;
+  --color-primary-300: #93c5fd;
+  --color-primary-400: #60a5fa;
+  --color-primary-500: #3b82f6;
+  --color-primary-600: #2563eb;
+  --color-primary-700: #1d4ed8;
+  --color-primary-800: #1e40af;
+  --color-primary-900: #1e3a8a;
+  --color-primary-950: #172554;
+
+  /* Slate fill-ins for non-standard Tailwind shades */
+  --color-slate-850: #1a2436;
+  --color-slate-950: #0d1117;
+
+  /* Typography */
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    Roboto, sans-serif;
+}
+
+/* ============================================================
+   Base Layer
+   ============================================================ */
+@layer base {
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: #f8fafc; /* slate-50 */
+    color: #0f172a;            /* slate-900 */
+    transition: background-color 200ms ease, color 200ms ease;
+  }
+
+  .dark body {
+    background-color: #0f172a;
+    color: #f1f5f9;
+  }
+}
+
+/* ============================================================
+   Glass / Blur Utilities
+   ============================================================ */
+.glass {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.dark .glass {
+  background: rgba(15, 23, 42, 0.78);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(226, 232, 240, 0.7);
+}
+
+.dark .glass-card {
+  background: rgba(30, 41, 59, 0.88);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(51, 65, 85, 0.7);
+}
+
+/* ============================================================
+   Custom Scrollbars
+   ============================================================ */
+::-webkit-scrollbar       { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 9999px;
+}
+.dark ::-webkit-scrollbar-thumb { background-color: #334155; }
+::-webkit-scrollbar-thumb:hover      { background-color: #94a3b8; }
+.dark ::-webkit-scrollbar-thumb:hover { background-color: #475569; }
+
+/* ============================================================
+   Re-usable Component Utilities
+   ============================================================ */
+
+/* Input / Select base */
+.input-base {
+  @apply w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50
+         text-sm text-slate-900 placeholder-slate-400
+         focus:bg-white focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none
+         dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-500
+         dark:focus:bg-slate-900 dark:focus:border-primary-400
+         transition-all duration-150;
+}
+
+/* Card surface */
+.card {
+  @apply rounded-2xl border border-slate-200/80 bg-white shadow-sm
+         dark:border-slate-800/60 dark:bg-slate-900;
+}
+
+/* Badge variants */
+.badge {
+  @apply inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold
+         uppercase tracking-wider;
+}
+
+/* Primary button */
+.btn-primary {
+  @apply px-4 py-2 text-sm font-semibold text-white bg-primary-600 hover:bg-primary-500
+         rounded-xl shadow-md shadow-primary-600/15 hover:shadow-primary-600/25
+         disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150;
+}
+
+/* Ghost button */
+.btn-ghost {
+  @apply px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100
+         dark:text-slate-300 dark:hover:bg-slate-800 rounded-xl transition-colors duration-150;
+}
+
+/* Danger button */
+.btn-danger {
+  @apply px-4 py-2 text-sm font-semibold text-red-600 hover:bg-red-50
+         dark:hover:bg-red-950/20 rounded-xl transition-colors duration-150;
+}
+
+/* Table row */
+.table-row-base {
+  @apply border-b border-slate-100 dark:border-slate-800
+         hover:bg-slate-50/60 dark:hover:bg-slate-800/30 transition-colors duration-100;
+}
+
+/* ============================================================
+   Page Transition
+   ============================================================ */
+.fade-enter-active,
+.fade-leave-active { transition: opacity 0.15s ease; }
+.fade-enter-from,
+.fade-leave-to      { opacity: 0; }
+
+/* ============================================================
+   Toast Transition
+   ============================================================ */
+.toast-enter-active,
+.toast-leave-active { transition: all 0.28s cubic-bezier(0.68, -0.55, 0.27, 1.55); }
+.toast-enter-from   { opacity: 0; transform: translateY(-16px) scale(0.92); }
+.toast-leave-to     { opacity: 0; transform: translateY(12px)  scale(0.92); }
+
+/* ============================================================
+   Dropdown Transition
+   ============================================================ */
+.dropdown-enter-active,
+.dropdown-leave-active { transition: all 0.1s ease-out; }
+.dropdown-enter-from,
+.dropdown-leave-to     { opacity: 0; transform: scale(0.95) translateY(-4px); }
