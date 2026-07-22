@@ -92,7 +92,7 @@ class TelegramBotWebhookTest extends TestCase
                     'date' => 1620000100,
                     'text' => 'Please select the category for your feedback:',
                 ],
-                'data' => 'cat:Bug',
+                'data' => 'cat:Spiritual Education',
             ]
         ];
 
@@ -101,9 +101,9 @@ class TelegramBotWebhookTest extends TestCase
         $response->assertStatus(200);
         $response->assertJson(['message' => 'Webhook processed successfully']);
 
-        // Verify user state in Cache was set to awaiting content for the "Bug" category
+        // Verify user state in Cache was set to awaiting content for the "Spiritual Education" category
         $userStateKey = "telegram_state_987654321";
-        $this->assertEquals('awaiting_content:Bug', Cache::get($userStateKey));
+        $this->assertEquals('awaiting_content:Spiritual Education', Cache::get($userStateKey));
     }
 
     public function test_webhook_submits_feedback_successfully_when_awaiting_content()
@@ -120,7 +120,7 @@ class TelegramBotWebhookTest extends TestCase
         ]);
 
         // Place the user state in cache
-        Cache::put('telegram_state_987654321', 'awaiting_content:Bug', 3600);
+        Cache::put('telegram_state_987654321', 'awaiting_content:Spiritual Education', 3600);
 
         $payload = [
             'update_id' => 123458,
@@ -160,7 +160,7 @@ class TelegramBotWebhookTest extends TestCase
         });
 
         $this->assertNotNull($submittedFeedback);
-        $this->assertEquals('Bug', $submittedFeedback['category']);
+        $this->assertEquals('Spiritual Education', $submittedFeedback['category']);
         $this->assertEquals('The app crashes when I click the export button!', $submittedFeedback['message']);
         $this->assertEquals('New', $submittedFeedback['status']);
         $this->assertEquals('Medium', $submittedFeedback['priority']);

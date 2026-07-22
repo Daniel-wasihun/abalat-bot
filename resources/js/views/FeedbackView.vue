@@ -5,7 +5,7 @@
     <div class="flex-1 flex flex-col min-w-0 lg:pl-64">
       <Navbar @toggle-sidebar="sidebarOpen = !sidebarOpen" />
 
-      <main class="flex-grow p-4 md:p-6 lg:p-8 space-y-5 overflow-y-auto">
+      <main class="grow p-4 md:p-6 lg:p-8 space-y-5 overflow-y-auto">
 
         <!-- Page header + export actions -->
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -37,8 +37,11 @@
 
           <select v-model="filters.category" @change="fetchFeedback" class="input-base">
             <option value="">All Categories</option>
-            <option>Bug</option><option>Suggestion</option>
-            <option>Complaint</option><option>Question</option><option>Other</option>
+            <option value="Spiritual Education">Spiritual Education</option>
+            <option value="Choir & Hymns">Choir & Hymns</option>
+            <option value="Liturgy & Service">Liturgy & Service</option>
+            <option value="General Inquiry">General Inquiry</option>
+            <option value="Other">Other</option>
           </select>
 
           <select v-model="filters.priority" @change="fetchFeedback" class="input-base">
@@ -223,7 +226,7 @@ const filters = ref({ search: '', category: '', priority: '', status: '' });
 const pagination = ref({ current_page: 1, last_page: 1, per_page: 15, total: 0 });
 
 const fieldOptions = {
-  category: ['Bug', 'Suggestion', 'Complaint', 'Question', 'Other'],
+  category: ['Spiritual Education', 'Choir & Hymns', 'Liturgy & Service', 'General Inquiry', 'Other'],
   priority: ['Low', 'Medium', 'High', 'Critical'],
   status:   ['New', 'Read', 'In Progress', 'Resolved', 'Closed'],
 };

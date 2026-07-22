@@ -5,7 +5,7 @@
     <div class="flex-1 flex flex-col min-w-0 lg:pl-64">
       <Navbar @toggle-sidebar="sidebarOpen = !sidebarOpen" />
 
-      <main class="flex-grow p-4 md:p-6 lg:p-8 space-y-5 overflow-y-auto">
+      <main class="grow p-4 md:p-6 lg:p-8 space-y-5 overflow-y-auto">
 
         <div>
           <h2 class="text-xl font-bold text-slate-800 dark:text-slate-100">Broadcast Campaigns</h2>
@@ -81,8 +81,11 @@
                 <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider">Feedback Group</label>
                 <select v-model="form.targetValue" class="input-base">
                   <option value="">Select group…</option>
-                  <option>Bug</option><option>Suggestion</option>
-                  <option>Complaint</option><option>Question</option>
+                  <option value="Spiritual Education">Spiritual Education</option>
+                  <option value="Choir & Hymns">Choir & Hymns</option>
+                  <option value="Liturgy & Service">Liturgy & Service</option>
+                  <option value="General Inquiry">General Inquiry</option>
+                  <option value="Other">Other</option>
                 </select>
               </div>
 
@@ -203,7 +206,7 @@
                   <th class="px-4 py-3">Segment</th>
                   <th class="px-4 py-3">Status</th>
                   <th class="px-4 py-3">Recipients</th>
-                  <th class="px-4 py-3 min-w-[140px]">Progress</th>
+                  <th class="px-4 py-3 min-w-35">Progress</th>
                   <th class="px-4 py-3">Date</th>
                   <th class="px-4 py-3 text-right">Logs</th>
                 </tr>

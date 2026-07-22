@@ -80,7 +80,7 @@ class FeedbackController extends Controller
     public function updateCategory(Request $request, string $id)
     {
         $validator = Validator::make($request->all(), [
-            'category' => 'required|in:Bug,Suggestion,Complaint,Question,Other',
+            'category' => 'required|in:Spiritual Education,Choir & Hymns,Liturgy & Service,General Inquiry,Other',
         ]);
 
         if ($validator->fails()) {
