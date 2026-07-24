@@ -3,15 +3,16 @@
                  border-b border-slate-200/80 bg-white/80 backdrop-blur-md
                  dark:border-slate-800/70 dark:bg-slate-900/80 transition-colors duration-200">
 
-    <!-- Left: hamburger + page title -->
+    <!-- Left: sidebar toggle icon (ChatGPT style) + page title -->
     <div class="flex items-center gap-3">
       <button
-        @click="$emit('toggle-sidebar')"
-        class="p-2 rounded-xl text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors lg:hidden"
+        @click="handleSidebarToggle"
+        class="p-2 rounded-xl text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
         aria-label="Toggle sidebar"
+        title="Toggle sidebar"
       >
-        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+        <svg class="w-5 h-5 text-slate-600 dark:text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
         </svg>
       </button>
       <h1 class="hidden sm:block text-base font-bold text-slate-800 dark:text-slate-100">
@@ -19,8 +20,11 @@
       </h1>
     </div>
 
-    <!-- Right: dark mode toggle + user menu -->
+    <!-- Right: language switcher + dark mode toggle + user menu -->
     <div class="flex items-center gap-2">
+
+      <!-- Language Switcher -->
+      <LanguageSwitcher />
 
       <!-- Theme toggle -->
       <button
@@ -60,7 +64,7 @@
                    dark:border-slate-800 dark:bg-slate-900 dark:shadow-slate-950/60 py-1 z-50"
           >
             <div class="px-4 py-2.5 border-b border-slate-100 dark:border-slate-800">
-              <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Signed in as</p>
+              <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{{ t('nav.signedInAs') }}</p>
               <p class="text-sm font-semibold text-slate-800 dark:text-slate-100 truncate mt-0.5">
                 {{ authStore.admin?.email }}
               </p>
@@ -69,18 +73,18 @@
             <div class="py-1">
               <button @click="openProfileModal" class="w-full text-left flex items-center gap-2.5 px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
                 <UserIcon class="w-4 h-4 text-slate-400" />
-                Edit Profile
+                {{ t('nav.editProfile') }}
               </button>
               <button @click="openPasswordModal" class="w-full text-left flex items-center gap-2.5 px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
                 <KeyIcon class="w-4 h-4 text-slate-400" />
-                Change Password
+                {{ t('nav.changePassword') }}
               </button>
             </div>
 
             <div class="border-t border-slate-100 dark:border-slate-800 py-1">
               <button @click="handleLogout" class="w-full text-left flex items-center gap-2.5 px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors">
                 <ArrowLeftOnRectangleIcon class="w-4 h-4" />
-                Sign Out
+                {{ t('nav.signOut') }}
               </button>
             </div>
           </div>
@@ -108,9 +112,9 @@
                 <input v-model="profileForm.avatar" type="url" placeholder="https://..." class="input-base" />
               </div>
               <div class="flex justify-end gap-3 pt-2">
-                <button type="button" @click="showProfileModal = false" class="btn-ghost">Cancel</button>
+                <button type="button" @click="showProfileModal = false" class="btn-ghost">{{ t('common.cancel') }}</button>
                 <button type="submit" :disabled="isSaving" class="btn-primary">
-                  {{ isSaving ? 'Saving…' : 'Save Profile' }}
+                  {{ isSaving ? t('common.saving') : t('common.save') + ' Profile' }}
                 </button>
               </div>
             </form>
@@ -139,9 +143,9 @@
                 <input v-model="passwordForm.confirm" type="password" required class="input-base" />
               </div>
               <div class="flex justify-end gap-3 pt-2">
-                <button type="button" @click="showPasswordModal = false" class="btn-ghost">Cancel</button>
+                <button type="button" @click="showPasswordModal = false" class="btn-ghost">{{ t('common.cancel') }}</button>
                 <button type="submit" :disabled="isSaving" class="btn-primary">
-                  {{ isSaving ? 'Changing…' : 'Update Password' }}
+                  {{ isSaving ? t('common.saving') : 'Update Password' }}
                 </button>
               </div>
             </form>
@@ -157,6 +161,8 @@
 import { ref, computed, inject, onMounted, onUnmounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useAuthStore } from '../stores/auth';
+import { useI18n } from '../i18n.js';
+import LanguageSwitcher from './LanguageSwitcher.vue';
 import {
   SunIcon,
   MoonIcon,
@@ -167,8 +173,17 @@ import {
 } from '@heroicons/vue/24/outline';
 
 defineProps({ sidebarOpen: Boolean });
-defineEmits(['toggle-sidebar']);
+const emit = defineEmits(['toggle-sidebar']);
 
+const handleSidebarToggle = () => {
+  if (window.innerWidth < 1024) {
+    emit('toggle-sidebar');
+  } else {
+    window.dispatchEvent(new Event('sidebar-toggle-action'));
+  }
+};
+
+const { t } = useI18n();
 const router    = useRouter();
 const route     = useRoute();
 const authStore = useAuthStore();
@@ -186,14 +201,15 @@ const profileForm  = ref({ name: '', email: '', avatar: '' });
 const passwordForm = ref({ current: '', new: '', confirm: '' });
 
 const pageTitle = computed(() => {
-  const titles = {
-    Dashboard:     'Dashboard Overview',
-    Feedback:      'Feedback Submissions',
-    Users:         'Telegram Subscribers',
-    Notifications: 'Broadcast Campaigns',
-    Settings:      'System Settings',
+  const keys = {
+    Dashboard:     'nav.dashboard',
+    Feedback:      'nav.feedback',
+    Users:         'nav.users',
+    UserProfile:   'user.profile',
+    Notifications: 'nav.notifications',
+    Settings:      'nav.settings',
   };
-  return titles[route.name] ?? 'FeedHub Admin';
+  return keys[route.name] ? t(keys[route.name]) : 'ደቂቀ ብርሃን';
 });
 
 const openProfileModal = () => {
