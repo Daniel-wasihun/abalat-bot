@@ -86,6 +86,12 @@ class NotificationService
                 }
                 return array_values(array_filter($allUsers, fn($u) => isset($userMap[$u['id']])));
 
+            case 'language':
+                return array_values(array_filter($allUsers, function($u) use ($targetValue) {
+                    $lang = $u['preferredLanguage'] ?? $u['language'] ?? 'am';
+                    return strtolower($lang) === strtolower((string)$targetValue);
+                }));
+
             case 'all':
             default:
                 return array_values($allUsers);
