@@ -33,7 +33,7 @@ class NotificationController extends Controller
     public function estimate(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'targetType' => 'required|in:all,active,selected,category',
+            'targetType' => 'required|in:all,active,selected,category,language',
             'targetValue' => 'nullable',
         ]);
 
@@ -50,7 +50,7 @@ class NotificationController extends Controller
         $validator = Validator::make($request->all(), [
             'title' => 'required|string|max:255',
             'message' => 'required|string|max:4000',
-            'targetType' => 'required|in:all,active,selected,category',
+            'targetType' => 'required|in:all,active,selected,category,language',
             'targetValue' => 'nullable',
             'scheduledAt' => 'nullable|date|after:now',
         ]);
