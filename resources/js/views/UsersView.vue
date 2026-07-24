@@ -144,8 +144,8 @@
             <div class="flex items-center gap-4">
               <span>{{ t('feedback.pageOf', { current: pagination.current_page, total: pagination.last_page || 1 }) }}</span>
               <div class="flex items-center gap-2">
-                <span class="text-slate-400">Rows per page:</span>
-                <select v-model="pagination.per_page" @change="changePerPage" class="input-base text-xs py-1 px-2 min-h-0 cursor-pointer focus:ring-amber-500/30">
+                <span class="text-slate-400 whitespace-nowrap">Per page:</span>
+                <select v-model="pagination.per_page" @change="changePerPage" class="input-base text-xs py-1.5 px-2 min-h-0 cursor-pointer focus:ring-amber-500/30">
                   <option :value="10">10</option>
                   <option :value="25">25</option>
                   <option :value="50">50</option>
@@ -155,11 +155,11 @@
             </div>
             <div class="flex gap-2">
               <button @click="changePage(pagination.current_page - 1)" :disabled="pagination.current_page <= 1"
-                      class="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-40 transition-colors">
+                      class="px-4 py-2 text-sm font-medium rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-40 transition-colors">
                 {{ t('feedback.prevPage') }}
               </button>
               <button @click="changePage(pagination.current_page + 1)" :disabled="pagination.current_page >= pagination.last_page"
-                      class="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-40 transition-colors">
+                      class="px-4 py-2 text-sm font-medium rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-40 transition-colors">
                 {{ t('feedback.nextPage') }}
               </button>
             </div>
