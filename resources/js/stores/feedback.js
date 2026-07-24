@@ -34,7 +34,7 @@ function invalidateCache() {
 export const useFeedbackStore = defineStore('feedback', {
   state: () => ({
     feedbackList: [],
-    pagination: { current_page: 1, last_page: 1, per_page: 15, total: 0 },
+    pagination: { current_page: 1, last_page: 1, per_page: 10, total: 0 },
     filters:     { search: '', category: '', language: '', priority: '', status: '' },
     loading:     false,
     error:       null,
@@ -57,6 +57,12 @@ export const useFeedbackStore = defineStore('feedback', {
 
     setPage(page) {
       this.pagination.current_page = page;
+      this.fetchFeedback(true);
+    },
+
+    setPerPage(size) {
+      this.pagination.per_page = size;
+      this.pagination.current_page = 1;
       this.fetchFeedback(true);
     },
 

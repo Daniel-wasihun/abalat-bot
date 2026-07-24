@@ -141,7 +141,18 @@
 
           <!-- Pagination details -->
           <div class="flex items-center justify-between px-4 py-3 border-t border-slate-100 dark:border-slate-800 text-xs text-slate-500">
-            <span>{{ t('feedback.pageOf', { current: pagination.current_page, total: pagination.last_page || 1 }) }}</span>
+            <div class="flex items-center gap-4">
+              <span>{{ t('feedback.pageOf', { current: pagination.current_page, total: pagination.last_page || 1 }) }}</span>
+              <div class="flex items-center gap-2">
+                <span class="text-slate-400">Rows per page:</span>
+                <select v-model="pagination.per_page" @change="changePerPage" class="input-base text-xs py-1 px-2 min-h-0 cursor-pointer focus:ring-amber-500/30">
+                  <option :value="10">10</option>
+                  <option :value="25">25</option>
+                  <option :value="50">50</option>
+                  <option :value="100">100</option>
+                </select>
+              </div>
+            </div>
             <div class="flex gap-2">
               <button @click="changePage(pagination.current_page - 1)" :disabled="pagination.current_page <= 1"
                       class="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-40 transition-colors">
@@ -247,7 +258,7 @@ const sending     = ref(false);
 const loadingUsers = ref(false);
 const showToast   = inject('showToast');
 
-const pagination = ref({ current_page: 1, last_page: 1, per_page: 15, total: 0 });
+const pagination = ref({ current_page: 1, last_page: 1, per_page: 10, total: 0 });
 
 // Dropdown state
 const activeDropdownId = ref(null);
@@ -306,6 +317,11 @@ const debouncedFetch = () => {
 
 const changePage = (page) => {
   pagination.value.current_page = page;
+  fetchUsers();
+};
+
+const changePerPage = () => {
+  pagination.value.current_page = 1;
   fetchUsers();
 };
 

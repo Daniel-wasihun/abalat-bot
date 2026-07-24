@@ -185,7 +185,18 @@
 
           <!-- Pagination -->
           <div class="flex items-center justify-between px-4 py-3 border-t border-slate-100 dark:border-slate-800 text-xs text-slate-500">
-            <span>{{ t('feedback.pageOf', { current: pagination.current_page, total: pagination.last_page || 1 }) }}</span>
+            <div class="flex items-center gap-4">
+              <span>{{ t('feedback.pageOf', { current: pagination.current_page, total: pagination.last_page || 1 }) }}</span>
+              <div class="flex items-center gap-2">
+                <span class="text-slate-400">Rows per page:</span>
+                <select :value="pagination.per_page" @change="changePerPage($event.target.value)" class="input-base text-xs py-1 px-2 min-h-0 cursor-pointer focus:ring-amber-500/30">
+                  <option :value="10">10</option>
+                  <option :value="25">25</option>
+                  <option :value="50">50</option>
+                  <option :value="100">100</option>
+                </select>
+              </div>
+            </div>
             <div class="flex gap-2">
               <AppButton variant="ghost" size="sm" @click="changePage(pagination.current_page - 1)" :disabled="pagination.current_page <= 1">
                 {{ t('feedback.prevPage') }}
@@ -510,6 +521,7 @@ const debouncedFetch = () => {
 };
 
 const changePage = (p) => feedbackStore.setPage(p);
+const changePerPage = (size) => feedbackStore.setPerPage(Number(size));
 
 const openDetail = (item) => {
   selectedItem.value = { ...item };
