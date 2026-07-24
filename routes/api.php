@@ -44,6 +44,7 @@ Route::middleware(['jwt.auth'])->group(function () {
         Route::put('/{id}/priority', [FeedbackController::class, 'updatePriority']);
         Route::put('/{id}/category', [FeedbackController::class, 'updateCategory']);
         Route::post('/{id}/notes', [FeedbackController::class, 'addNote']);
+        Route::post('/{id}/reply', [FeedbackController::class, 'reply']);
         Route::delete('/{id}', [FeedbackController::class, 'destroy']);
     });
 
