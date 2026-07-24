@@ -70,13 +70,39 @@ class UserController extends Controller
         $feedbackHistory = $this->feedbackRepo->getByUserId($id);
 
         // Fetch delivery logs for this user
-        $logs = $this->notificationRepo->getLogsByNotificationId('*'); // Wildcard or filter manually
-        $receivedLogs = array_filter($logs, fn($log) => ($log['userId'] ?? '') === $id);
+        $logs = $this->notificationRepo->getLogsByUserId($id);
+        $notifications = $this->notificationRepo->getAll();
+        $notificationMap = [];
+        foreach ($notifications as $n) {
+            $notificationMap[$n['id']] = $n;
+        }
+
+        foreach ($logs as &$log) {
+            $notifId = $log['notificationId'] ?? '';
+            $log['title'] = $notificationMap[$notifId]['title'] ?? 'Direct Message';
+            $log['message'] = $notificationMap[$notifId]['message'] ?? '';
+        }
+
+        // Extract replies to this user's feedbacks
+        $replyHistory = [];
+        foreach ($feedbackHistory as $fb) {
+            if (!empty($fb['replies'])) {
+                foreach ($fb['replies'] as $reply) {
+                    $replyHistory[] = array_merge($reply, [
+                        'feedbackId' => $fb['id'] ?? '',
+                        'feedbackMessage' => $fb['message'] ?? '',
+                        'feedbackCategory' => $fb['category'] ?? '',
+                    ]);
+                }
+            }
+        }
+        usort($replyHistory, fn($a, $b) => strcmp($b['createdAt'] ?? '', $a['createdAt'] ?? ''));
 
         return response()->json([
             'user' => $user,
             'feedbacks' => $feedbackHistory,
-            'notifications' => array_values($receivedLogs),
+            'notifications' => array_values($logs),
+            'replies' => $replyHistory,
         ]);
     }
 
@@ -104,6 +130,7 @@ class UserController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
+            'title' => 'nullable|string|max:255',
             'message' => 'required|string|max:4000',
         ]);
 
@@ -121,6 +148,31 @@ class UserController extends Controller
         if (!$success) {
             return response()->json(['message' => 'Failed to send message via Telegram Bot API'], 502);
         }
+
+        // Save to notifications and logs
+        $admin = $request->attributes->get('admin');
+        $sentBy = $admin['name'] ?? 'Admin';
+        $title = $request->input('title') ?: 'Direct Notification';
+
+        $notifData = $this->notificationRepo->createNotification([
+            'title' => $title,
+            'message' => $request->message,
+            'targetType' => 'selected',
+            'targetValue' => $id,
+            'sentBy' => $sentBy,
+            'status' => 'Completed',
+            'totalRecipients' => 1,
+            'sentCount' => 1,
+            'failedCount' => 0,
+        ]);
+
+        $this->notificationRepo->logDelivery([
+            'notificationId' => $notifData['id'],
+            'userId' => $id,
+            'telegramId' => $user['telegramId'] ?? '',
+            'status' => 'Success',
+            'sentAt' => now()->toIso8601String(),
+        ]);
 
         return response()->json(['message' => 'Direct message sent successfully']);
     }
