@@ -145,7 +145,7 @@
               <span>{{ t('feedback.pageOf', { current: pagination.current_page, total: pagination.last_page || 1 }) }}</span>
               <div class="flex items-center gap-2">
                 <span class="text-slate-400 whitespace-nowrap">Per page:</span>
-                <select v-model="pagination.per_page" @change="changePerPage" class="input-base text-xs py-1.5 px-2 min-h-0 cursor-pointer focus:ring-amber-500/30">
+                <select v-model="pagination.per_page" @change="changePerPage" class="text-xs py-1 px-2 pr-8 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-0 focus:border-slate-200 dark:focus:border-slate-700 cursor-pointer">
                   <option :value="10">10</option>
                   <option :value="25">25</option>
                   <option :value="50">50</option>
