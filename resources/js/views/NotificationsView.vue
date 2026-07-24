@@ -1,270 +1,251 @@
 <template>
-  <div class="flex min-h-screen bg-slate-50 dark:bg-slate-950">
-    <Sidebar :is-open="sidebarOpen" @close="sidebarOpen = false" />
-
-    <div class="flex-1 flex flex-col min-w-0 lg:pl-64">
-      <Navbar @toggle-sidebar="sidebarOpen = !sidebarOpen" />
-
-      <main class="grow p-4 md:p-6 lg:p-8 space-y-5 overflow-y-auto">
+  <div class="flex flex-col flex-1 min-w-0">
+  <main class="grow p-4 md:p-6 lg:p-8 space-y-5 overflow-y-auto">
 
         <div>
-          <h2 class="text-xl font-bold text-slate-800 dark:text-slate-100">Broadcast Campaigns</h2>
-          <p class="text-xs text-slate-400 mt-0.5">Compose and dispatch bulk messages to Telegram subscribers</p>
+          <h2 class="text-xl font-bold text-slate-800 dark:text-slate-100">{{ t('notifications.title') }}</h2>
+          <p class="text-xs text-slate-400 mt-0.5">{{ t('notifications.subtitle') }}</p>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
 
           <!-- ── Wizard composer ───────────────────────────────── -->
-          <div class="card p-6 lg:col-span-2 space-y-5">
+          <div class="card p-6 lg:col-span-2 space-y-5 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/60">
             <div class="flex items-center justify-between">
-              <h3 class="text-sm font-bold text-slate-700 dark:text-slate-200">New Campaign</h3>
+              <h3 class="text-sm font-bold text-slate-700 dark:text-slate-200">{{ t('notifications.newCampaign') }}</h3>
               <!-- Step indicator pills -->
               <div class="flex items-center gap-1.5">
                 <span
                   v-for="n in 3"
                   :key="n"
                   class="w-6 h-1.5 rounded-full transition-all duration-300"
-                  :class="step >= n ? 'bg-primary-500' : 'bg-slate-200 dark:bg-slate-700'"
+                  :class="step >= n ? 'bg-amber-500' : 'bg-slate-200 dark:bg-slate-700'"
                 />
               </div>
             </div>
 
             <!-- Step labels -->
             <div class="flex items-center text-xs text-slate-400 gap-2">
-              <span :class="step === 1 ? 'font-bold text-primary-600 dark:text-primary-400' : ''">1. Compose</span>
+              <span :class="step === 1 ? 'font-bold text-amber-600 dark:text-amber-400' : ''">{{ t('notifications.step1') }}</span>
               <svg class="w-3 h-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
-              <span :class="step === 2 ? 'font-bold text-primary-600 dark:text-primary-400' : ''">2. Audience</span>
+              <span :class="step === 2 ? 'font-bold text-amber-600 dark:text-amber-400' : ''">{{ t('notifications.step2') }}</span>
               <svg class="w-3 h-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
-              <span :class="step === 3 ? 'font-bold text-primary-600 dark:text-primary-400' : ''">3. Confirm</span>
+              <span :class="step === 3 ? 'font-bold text-amber-600 dark:text-amber-400' : ''">{{ t('notifications.step3') }}</span>
             </div>
 
             <!-- Step 1: Compose -->
-            <div v-if="step === 1" class="space-y-4">
+            <div v-if="step === 1" class="space-y-4 tab-content-enter-active">
               <div>
-                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Campaign Title</label>
-                <input v-model="form.title" type="text" placeholder="Internal reference name…" class="input-base" />
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">{{ t('notifications.campaignTitle') }}</label>
+                <input v-model="form.title" type="text" :placeholder="t('notifications.campaignTitlePh')" class="input-base text-xs" />
               </div>
               <div>
-                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Message Content</label>
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">{{ t('notifications.messageContent') }}</label>
                 <textarea v-model="form.message" rows="6"
-                          placeholder="Write your announcement. Supports Telegram Markdown (*bold*, _italic_, `code`)."
-                          class="input-base resize-none" />
+                          :placeholder="t('notifications.messagePh')"
+                          class="input-base text-xs resize-none" />
               </div>
               <div class="flex justify-end">
-                <button @click="step = 2" :disabled="!form.title.trim() || !form.message.trim()" class="btn-primary">
-                  Continue →
+                <button @click="step = 2" :disabled="!form.title.trim() || !form.message.trim()" class="btn-primary text-xs">
+                  {{ t('notifications.continueAudience') }}
                 </button>
               </div>
             </div>
 
             <!-- Step 2: Audience -->
-            <div v-if="step === 2" class="space-y-4">
+            <div v-if="step === 2" class="space-y-4 tab-content-enter-active">
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <label
                   v-for="seg in segments"
                   :key="seg.value"
                   class="flex flex-col gap-1.5 p-4 rounded-xl border cursor-pointer transition-all duration-150"
                   :class="form.targetType === seg.value
-                    ? 'border-primary-500 bg-primary-50/50 dark:bg-primary-950/20'
+                    ? 'border-amber-500 bg-amber-50/50 dark:bg-amber-950/20'
                     : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'"
                 >
                   <div class="flex items-center gap-2">
-                    <input type="radio" v-model="form.targetType" :value="seg.value" class="text-primary-600" />
+                    <input type="radio" v-model="form.targetType" :value="seg.value" class="text-amber-600 focus:ring-amber-500" />
                     <span class="text-xs font-bold text-slate-800 dark:text-slate-200">{{ seg.label }}</span>
                   </div>
                   <p class="text-[10px] text-slate-400 pl-5">{{ seg.description }}</p>
                 </label>
               </div>
 
-              <!-- Segment parameters -->
-              <div v-if="form.targetType === 'category'" class="space-y-1.5">
-                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider">Feedback Group</label>
-                <select v-model="form.targetValue" class="input-base">
-                  <option value="">Select group…</option>
-                  <option value="Spiritual Education">Spiritual Education</option>
-                  <option value="Choir & Hymns">Choir & Hymns</option>
-                  <option value="Liturgy & Service">Liturgy & Service</option>
-                  <option value="General Inquiry">General Inquiry</option>
-                  <option value="Other">Other</option>
+              <!-- Segment parameter: Language -->
+              <div v-if="form.targetType === 'language'" class="space-y-1.5">
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider">{{ t('notifications.prefLanguage') }}</label>
+                <select v-model="form.targetValue" class="input-base text-xs">
+                  <option value="">{{ t('notifications.selectLang') }}</option>
+                  <option value="am">🇪🇹 አማርኛ (Amharic)</option>
+                  <option value="en">🇺🇸 English</option>
+                  <option value="om">🇪🇹 Afaan Oromoo</option>
                 </select>
               </div>
 
-              <!-- Slicing the selector for target type selected subscribers -->
-              <div v-if="form.targetType === 'selected'" class="space-y-3">
-                <div class="flex items-center justify-between">
-                  <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider">Select Target Subscribers</label>
-                  <span class="text-xs font-bold text-primary-600 dark:text-primary-400">
-                    {{ selectedSubscribers.length }} subscriber{{ selectedSubscribers.length !== 1 ? 's' : '' }} selected
-                  </span>
-                </div>
-
-                <!-- Simple internal list wrapper -->
-                <div class="border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden bg-white dark:bg-slate-900">
-                  
-                  <!-- Filter field inside list -->
-                  <div class="p-2 border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 flex gap-2">
-                    <input v-model="subscriberSearch" type="text" placeholder="Search by name or username…"
-                           class="flex-1 px-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-white focus:outline-none focus:border-primary-500 dark:border-slate-700 dark:bg-slate-950 text-slate-700 dark:text-slate-200" />
-                    <button v-if="selectedSubscribers.length" @click="clearSelectedSubscribers" type="button"
-                            class="px-2.5 py-1.5 text-[10px] font-bold text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-lg transition-colors">
-                      Clear Selection
-                    </button>
-                  </div>
-
-                  <!-- Subscribers selection check grid -->
-                  <div class="max-h-56 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800">
-                    <div v-if="!filteredSubscribers.length" class="p-4 text-center text-xs text-slate-400">
-                      No subscribers match search
-                    </div>
-                    <label v-for="sub in filteredSubscribers" :key="sub.id"
-                           class="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-950 cursor-pointer transition-colors">
-                      <input type="checkbox" :value="sub.telegramId" v-model="selectedSubscribers" @change="syncTargetValue"
-                             class="rounded text-primary-600 focus:ring-primary-500/20 w-4 h-4" />
-                      <div class="min-w-0 flex-1">
-                        <p class="text-xs font-bold text-slate-700 dark:text-slate-300 truncate">
-                          {{ sub.firstName }} {{ sub.lastName }}
-                        </p>
-                        <p class="text-[10px] text-slate-400 truncate">
-                          @{{ sub.username || '—' }} (ID: {{ sub.telegramId }})
-                        </p>
-                      </div>
-                    </label>
-                  </div>
-
-                </div>
+              <!-- Segment parameter: Category -->
+              <div v-if="form.targetType === 'category'" class="space-y-1.5">
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider">{{ t('notifications.catLabel') }}</label>
+                <select v-model="form.targetValue" class="input-base text-xs">
+                  <option value="">{{ t('notifications.selectCategory') }}</option>
+                  <option v-for="opt in categoryOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+                </select>
               </div>
 
-              <div class="flex justify-between pt-2">
-                <button @click="step = 1" class="btn-ghost">← Back</button>
-                <button @click="estimateDelivery"
-                        :disabled="(form.targetType === 'category' && !form.targetValue) || (form.targetType === 'selected' && !selectedSubscribers.length)"
-                        class="btn-primary">
-                  Estimate Recipients →
-                </button>
+              <!-- Segment parameter: Selected Users list -->
+              <div v-if="form.targetType === 'selected'" class="space-y-3">
+                <div class="flex gap-2">
+                  <input v-model="subscriberSearch" type="text" :placeholder="t('notifications.searchSubscribers')" class="input-base flex-1 text-xs" />
+                </div>
+                <div class="max-h-48 overflow-y-auto border border-slate-100 dark:border-slate-800 rounded-xl divide-y divide-slate-100 dark:divide-slate-800">
+                  <label
+                    v-for="s in filteredSubscribers"
+                    :key="s.id"
+                    class="flex items-center justify-between p-2.5 hover:bg-slate-50 dark:hover:bg-slate-800/40 cursor-pointer text-xs"
+                  >
+                    <div class="flex items-center gap-2">
+                      <input type="checkbox" :value="s.telegramId" v-model="selectedSubscribers" class="rounded text-amber-600 focus:ring-amber-500" />
+                      <div>
+                        <p class="font-bold text-slate-800 dark:text-slate-200">{{ s.firstName }} {{ s.lastName }}</p>
+                        <span class="text-[10px] text-slate-400">@{{ s.username || 'no-username' }}</span>
+                      </div>
+                    </div>
+                    <span class="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500">
+                      {{ (s.preferredLanguage || 'am').toUpperCase() }}
+                    </span>
+                  </label>
+                </div>
+                <p class="text-[10px] text-slate-400 font-semibold">
+                  {{ t('notifications.selectedCount', { count: selectedSubscribers.length }) }}
+                </p>
+              </div>
+
+              <div class="flex justify-between">
+                <AppButton variant="ghost" size="sm" @click="step = 1">{{ t('notifications.back') }}</AppButton>
+                <AppButton variant="primary" size="sm" @click="estimateAudience">
+                  {{ t('notifications.continueConfirm') }}
+                </AppButton>
               </div>
             </div>
 
-            <!-- Step 3: Confirm & dispatch -->
-            <div v-if="step === 3" class="space-y-5">
-              <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-4">
-                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Campaign Summary</p>
-                <div class="grid grid-cols-2 gap-4">
+            <!-- Step 3: Confirm -->
+            <div v-if="step === 3" class="space-y-4 tab-content-enter-active">
+              <div class="p-4 rounded-xl border border-amber-200 bg-amber-50/20 dark:border-amber-900/40 dark:bg-amber-950/10 space-y-3">
+                <h4 class="font-bold text-slate-800 dark:text-slate-200 text-xs">{{ t('notifications.reviewTitle') }}</h4>
+                <div class="grid grid-cols-2 gap-2 text-xs">
                   <div>
-                    <p class="text-xs text-slate-400 mb-0.5">Recipients</p>
-                    <p class="text-xl font-bold text-slate-800 dark:text-slate-100">{{ estimate.count.toLocaleString() }}</p>
+                    <span class="text-slate-400 block text-[10px] uppercase font-bold">{{ t('notifications.labelTitle') }}</span>
+                    <span class="font-semibold text-slate-700 dark:text-slate-300">{{ form.title }}</span>
                   </div>
                   <div>
-                    <p class="text-xs text-slate-400 mb-0.5">Est. Duration</p>
-                    <p class="text-xl font-bold text-slate-800 dark:text-slate-100">~{{ estimate.duration }}s</p>
+                    <span class="text-slate-400 block text-[10px] uppercase font-bold">{{ t('notifications.labelTarget') }}</span>
+                    <span class="font-semibold text-amber-700 dark:text-amber-400 uppercase">{{ form.targetType }}</span>
                   </div>
                 </div>
-
-                <div class="flex gap-2.5 p-3 rounded-xl bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/50 text-xs text-amber-800 dark:text-amber-300">
-                  <svg class="w-4 h-4 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                  </svg>
-                  <span><strong>Rate limited</strong> to 30 messages/sec to prevent Telegram API throttling.</span>
+                <div>
+                  <span class="text-slate-400 block text-[10px] uppercase font-bold">{{ t('notifications.labelReach') }}</span>
+                  <span class="text-xs font-bold text-slate-800 dark:text-slate-200">
+                    {{ estimate !== null ? t('notifications.usersCount', { count: estimate }) : t('notifications.calculating') }}
+                  </span>
+                </div>
+                <div class="border-t border-amber-200/60 dark:border-amber-900/30 pt-2">
+                  <span class="text-slate-400 block text-[10px] uppercase font-bold mb-1">{{ t('notifications.labelPreview') }}</span>
+                  <p class="text-xs text-slate-600 dark:text-slate-300 whitespace-pre-wrap leading-relaxed">{{ form.message }}</p>
                 </div>
               </div>
 
               <div class="flex justify-between">
-                <button @click="step = 2" class="btn-ghost">← Back</button>
-                <button @click="dispatchBroadcast" :disabled="sending"
-                        class="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-500 rounded-xl shadow-md shadow-emerald-600/20 disabled:opacity-50 transition-all">
-                  <svg v-if="sending" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
-                  </svg>
-                  {{ sending ? 'Dispatching…' : 'Dispatch Campaign' }}
-                </button>
+                <AppButton variant="ghost" size="sm" @click="step = 2">{{ t('notifications.back') }}</AppButton>
+                <AppButton
+                  variant="primary"
+                  size="sm"
+                  :loading="sending"
+                  :disabled="sending || estimate === 0"
+                  @click="dispatchBroadcast"
+                >
+                  {{ sending ? t('notifications.sending') : t('notifications.sendNow') }}
+                </AppButton>
               </div>
             </div>
           </div>
 
-          <!-- ── Tips panel ─────────────────────────────────── -->
-          <div class="card p-6 space-y-4">
-            <h3 class="text-sm font-bold text-slate-700 dark:text-slate-200">Deliverability Guide</h3>
-            <div class="space-y-4 text-xs">
-              <div v-for="tip in tips" :key="tip.title">
-                <p class="font-semibold text-slate-700 dark:text-slate-300 mb-0.5">{{ tip.title }}</p>
-                <p class="text-slate-400 leading-relaxed">{{ tip.body }}</p>
+          <!-- History panel -->
+          <div class="card p-6 space-y-4 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/60">
+            <h3 class="text-sm font-bold text-slate-700 dark:text-slate-200">{{ t('notifications.history') }}</h3>
+
+            <!-- Skeleton loader -->
+            <div v-if="loadingCampaigns" class="space-y-3 animate-pulse">
+              <div v-for="i in 4" :key="i" class="p-3.5 rounded-xl border border-slate-100 dark:border-slate-800 space-y-2">
+                <div class="flex justify-between">
+                  <div class="space-y-1.5 flex-1">
+                    <div class="h-3 skeleton rounded w-2/3" />
+                    <div class="h-2.5 skeleton rounded w-1/2" />
+                  </div>
+                  <div class="h-5 w-16 skeleton rounded-full ml-2 shrink-0" />
+                </div>
+                <div class="flex justify-between">
+                  <div class="h-2.5 skeleton rounded w-20" />
+                  <div class="h-2.5 skeleton rounded w-28" />
+                </div>
+                <div class="flex justify-end">
+                  <div class="h-3 skeleton rounded w-24" />
+                </div>
+              </div>
+            </div>
+
+            <!-- Empty state -->
+            <div v-else-if="!campaigns.length" class="text-center py-10 text-xs text-slate-400">
+              {{ t('notifications.noCampaigns') }}
+            </div>
+
+            <!-- Campaign list -->
+            <div v-else class="space-y-3 max-h-[500px] overflow-y-auto pr-1">
+              <div v-for="c in campaigns" :key="c.id" class="p-3.5 rounded-xl border border-slate-100 dark:border-slate-800/60 bg-slate-50/50 dark:bg-slate-950/20 text-xs space-y-2">
+                <div class="flex justify-between items-start">
+                  <div>
+                    <h4 class="font-bold text-slate-800 dark:text-slate-200">{{ c.title }}</h4>
+                    <span class="text-[10px] text-slate-400">{{ t('notifications.byAdmin', { name: c.sentBy || 'Admin' }) }} • {{ formatDate(c.createdAt) }}</span>
+                  </div>
+                  <span class="badge" :class="campaignStatusClasses(c.status?.toLowerCase())">{{ c.status }}</span>
+                </div>
+
+                <div class="text-[10px] text-slate-500 dark:text-slate-400 flex justify-between font-mono">
+                  <span>{{ t('notifications.recipients', { count: c.totalRecipients || 0 }) }}</span>
+                  <span>{{ t('notifications.sent', { sent: c.sentCount || 0 }) }} / {{ t('notifications.failed', { failed: c.failedCount || 0 }) }}</span>
+                </div>
+
+                <div class="flex justify-end">
+                  <button @click="viewLogs(c)" class="text-[11px] font-semibold text-amber-600 hover:underline">
+                    {{ t('notifications.viewLogs') }}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <!-- ── Campaign history table ─────────────────────── -->
-        <div class="card overflow-hidden">
-          <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800">
-            <h3 class="text-sm font-bold text-slate-700 dark:text-slate-200">Campaign History</h3>
-          </div>
-          <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs">
-              <thead>
-                <tr class="border-b border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-900/50 text-slate-400 font-semibold uppercase tracking-wide">
-                  <th class="px-4 py-3">Campaign</th>
-                  <th class="px-4 py-3">Segment</th>
-                  <th class="px-4 py-3">Status</th>
-                  <th class="px-4 py-3">Recipients</th>
-                  <th class="px-4 py-3 min-w-35">Progress</th>
-                  <th class="px-4 py-3">Date</th>
-                  <th class="px-4 py-3 text-right">Logs</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
-                <tr v-if="!campaigns.length">
-                  <td colspan="7" class="px-4 py-10 text-center text-slate-400">No broadcast history yet</td>
-                </tr>
-                <tr v-else v-for="camp in campaigns" :key="camp.id" class="table-row-base">
-                  <td class="px-4 py-3 font-semibold text-slate-800 dark:text-slate-200">{{ camp.title }}</td>
-                  <td class="px-4 py-3 uppercase font-bold text-slate-400">{{ camp.targetType }}</td>
-                  <td class="px-4 py-3">
-                    <span class="badge" :class="campaignStatusClasses(camp.status)">{{ camp.status }}</span>
-                  </td>
-                  <td class="px-4 py-3 font-mono font-semibold text-slate-600 dark:text-slate-300">{{ camp.totalRecipients }}</td>
-                  <td class="px-4 py-3">
-                    <div class="flex items-center gap-2">
-                      <div class="flex-1 h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                        <div class="h-full bg-primary-500 rounded-full transition-all duration-500"
-                             :style="{ width: progress(camp) + '%' }" />
-                      </div>
-                      <span class="text-[10px] font-mono shrink-0 text-slate-400">{{ progress(camp) }}%</span>
-                    </div>
-                  </td>
-                  <td class="px-4 py-3 text-slate-400 whitespace-nowrap">{{ formatDate(camp.createdAt) }}</td>
-                  <td class="px-4 py-3 text-right">
-                    <button @click="viewLogs(camp)"
-                            class="px-3 py-1.5 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
-                      View Logs
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
         </div>
-
       </main>
-    </div>
 
-    <!-- Logs modal -->
+    <!-- Logs Modal -->
     <teleport to="body">
       <transition name="fade">
         <div v-if="selectedCampaign" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-          <div class="w-full max-w-lg max-h-[75vh] flex flex-col bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden">
-            <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-slate-800 shrink-0">
-              <h3 class="text-base font-bold text-slate-900 dark:text-slate-100">Logs — {{ selectedCampaign.title }}</h3>
-              <button @click="selectedCampaign = null" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
-                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+          <div class="modal-panel w-full max-w-lg bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl p-6 max-h-[85vh] flex flex-col">
+            <div class="flex justify-between items-center mb-4 shrink-0">
+              <h3 class="text-base font-bold text-slate-900 dark:text-slate-100">{{ t('notifications.logsTitle', { title: selectedCampaign.title }) }}</h3>
+              <button @click="selectedCampaign = null" class="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600 transition-colors" aria-label="Close">
+                <XMarkIcon class="w-7 h-7" />
               </button>
             </div>
-            <div class="flex-1 overflow-y-auto p-4 space-y-2 bg-slate-50 dark:bg-slate-950">
-              <p v-if="!logs.length" class="text-xs text-slate-400 text-center py-6">No logs available</p>
-              <div v-else v-for="log in logs" :key="log.id"
-                   class="flex justify-between text-xs font-mono p-2 rounded border border-slate-200/60 dark:border-slate-800/60">
-                <span class="text-slate-400">{{ log.chatId }}</span>
-                <span :class="log.status === 'success' ? 'text-emerald-500' : 'text-red-500'">
-                  {{ log.status === 'success' ? '✓ Delivered' : '✗ ' + log.errorMessage }}
+
+            <div class="flex-1 overflow-y-auto space-y-2 text-xs pr-1">
+              <div v-if="!logs.length" class="text-center py-8 text-slate-400">{{ t('notifications.noLogs') }}</div>
+              <div v-for="log in logs" :key="log.id" class="p-2.5 rounded-lg border border-slate-100 dark:border-slate-800 flex justify-between items-center">
+                <div>
+                  <span class="font-mono font-bold text-slate-700 dark:text-slate-300">ID: {{ log.userId || log.telegramId }}</span>
+                  <span class="block text-[10px] text-slate-400">{{ formatDate(log.sentAt) }}</span>
+                </div>
+                <span class="badge" :class="log.status === 'Success' ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'">
+                  {{ log.status }}
                 </span>
               </div>
             </div>
@@ -272,46 +253,47 @@
         </div>
       </transition>
     </teleport>
-
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, inject, computed } from 'vue';
-import Sidebar from '../components/Sidebar.vue';
-import Navbar  from '../components/Navbar.vue';
-import axios   from 'axios';
+import { ref, computed, onMounted, inject } from 'vue';
+import AppButton from '../components/AppButton.vue';
+import axios from 'axios';
+import { useI18n, useEnumI18n } from '../i18n.js';
+import { XMarkIcon } from '@heroicons/vue/24/outline';
 
-const sidebarOpen      = ref(false);
-const step             = ref(1);
-const sending          = ref(false);
-const campaigns        = ref([]);
-const logs             = ref([]);
-const selectedCampaign = ref(null);
-const showToast        = inject('showToast');
+const { t } = useI18n();
+const { categoryOptions } = useEnumI18n();
 
-const form = ref({ title: '', message: '', targetType: 'all', targetValue: '' });
-const estimate = ref({ count: 0, duration: 0 });
-
-// Selection states for target specific users
-const subscribers         = ref([]);
-const subscriberSearch    = ref('');
+const step = ref(1);
+const campaigns = ref([]);
+const loadingCampaigns = ref(true);
+const subscribers = ref([]);
 const selectedSubscribers = ref([]);
+const subscriberSearch = ref('');
+const estimate = ref(null);
+const sending = ref(false);
+const selectedCampaign = ref(null);
+const logs = ref([]);
+const showToast = inject('showToast');
 
-const segments = [
-  { value: 'all',      label: 'All Subscribers',   description: 'Send to the entire chatbot network' },
-  { value: 'active',   label: 'Active Contacts',    description: 'Only recently active subscribers' },
-  { value: 'category', label: 'Feedback Segment',   description: 'Target a specific feedback category group' },
-  { value: 'selected', label: 'Specific Users',     description: 'Select target users from a searchable list' },
-];
+const form = ref({
+  title: '',
+  message: '',
+  targetType: 'all',
+  targetValue: ''
+});
 
-const tips = [
-  { title: 'Markdown Support', body: 'Use *bold*, _italic_, and `code` to format your message.' },
-  { title: 'Targeting Strategy', body: 'Segmented messages achieve up to 4× higher engagement than mass blasts.' },
-  { title: 'Queue Processing', body: 'Campaigns run asynchronously in the background via Laravel queues.' },
-];
+// Reactively translate target segment cards
+const segments = computed(() => [
+  { value: 'all',      label: t('notifications.targetAll'),      description: t('notifications.segDescAll') },
+  { value: 'active',   label: t('notifications.targetActive'),   description: t('notifications.segDescActive') },
+  { value: 'language', label: t('notifications.targetLanguage'), description: t('notifications.segDescLanguage') },
+  { value: 'category', label: t('notifications.targetCategory'), description: t('notifications.segDescCategory') },
+  { value: 'selected', label: t('notifications.targetSelected'), description: t('notifications.segDescSelected') },
+]);
 
-// Computed to filter subscribers list in selection UI
 const filteredSubscribers = computed(() => {
   if (!subscriberSearch.value.trim()) return subscribers.value;
   const q = subscriberSearch.value.toLowerCase();
@@ -319,82 +301,85 @@ const filteredSubscribers = computed(() => {
     return (s.firstName ?? '').toLowerCase().includes(q) ||
            (s.lastName ?? '').toLowerCase().includes(q) ||
            (s.username ?? '').toLowerCase().includes(q) ||
-           String(s.telegramId ?? '').includes(q);
+           String(s.telegramId).includes(q);
   });
 });
 
 const fetchCampaigns = async () => {
+  loadingCampaigns.value = true;
   try {
     const res = await axios.get('/notifications');
-    campaigns.value = res.data;
-  } catch { showToast('Failed to load campaign history', 'error'); }
+    campaigns.value = Array.isArray(res.data) ? res.data : (res.data.data || []);
+  } catch (_) {}
+  finally { loadingCampaigns.value = false; }
 };
 
 const fetchSubscribers = async () => {
   try {
-    const res = await axios.get('/users');
-    subscribers.value = res.data;
-  } catch {
-    console.error('Failed to fetch subscribers for wizard');
-  }
+    // Fetch all users (paginated with high limit) for the 'selected' audience targeting
+    const res = await axios.get('/users', { params: { per_page: 1000 } });
+    subscribers.value = res.data?.data || res.data || [];
+  } catch (_) {}
 };
 
-const syncTargetValue = () => {
-  form.value.targetValue = selectedSubscribers.value.join(',');
-};
-
-const clearSelectedSubscribers = () => {
-  selectedSubscribers.value = [];
-  form.value.targetValue = '';
-};
-
-const estimateDelivery = async () => {
+const estimateAudience = async () => {
+  estimate.value = null;
+  step.value = 3;
   try {
     const res = await axios.post('/notifications/estimate', {
-      targetType: form.value.targetType, targetValue: form.value.targetValue,
+      targetType: form.value.targetType,
+      targetValue: form.value.targetType === 'selected' ? selectedSubscribers.value : form.value.targetValue
     });
-    estimate.value = res.data;
-    step.value = 3;
-  } catch { showToast('Failed to estimate recipients', 'error'); }
+    estimate.value = res.data.count;
+  } catch {
+    estimate.value = 0;
+  }
 };
 
 const dispatchBroadcast = async () => {
   sending.value = true;
   try {
-    await axios.post('/notifications', form.value);
-    showToast('Campaign dispatched to queue!');
+    await axios.post('/notifications', {
+      title: form.value.title,
+      message: form.value.message,
+      targetType: form.value.targetType,
+      targetValue: form.value.targetType === 'selected' ? selectedSubscribers.value : form.value.targetValue
+    });
+    showToast(t('notifications.dispatched'));
     form.value = { title: '', message: '', targetType: 'all', targetValue: '' };
     selectedSubscribers.value = [];
     step.value = 1;
     fetchCampaigns();
-  } catch { showToast('Failed to dispatch campaign', 'error'); }
-  finally { sending.value = false; }
+  } catch {
+    showToast(t('notifications.dispatchFailed'), 'error');
+  } finally {
+    sending.value = false;
+  }
 };
 
-const viewLogs = async (camp) => {
-  selectedCampaign.value = camp;
+const viewLogs = async (c) => {
+  selectedCampaign.value = c;
   try {
-    const res = await axios.get(`/notifications/${camp.id}/logs`);
-    logs.value = res.data.logs;
-  } catch { showToast('Failed to load logs', 'error'); }
+    const res = await axios.get(`/notifications/${c.id}/logs`);
+    logs.value = Array.isArray(res.data) ? res.data : (res.data.data || []);
+  } catch {
+    logs.value = [];
+  }
 };
 
-const progress = (c) => c.totalRecipients === 0 ? 100 : Math.round((c.processedRecipients / c.totalRecipients) * 100);
+const campaignStatusClasses = (status) => {
+  switch (status) {
+    case 'completed': return 'bg-emerald-50 text-emerald-600 border border-emerald-200';
+    case 'failed':    return 'bg-red-50 text-red-600 border border-red-200';
+    case 'sending':   return 'bg-blue-50 text-blue-600 border border-blue-200 animate-pulse';
+    default:          return 'bg-slate-100 text-slate-500 border border-slate-200';
+  }
+};
 
-const campaignStatusClasses = (s) => ({
-  completed: 'bg-emerald-50 text-emerald-600 border border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-800',
-  sending:   'bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-950/30 dark:text-blue-400 dark:border-blue-800 animate-pulse',
-  failed:    'bg-red-50 text-red-600 border border-red-200 dark:bg-red-950/30 dark:text-red-400 dark:border-red-800',
-  pending:   'bg-slate-100 text-slate-500 border border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700',
-}[s] ?? 'bg-slate-100 text-slate-500');
+const formatDate = (d) => d ? new Date(d).toLocaleDateString() : '';
 
-const formatDate = (d) => d ? new Date(d).toLocaleDateString() : '—';
-
-let pollTimer;
 onMounted(() => {
   fetchCampaigns();
   fetchSubscribers();
-  pollTimer = setInterval(fetchCampaigns, 10000);
 });
-onUnmounted(() => clearInterval(pollTimer));
 </script>
