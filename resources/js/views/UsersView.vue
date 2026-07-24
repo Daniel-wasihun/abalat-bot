@@ -229,7 +229,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, inject } from 'vue';
+import { ref, onMounted, onUnmounted, inject } from 'vue';
 import AppButton from '../components/AppButton.vue';
 import axios   from 'axios';
 import { useI18n, useEnumI18n } from '../i18n.js';
@@ -361,5 +361,12 @@ const getLanguageFlag = (lang) => {
 
 const formatDate = (d) => d ? new Date(d).toLocaleDateString() : '—';
 
-onMounted(fetchUsers);
+onMounted(() => {
+  fetchUsers();
+  document.addEventListener('click', handleClickOutside);
+});
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside);
+});
 </script>

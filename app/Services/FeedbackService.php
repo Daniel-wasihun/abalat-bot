@@ -46,14 +46,25 @@ class FeedbackService
         // Detect user language for a polite reply header
         $userLang   = $user['preferredLanguage'] ?? $user['language'] ?? 'am';
         $headers    = [
-            'am' => '💬 *የደቂቀ ብርሃን ሰንበት ትምህርት ቤት ምላሽ*',
-            'om' => '💬 *Deebii Mana Barumsa Dilbataa Daqiiqaa Birhaan*',
-            'en' => '💬 *Dekiqen Birhan Sunday School Response*',
+            'am' => '💬 የሰንበት ትምህርት ቤቱ ምላሽ',
+            'om' => '💬 Deebii Mana Barumsa Dilbataa',
+            'en' => '💬 Sunday School Response',
         ];
         $header = $headers[$userLang] ?? $headers['am'];
 
+        $footers    = [
+            'am' => 'ደቂቀ ብርሃን ሰንበት ትምህርት ቤት 🙏',
+            'om' => 'M.B.D. Daqiiqaa Birhaan 🙏',
+            'en' => 'Dekiqen Birhan Sunday School 🙏',
+        ];
+        $footer = $footers[$userLang] ?? $footers['am'];
+
         $telegramMessageId = isset($feedback['telegramMessageId']) ? (int) $feedback['telegramMessageId'] : null;
-        $formattedMsg      = "{$header}\n\n{$messageText}\n\n—\n🙏 *ደቂቀ ብርሃን ሰንበት ትምህርት ቤት*";
+        $formattedMsg = "{$header}\n" .
+            "————————————————————\n\n" .
+            "{$messageText}\n\n" .
+            "————————————————————\n" .
+            "{$footer}";
 
         $sent = $this->botService->sendMessage($chatId, $formattedMsg, null, $telegramMessageId);
         if (!$sent) {

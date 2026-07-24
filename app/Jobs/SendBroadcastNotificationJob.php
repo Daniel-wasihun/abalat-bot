@@ -68,15 +68,24 @@ class SendBroadcastNotificationJob implements ShouldQueue
             $userLang = $user['preferredLanguage'] ?? $user['language'] ?? 'am';
             $title    = $notification['title'] ?? 'Announcement';
 
-            $header = match($userLang) {
-                'am'    => "📢 *የደቂቀ ብርሃን ሰንበት ትምህርት ቤት ማስታወቂያ — {$title}*\n\n",
-                'om'    => "📢 *Beeksisa M.B.D. Daqiiqaa Birhaan — {$title}*\n\n",
-                default => "📢 *Dekiqen Birhan Sunday School Announcement — {$title}*\n\n",
+            $headerLabel = match($userLang) {
+                'om'    => "📢 Beeksisa",
+                'en'    => "📢 Announcement",
+                default => "📢 ማስታወቂያ",
             };
 
-            $formattedMessage = (str_starts_with($this->message, '📢') || str_starts_with($this->message, '⛪'))
-                ? $this->message
-                : $header . $this->message;
+            $footerLabel = match($userLang) {
+                'om'    => "M.B.D. Daqiiqaa Birhaan 🙏",
+                'en'    => "Dekiqen Birhan Sunday School 🙏",
+                default => "ደቂቀ ብርሃን ሰንበት ትምህርት ቤት 🙏",
+            };
+
+            $formattedMessage = "{$headerLabel}\n" .
+                "————————————————————\n" .
+                "{$title}\n\n" .
+                "{$this->message}\n" .
+                "————————————————————\n" .
+                "{$footerLabel}";
 
             // Call bot service to send message
             $success = $botService->sendMessage($chatId, $formattedMessage);

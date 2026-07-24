@@ -35,12 +35,12 @@ class TelegramBotService
     {
         $t = [
             'am' => [
-                'welcome'              => "እንኳን ወደ *ደቂቀ ብርሃን ሰንበት ትምህርት ቤት* የአስተያየት ቦት በደህና መጡ! ⛪🙏\n\nእባክዎን ከታች ካሉት አማራጮች አንዱን ይምረጡ፦",
+                'welcome'              => "ሰላም {name}👋\n\nእንኳን ወደ ኢትዮጵያ ኦርቶዶክስ ተዋሕዶ ቤተ ክርስቲያን መንበረ ብርሃን ቅድስት ስላሴ የደቂቀ ብርሃን ሰንበት ትምህርት ቤት የአስተያየት ቦት በደህና መጡ! ⛪🙏\n\nእባክዎን ከታች ካሉት አማራጮች አንዱን ይምረጡ፦",
                 'choose_lang_first'    => "🙏 *እንኳን ደህና መጡ!*\n\nወደ ደቂቀ ብርሃን ሰንበት ትምህርት ቤቱ ቦት እንኳን ደህና መጡ።\n\nእባክዎን ቋንቋ ይምረጡ / Please choose your language:",
                 'help'                 => "ℹ️ *የአጠቃቀም መመሪያ*\n\n• *📝 አስተያየት ለመስጠት* — ሃሳብ፣ ጥያቄ ወይም ጸሎት ጥያቄ ይላኩ\n• *📋 የላክኋቸው አስተያየቶች* — ያስቀደሙ አስተያየቶች\n• *🌐 ቋንቋ ቀይር* — ቋንቋ ለመቀየር\n• */help* — ይህን ጽሑፍ ለማየት",
                 'choose_category'      => "⛪ እባክዎን የሚሰጡትን አስተያየት ዓይነት ይምረጡ፦",
                 'category_selected'    => "✅ ዘርፍ፦ *{category}*\n\nእባክዎን አሁን መልዕክትዎን ይጻፉ፦\n_(ፎቶ፣ ሰነድ ወይም የድምፅ መልዕክት ማያያዝ ይቻላል)_",
-                'feedback_received'    => "✝️ *እግዚአብሔር ይባርክዎ!*\n\nአስተያየትዎ በተሳካ ሁኔታ ደርሶናል። በደቂቀ ብርሃን ሰንበት ትምህርት ቤቱ አስተዳዳሪዎች ተገምግሞ ምላሽ ይሰጥዎታል። 🙏",
+                'feedback_received'    => "✝️ እግዚአብሔር ያክብርልን!\n\nአስተያየትዎ በተሳካ ሁኔታ ደርሶናል። በደቂቀ ብርሃን ሰንበት ትምህርት ቤት አስተዳዳሪዎች ተገምግሞ ምላሽ ይሰጥዎታል። \n\nእናመሰግናለን 🙏",
                 'no_feedback'          => "📭 እስካሁን ምንም አስተያየት አልተላኩም።\n\n*📝 አስተያየት ለመስጠት* ይጫኑ!",
                 'feedback_list_title'  => "📋 *የቅርብ ጊዜ አስተያየቶችዎ፦*\n",
                 'submitted_on'         => "📅 {date} ተልኳል",
@@ -62,7 +62,7 @@ class TelegramBotService
             ],
 
             'om' => [
-                'welcome'              => "Baga Gara *Botii Yaadaa fi Gaaffii Mana Barumsa Dilbataa Mana Kiristaanaa Ortodoxii* nagaan dhuftan! ⛪🙏\n\nMaaloo filannoowwan gadii keessaa tokko filadhaa:",
+                'welcome'              => "Nagaan {name}👋\n\nBaga Gara Mana Barumsa Dilbataa Mana Kiristaanaa Ortodoxii nagaan dhuftan! ⛪🙏\n\nMaaloo filannoowwan gadii keessaa tokko filadhaa:",
                 'choose_lang_first'    => "🙏 *Baga nagaan dhuftan!*\n\nBotii Mana Barumsa Dilbataatti baga nagaan dhuftan.\n\nMaaloo qooqa filadhaa / Please choose your language:",
                 'help'                 => "ℹ️ *Qajeelfama Fayyadamaa*\n\n• *📝 Yaada Erguu* — Yaada, gaaffii ykn kadhannaa erguu\n• *📋 Yaada Koo* — Yaada kanaan dura ergitan ilaaluu\n• *🌐 Qooqa Jijjiiri* — Qooqa jijjiiruuf\n• */help* — Gargaarsa argatuuf",
                 'choose_category'      => "⛪ Maaloo gosa yaada keessanii filadhaa:",
@@ -89,7 +89,7 @@ class TelegramBotService
             ],
 
             'en' => [
-                'welcome'              => "Welcome to the *Ethiopian Orthodox Tewahedo Church Sunday School* Feedback Bot! ⛪🙏\n\nPlease select an option from the menu below:",
+                'welcome'              => "Hello {name}👋\n\nWelcome to the Ethiopian Orthodox Tewahedo Church Sunday School Feedback Bot! ⛪🙏\n\nPlease select an option from the menu below:",
                 'choose_lang_first'    => "🙏 *Welcome!*\n\nWelcome to the Sunday School Bot.\n\nPlease choose your preferred language:",
                 'help'                 => "ℹ️ *Help & Usage Guide*\n\n• *📝 Send Feedback* — Share your thoughts, questions, or prayer requests\n• *📋 My Feedback* — View your past submissions\n• *🌐 Change Language* — Switch your preferred language\n• */help* — Show this message",
                 'choose_category'      => "⛪ Please select the category for your feedback:",
@@ -285,7 +285,7 @@ class TelegramBotService
             // Clear first-start flag and send welcome
             Cache::forget("tg_first_{$telegramId}");
             $firstName = $user['firstName'] ?? '';
-            $welcome   = "ሰላም / Hello *{$firstName}*! 👋\n\n" . $trans['welcome'];
+            $welcome = str_replace('{name}', $firstName, $trans['welcome']);
             $this->sendMessage($chatId, $trans['language_changed']);
             $this->sendMessage($chatId, $welcome, $this->getMainMenuKeyboard($newLang));
             return;
@@ -310,7 +310,7 @@ class TelegramBotService
     {
         $trans = $this->getTranslations($lang);
         $name  = !empty($firstName) ? "*{$firstName}*" : '';
-        $msg   = ($name ? "ሰላም / Hello {$name}! 👋\n\n" : '') . $trans['welcome'];
+        $msg = str_replace('{name}', $name ?: '', $trans['welcome']);
         $this->sendMessage($chatId, $msg, $this->getMainMenuKeyboard($lang));
     }
 
