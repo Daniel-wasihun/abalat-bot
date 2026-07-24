@@ -66,6 +66,13 @@ class FirestoreNotificationRepository implements NotificationRepositoryInterface
         return array_values($logs);
     }
 
+    public function getLogsByUserId(string $userId): array
+    {
+        $logs = $this->firestore->collection($this->logsCollection)->where('userId', '=', $userId);
+        usort($logs, fn($a, $b) => strcmp($b['sentAt'] ?? '', $a['sentAt'] ?? ''));
+        return array_values($logs);
+    }
+
     public function getStats(): array
     {
         $all = $this->firestore->collection($this->collection)->get();

@@ -10,5 +10,6 @@ interface NotificationRepositoryInterface
     public function updateStatus(string $id, string $status, array $metrics = []): void;
     public function logDelivery(array $logData): void;
     public function getLogsByNotificationId(string $notificationId): array;
+    public function getLogsByUserId(string $userId): array;
     public function getStats(): array;
 }

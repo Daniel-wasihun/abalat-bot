@@ -64,8 +64,22 @@ class SendBroadcastNotificationJob implements ShouldQueue
                 continue;
             }
 
+            // Format message with language-tailored Sunday School header
+            $userLang = $user['preferredLanguage'] ?? $user['language'] ?? 'am';
+            $title    = $notification['title'] ?? 'Announcement';
+
+            $header = match($userLang) {
+                'am'    => "📢 *የደቂቀ ብርሃን ሰንበት ትምህርት ቤት ማስታወቂያ — {$title}*\n\n",
+                'om'    => "📢 *Beeksisa M.B.D. Daqiiqaa Birhaan — {$title}*\n\n",
+                default => "📢 *Dekiqen Birhan Sunday School Announcement — {$title}*\n\n",
+            };
+
+            $formattedMessage = (str_starts_with($this->message, '📢') || str_starts_with($this->message, '⛪'))
+                ? $this->message
+                : $header . $this->message;
+
             // Call bot service to send message
-            $success = $botService->sendMessage($chatId, $this->message);
+            $success = $botService->sendMessage($chatId, $formattedMessage);
 
             if ($success) {
                 $sentCount++;
