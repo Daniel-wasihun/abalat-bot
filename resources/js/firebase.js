@@ -34,7 +34,7 @@ export { db, isFirebaseActive };
  * If Firestore is available, it listens to collection changes.
  * Otherwise, it falls back to polling the given apiEndpoint.
  */
-export function subscribeToCollection(collectionName, apiEndpoint, callback, pollingIntervalMs = 5000) {
+export function subscribeToCollection(collectionName, apiEndpoint, callback, pollingIntervalMs = 15000) {
   if (isFirebaseActive && db) {
     try {
       const q = query(collection(db, collectionName), orderBy('createdAt', 'desc'), limit(50));
@@ -59,15 +59,24 @@ export function subscribeToCollection(collectionName, apiEndpoint, callback, pol
 }
 
 function setupPolling(apiEndpoint, callback, intervalMs) {
-  const fetchUrl = `/api/${apiEndpoint}`;
+  const cleanEndpoint = apiEndpoint.replace(/^\/?api\//, '');
+  const fetchUrl = `/api/${cleanEndpoint}`;
   let isCancelled = false;
+  let timerId = null;
 
   const poll = async () => {
     if (isCancelled) return;
+
+    const token = localStorage.getItem('admin_token');
+    if (!token) {
+      isCancelled = true;
+      return;
+    }
+
     try {
       const response = await fetch(fetchUrl, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('admin_token')}`
+          'Authorization': `Bearer ${token}`
         }
       });
       if (response.ok) {
@@ -75,11 +84,17 @@ function setupPolling(apiEndpoint, callback, intervalMs) {
         // Extract array key depending on the standard API response structure
         const arrayData = data.data || data;
         callback(arrayData);
+      } else if (response.status === 401) {
+        // Token expired or unauthorized - stop polling
+        isCancelled = true;
+        return;
       }
     } catch (e) {
       console.error('Polling failed:', e);
     } finally {
-      setTimeout(poll, intervalMs);
+      if (!isCancelled) {
+        timerId = setTimeout(poll, intervalMs);
+      }
     }
   };
 
@@ -88,5 +103,6 @@ function setupPolling(apiEndpoint, callback, intervalMs) {
   // Return unsubscribe handler
   return () => {
     isCancelled = true;
+    if (timerId) clearTimeout(timerId);
   };
 }

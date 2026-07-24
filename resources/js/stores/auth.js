@@ -4,6 +4,46 @@ import axios from 'axios';
 // Set base URL for all API requests
 axios.defaults.baseURL = '/api';
 
+// Set initial auth header if token exists
+const initialToken = localStorage.getItem('admin_token');
+if (initialToken) {
+  axios.defaults.headers.common['Authorization'] = `Bearer ${initialToken}`;
+}
+
+// Request interceptor: attach token to all requests
+axios.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('admin_token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+// Response interceptor: handle 401 Unauthorized globally
+axios.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    if (error.response && error.response.status === 401) {
+      const authStore = useAuthStore();
+      authStore.logout();
+      if (window.location.pathname !== '/login') {
+        try {
+          const { default: router } = await import('../router');
+          if (router.currentRoute.value.name !== 'Login') {
+            router.push({ name: 'Login' });
+          }
+        } catch (_) {
+          window.location.href = '/login';
+        }
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     token: localStorage.getItem('admin_token') || null,
