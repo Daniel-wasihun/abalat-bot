@@ -1,58 +1,224 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# ⛪ EOTC Sunday School Telegram Feedback & Broadcast System
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A complete, production-ready Telegram Bot and Web Dashboard built for the **Ethiopian Orthodox Tewahedo Church (EOTC) Sunday School**. This system allows the Sunday School administration to collect categorized feedback from members in three languages (Amharic, Oromifa, English), manage incoming inquiries via a beautiful admin dashboard, and broadcast messages back to specific groups of subscribers.
 
-## About Laravel
+## ✨ Key Features
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **Multi-lingual Telegram Bot**: Supports Amharic (default), Oromifa, and English. Users can switch their preferred language on the fly.
+- **EOTC Specific Categories**: Feedback is natively categorized into church-specific areas:
+  - Spiritual Education (ትምህርተ ሃይማኖትና መንፈሳዊ ትምህርት)
+  - Choir & Hymns (መዝሙርና ማኅሌት አገልግሎት)
+  - Liturgy & Service (ሥርዓተ አምልኮና ቅዳሴ)
+  - General Inquiry (አጠቃላይ ጥያቄና አስተያየት)
+- **Comprehensive Admin Dashboard**: A responsive, modern Vue 3 interface powered by Tailwind CSS v4.
+- **Broadcast Wizard**: Send rich broadcast messages (with photos or documents) to targeted segments or manually selected users.
+- **Data Persistence**: Uses Google Cloud Firestore for a scalable production database with an automatic fallback to local JSON files if the network or credentials are unavailable.
+- **Exporting**: Generate detailed PDF and CSV reports for administrative review.
+- **Asynchronous Processing**: Uses Laravel Queues to respect Telegram's strict rate limits (30 msgs/sec) during mass broadcasts.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 🛠 Tech Stack
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- **Backend**: Laravel 11, PHP 8.3
+- **Frontend**: Vue 3 (Composition API), Vite, Tailwind CSS v4
+- **Database**: Google Cloud Firestore (via `google/cloud-firestore`) & Local JSON Storage
+- **Authentication**: Custom JWT implementation for the admin panel
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## 💻 Development Setup
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Follow these steps to set up the project on your local machine for development.
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+### 1. Prerequisites
+- **PHP** >= 8.2
+- **Composer** (PHP Package Manager)
+- **Node.js** >= 18 & **npm**
+- **Telegram Bot Token** (Get it from [@BotFather](https://t.me/BotFather))
 
-## Agentic Development
+### 2. Installation
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
-
+Clone the repository and install dependencies:
 ```bash
-composer require laravel/boost --dev
+git clone <repository-url>
+cd Bot
 
-php artisan boost:install
+# Install PHP dependencies
+composer install
+
+# Install JS dependencies
+npm install
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+### 3. Environment Configuration
 
-## Contributing
+Copy the `.env.example` file to `.env`:
+```bash
+cp .env.example .env
+php artisan key:generate
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Update your `.env` file with your specific variables. Pay special attention to:
+```env
+# Telegram Bot
+TELEGRAM_BOT_TOKEN="your-bot-token"
+TELEGRAM_WEBHOOK_URL="https://your-ngrok-url.ngrok.app/api/telegram/webhook"
 
-## Code of Conduct
+# Firebase (Optional for local dev, will fallback to local JSON if omitted)
+FIREBASE_PROJECT_ID="abalat-guday"
+FIREBASE_CREDENTIALS_PATH="storage/app/firebase-credentials.json"
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+# Admin Auth Secret
+JWT_SECRET="generate-a-long-random-string-here"
+```
 
-## Security Vulnerabilities
+### 4. Running the Development Servers
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+You will need multiple terminal tabs to run the backend, frontend, and queue worker.
 
-## License
+**Tab 1: Start the Laravel Backend server**
+```bash
+php artisan serve
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+**Tab 2: Start the Vite Frontend server**
+```bash
+npm run dev
+```
+
+**Tab 3: Start the Laravel Queue Worker (for broadcasting messages)**
+```bash
+php artisan queue:work
+```
+
+### 5. Setting up the Telegram Webhook (Local)
+To test the Telegram bot locally, you must expose your local server to the internet using a tool like [ngrok](https://ngrok.com/).
+```bash
+ngrok http 8000
+```
+Copy the secure `https` URL from ngrok, paste it into `TELEGRAM_WEBHOOK_URL` in your `.env`, and register the webhook:
+```bash
+php artisan telegram:set-webhook
+```
+
+### 6. Accessing the Dashboard
+Go to `http://localhost:8000` in your browser. 
+If the database is fresh, the system will automatically seed a Super Admin user upon your first login attempt.
+- **Default Email:** `admin@example.com`
+- **Default Password:** `password123`
+
+*(Change this password immediately after logging in!)*
+
+---
+
+## 🚀 Production Deployment
+
+Deploying to production requires optimizing the application and ensuring strict security measures.
+
+### 1. Server Requirements
+Ensure your production server (e.g., Ubuntu VPS, AWS EC2, DigitalOcean Droplet) has PHP, Composer, Node.js, and a web server like Nginx or Apache installed.
+
+### 2. Prepare the Environment
+Pull the code to your production server and install dependencies without development packages:
+```bash
+composer install --optimize-autoloader --no-dev
+npm install
+```
+
+### 3. Build Frontend Assets
+Compile the Vue application and Tailwind CSS for production:
+```bash
+npm run build
+```
+
+### 4. Configure Production `.env`
+Ensure your `.env` is set for production:
+```env
+APP_ENV=production
+APP_DEBUG=false
+APP_URL=https://your-production-domain.com
+
+# Ensure this points to your actual domain
+TELEGRAM_WEBHOOK_URL="https://your-production-domain.com/api/telegram/webhook"
+```
+Place your actual Firebase JSON credentials at `storage/app/firebase-credentials.json` to enable cloud persistence.
+
+### 5. Optimize Laravel
+Cache the configuration, routes, and views to maximize performance:
+```bash
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+```
+
+### 6. Register the Production Webhook
+Tell Telegram where to send live updates:
+```bash
+php artisan telegram:set-webhook
+```
+
+### 7. Run the Queue Worker as a Daemon
+In production, you should **not** run `php artisan queue:work` manually. Instead, use a process monitor like **Supervisor** to keep the queue worker running permanently in the background.
+
+Create a Supervisor configuration file (`/etc/supervisor/conf.d/bot-worker.conf`):
+```ini
+[program:bot-worker]
+process_name=%(program_name)s_%(process_num)02d
+command=php /path/to/your/Bot/artisan queue:work --sleep=3 --tries=3 --max-time=3600
+autostart=true
+autorestart=true
+stopasgroup=true
+killasgroup=true
+user=www-data
+numprocs=1
+redirect_stderr=true
+stdout_logfile=/path/to/your/Bot/storage/logs/worker.log
+stopwaitsecs=3600
+```
+Update supervisor to read the new config:
+```bash
+sudo supervisorctl reread
+sudo supervisorctl update
+sudo supervisorctl start bot-worker:*
+```
+
+### 8. Web Server Configuration (Nginx Example)
+Point your web server to the `public` directory.
+```nginx
+server {
+    listen 80;
+    server_name your-production-domain.com;
+    root /path/to/your/Bot/public;
+
+    add_header X-Frame-Options "SAMEORIGIN";
+    add_header X-Content-Type-Options "nosniff";
+
+    index index.php;
+
+    charset utf-8;
+
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+
+    location = /favicon.ico { access_log off; log_not_found off; }
+    location = /robots.txt  { access_log off; log_not_found off; }
+
+    error_page 404 /index.php;
+
+    location ~ \.php$ {
+        fastcgi_pass unix:/var/run/php/php8.3-fpm.sock;
+        fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
+        include fastcgi_params;
+    }
+
+    location ~ /\.(?!well-known).* {
+        deny all;
+    }
+}
+```
+
+## 🔒 Security Best Practices
+- **Restrict Storage Permissions**: Ensure the `storage` and `bootstrap/cache` directories are writable by the web server (e.g., `chmod -R 775 storage bootstrap/cache` and `chown -R www-data:www-data storage bootstrap/cache`).
+- **Protect Credentials**: Never commit your `.env` or `storage/app/firebase-credentials.json` files to source control. They are already in `.gitignore`.
+- **Change Default Admin**: Update the default `admin@example.com` password immediately after your first login on production.
+- **SSL Certificate**: Telegram requires webhooks to run over HTTPS. Ensure your production domain is secured with an SSL certificate (e.g., Let's Encrypt).
