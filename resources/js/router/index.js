@@ -39,6 +39,12 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
+    path: '/users/:id',
+    name: 'UserProfile',
+    component: () => import('../views/UserProfileView.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
     path: '/notifications',
     name: 'Notifications',
     component: () => import('../views/NotificationsView.vue'),
@@ -61,7 +67,7 @@ const router = createRouter({
   routes
 });
 
-router.beforeEach(async (to, from, next) => {
+router.beforeEach((to, from) => {
   const authStore = useAuthStore();
   
   // Set auth header in Axios if token exists
@@ -70,11 +76,11 @@ router.beforeEach(async (to, from, next) => {
   }
 
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
-    next({ name: 'Login' });
-  } else if (to.meta.guest && authStore.isAuthenticated) {
-    next({ name: 'Dashboard' });
-  } else {
-    next();
+    return { name: 'Login' };
+  }
+  
+  if (to.meta.guest && authStore.isAuthenticated) {
+    return { name: 'Dashboard' };
   }
 });
 

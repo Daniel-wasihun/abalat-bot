@@ -3,7 +3,7 @@
     <div class="min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 transition-colors duration-200">
 
       <!-- Toast Notification Layer -->
-      <div class="fixed top-4 right-4 z-50 flex flex-col gap-2 w-full max-w-sm pointer-events-none">
+      <div class="fixed top-4 right-4 z-[9999] flex flex-col gap-2 w-full max-w-sm pointer-events-none">
         <transition-group name="toast">
           <div
             v-for="toast in toasts"
@@ -24,25 +24,38 @@
         </transition-group>
       </div>
 
-      <!-- Router View with page fade transition -->
-      <router-view v-slot="{ Component }">
+      <!-- Guest routes (Login, ForgotPassword, ResetPassword) — no layout shell -->
+      <router-view v-if="isGuestRoute" v-slot="{ Component }">
         <transition name="fade" mode="out-in">
           <component :is="Component" />
         </transition>
       </router-view>
 
+      <!-- Authenticated routes — Sidebar + Navbar stay permanently mounted -->
+      <AppLayout v-else />
+
     </div>
   </div>
 </template>
 
+
 <script setup>
-import { ref, onMounted, provide } from 'vue';
+import { ref, computed, onMounted, provide } from 'vue';
+import { useRoute } from 'vue-router';
+import AppLayout from './components/AppLayout.vue';
 import {
   CheckCircleIcon,
   ExclamationCircleIcon,
   InformationCircleIcon,
   ExclamationTriangleIcon,
 } from '@heroicons/vue/24/outline';
+
+const route = useRoute();
+
+// Guest-only routes — these render without the Sidebar/Navbar shell
+const GUEST_ROUTES = ['Login', 'ForgotPassword', 'ResetPassword'];
+const isGuestRoute = computed(() => GUEST_ROUTES.includes(route.name));
+
 
 // ── Dark Mode ──────────────────────────────────────────────
 const isDarkMode = ref(localStorage.getItem('theme') === 'dark');
