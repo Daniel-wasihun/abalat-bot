@@ -15,6 +15,10 @@ class RoleSeeder extends Seeder {
      * Exact format:               'module.action'
      */
     public function run(): void {
+        $this->command->info('Cleaning up unrelated roles...');
+        // Force delete any roles that do not belong to Senbet School
+        Role::whereNotIn('slug', ['super-admin', 'admin', 'teacher', 'student'])->forceDelete();
+
         $this->command->info('Seeding hierarchical roles...');
 
         $roles = [
@@ -35,37 +39,14 @@ class RoleSeeder extends Seeder {
                 'description'     => 'System administrator',
                 'permissions'     => [
                     'dashboard.*',
-                    'books.*',
                     'users.view',
                     'users.create',
                     'users.edit',
                     'roles.*',
                     'permissions.*',
-                    'borrows.*',
-                    'returns.*',
-                    'fines.*',
-                    'spot_readings.*',
-                    'circulation_policies.*',
-                    'libraries.*',
-                    'shelves.*',
-                    'categories.*',
                     'reports.view',
                     'security.view',
                     'settings.*',
-                    'cataloging.*',
-                    'campuses.*',
-                    'colleges.*',
-                    'schools.*',
-                    'academic_years.*',
-                    'courses.*',
-                    'lecture_notes.*',
-                    'course_outlines.*',
-                    'worksheets.*',
-                    'video_lectures.*',
-                    'assignments.*',
-                    'reference_books.*',
-                    'wishlists.*',
-                    // Attendance: full access including reporting and deletion
                     'attendance.view',
                     'attendance.create',
                     'attendance.edit',
@@ -75,206 +56,46 @@ class RoleSeeder extends Seeder {
             ],
 
             // ─────────────────────────────────────────────
-            // LIBRARY DIRECTOR – strategic oversight
-            // ─────────────────────────────────────────────
-            'library_director' => [
-                'hierarchy_level' => 75,
-                'description'     => 'Strategic management and library leadership',
-                'permissions'     => [
-                    'dashboard.view',
-                    'reports.view',
-                    'books.view',
-                    'wishlists.*',
-                    'libraries.view',
-                    'borrows.view',
-                    'fines.view',
-                    'attendance.view',
-                    'attendance.report',
-                ],
-            ],
-
-            // ─────────────────────────────────────────────
-            // MANAGER – operational oversight
-            // ─────────────────────────────────────────────
-            'manager' => [
-                'hierarchy_level' => 65,
-                'description'     => 'Library manager',
-                'permissions'     => [
-                    'dashboard.view',
-                    'books.*',
-                    'borrows.*',
-                    'returns.*',
-                    'fines.*',
-                    'spot_readings.*',
-                    'circulation_policies.*',
-                    'libraries.view',
-                    'shelves.*',
-                    'categories.*',
-                    'reports.view',
-                    'lecture_notes.*',
-                    'course_outlines.*',
-                    'worksheets.*',
-                    'video_lectures.*',
-                    'assignments.*',
-                    'reference_books.*',
-                    'cataloging.*',
-                    'wishlists.*',
-                    // Manager: full attendance access including reports and deletion
-                    'attendance.view',
-                    'attendance.create',
-                    'attendance.edit',
-                    'attendance.delete',
-                    'attendance.report',
-                ],
-            ],
-
-            // ─────────────────────────────────────────────
-            // ACQUISITION MANAGER – manages library acquisitions
-            // ─────────────────────────────────────────────
-            'acquisition_manager' => [
-                'hierarchy_level' => 60,
-                'description'     => 'Manages library acquisitions',
-                'permissions'     => [
-                    'dashboard.view',
-                    'books.view',
-                    'books.create',
-                    'books.edit',
-                    'books.delete',
-                    'cataloging.*',
-                    'wishlists.*',
-                    'circulation_policies.view',
-                    'libraries.view',
-                    'shelves.view',
-                    'categories.view',
-                    'reports.view',
-                ],
-            ],
-
-            // ─────────────────────────────────────────────
-            // WISHLIST ADMINISTRATOR – full wishlist management
-            // ─────────────────────────────────────────────
-            'wishlist_administrator' => [
-                'hierarchy_level' => 55,
-                'description'     => 'Strategic management of library acquisition wishlist',
-                'permissions'     => [
-                    'dashboard.view',
-                    'wishlists.*',
-                    'books.view',
-                    'categories.view',
-                    'libraries.view',
-                ],
-            ],
-
-            // ─────────────────────────────────────────────
-            // LIBRARIAN – day-to-day operations
-            // ─────────────────────────────────────────────
-            'librarian' => [
-                'hierarchy_level' => 40,
-                'description'     => 'Library staff',
-                'permissions'     => [
-                    'dashboard.view',
-                    'books.view',
-                    'books.create',
-                    'books.edit',
-                    'borrows.view',
-                    'borrows.create',
-                    'borrows.edit',
-                    'returns.view',
-                    'returns.create',
-                    'returns.edit',
-                    'fines.view',
-                    'spot_readings.view',
-                    'spot_readings.create',
-                    'spot_readings.edit',
-                    'libraries.view',
-                    'shelves.view',
-                    'shelves.create',
-                    'shelves.edit',
-                    'categories.view',
-                    'lecture_notes.view',
-                    'course_outlines.view',
-                    'worksheets.view',
-                    'video_lectures.view',
-                    'assignments.view',
-                    'reference_books.view',
-                    'cataloging.*',
-                    'wishlists.*',
-                    // Librarian: can log and view attendance, can delete within 2 min, CANNOT generate reports
-                    'attendance.view',
-                    'attendance.create',
-                    'attendance.delete',
-                ],
-            ],
-
-            // ─────────────────────────────────────────────
-            // TEACHER – academic material management
+            // TEACHER – Sunday School Teacher
             // ─────────────────────────────────────────────
             'teacher' => [
                 'hierarchy_level' => 20,
-                'description'     => 'Teacher / Academic staff',
+                'description'     => 'Sunday School Teacher',
                 'permissions'     => [
-                    'books.view',
-                    'borrows.view',
-                    'borrows.create',
-                    'lecture_notes.*',
-                    'course_outlines.*',
-                    'worksheets.*',
-                    'video_lectures.*',
-                    'assignments.*',
-                    'reference_books.*',
-                    'categories.view',
-                    'libraries.view',
-                    'shelves.view',
-                    'campuses.view',
-                    'colleges.view',
-                    'schools.view',
-                    'academic_years.view',
-                    'courses.view',
-                    'wishlists.view',
-                    'wishlists.create',
-                    'wishlists.edit',
-                    'wishlists.delete',
+                    'dashboard.view',
+                    'attendance.view',
+                    'attendance.create',
                 ],
             ],
 
             // ─────────────────────────────────────────────
-            // STUDENT – read-only access
+            // STUDENT – Sunday School Student
             // ─────────────────────────────────────────────
             'student' => [
                 'hierarchy_level' => 10,
-                'description'     => 'University student',
+                'description'     => 'Sunday School Student',
                 'permissions'     => [
-                    'books.view',
-                    'borrows.view',
-                    'lecture_notes.view',
-                    'course_outlines.view',
-                    'worksheets.view',
-                    'video_lectures.view',
-                    'assignments.view',
-                    'reference_books.view',
-                    'categories.view',
-                    'libraries.view',
-                    'shelves.view',
-                    'campuses.view',
-                    'colleges.view',
-                    'schools.view',
-                    'academic_years.view',
-                    'courses.view',
+                    'dashboard.view',
+                    'attendance.view',
                 ],
             ],
         ];
 
         foreach ($roles as $name => $data) {
             $enName = ucfirst(str_replace('_', ' ', $name));
+            $slug   = Str::slug($name);
 
-            $role = Role::whereRaw("name->>'en' = ?", [$enName])->withTrashed()->first();
+            // Find by slug first (most reliable), fall back to name match
+            $role = Role::withTrashed()->where('slug', $slug)->first()
+                ?? Role::withTrashed()->whereRaw("name->>'en' = ?", [$enName])->first();
 
             $baseData = [
-                'name' => [
+                'slug'            => $slug,          // always enforce correct slug
+                'name'            => [
                     'en' => $enName,
                     'am' => $enName,
                 ],
-                'description' => [
+                'description'     => [
                     'en' => $data['description'],
                     'am' => $data['description'],
                 ],
@@ -283,14 +104,17 @@ class RoleSeeder extends Seeder {
                 'is_active'       => true,
             ];
 
-            if ($role) {
-                $role->update($baseData);
-                if ($role->trashed()) {
-                    $role->restore();
+            $role = Role::withoutEvents(function () use ($role, $baseData) {
+                if ($role) {
+                    $role->update($baseData);
+                    if ($role->trashed()) {
+                        $role->restore();
+                    }
+                    return $role;
+                } else {
+                    return Role::create($baseData);
                 }
-            } else {
-                $role = Role::create(array_merge(['slug' => Str::slug($name)], $baseData));
-            }
+            });
 
             $permissionIds = collect();
 

@@ -47,17 +47,16 @@ class UserSeeder extends Seeder {
                 ]);
             }
 
-            $prefix = $userType === 'student' ? 'STU' : ($userType === 'teacher' ? 'TCH' : 'STF');
+            $prefix = strtoupper(substr($userType, 0, 2));
             $digits = rand(10000000, 99999999);
 
             UserInfo::updateOrCreate(
                 ['user_id' => $user->id],
                 [
-                    'user_university_id' => $prefix . $digits,
-                    'user_type' => $userType,
+                    'registration_id' => 'SB' . $digits,
                     'gender' => collect(['male', 'female'])->random(),
                     'phone_number' => '+251' . collect(['7', '9'])->random() . str_pad(rand(0, 99999999), 8, '0', STR_PAD_LEFT),
-                    'date_of_birth' => Carbon::now()->subYears(rand($userType === 'student' ? 18 : 25, 50))->format('Y-m-d'),
+                    'date_of_birth' => Carbon::now()->subYears(rand(18, 50))->format('Y-m-d'),
                     'address' => 'Addis Ababa, Ethiopia',
                 ]
             );
@@ -73,6 +72,36 @@ class UserSeeder extends Seeder {
             'super_admin',
             null,
             'staff'
+        );
+
+        // Create Admin User
+        $createFullUser(
+            'admin@lms.com',
+            'School Administrator',
+            'password123',
+            'admin',
+            null,
+            'staff'
+        );
+
+        // Create Teacher User
+        $createFullUser(
+            'teacher@lms.com',
+            'Sunday School Teacher',
+            'password123',
+            'teacher',
+            null,
+            'teacher'
+        );
+
+        // Create Student User
+        $createFullUser(
+            'student@lms.com',
+            'Sunday School Student',
+            'password123',
+            'student',
+            null,
+            'student'
         );
 
         $this->command->info('Users seeded successfully!');
