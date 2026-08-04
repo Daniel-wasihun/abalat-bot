@@ -14,23 +14,25 @@ use App\Services\BackMessage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Helpers\Response;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class RoleController extends Controller {
-    public function __construct() {
-        $this->middleware(function ($request, $next) {
-            /** @var \App\Models\User $auth */
-            $auth = Auth::user();
-            if ($auth && ($auth->hasPermission('roles.view') || $auth->hasPermission('users.view'))) {
-                return $next($request);
-            }
-            return Response::_403(BackMessage::get('forbidden'));
-        })->only('index');
-
-        $this->middleware(PermissionHelper::roles()->view())->only('show');
-        $this->middleware(PermissionHelper::roles()->create())->only('store');
-        $this->middleware(PermissionHelper::roles()->edit())->only(['update', 'syncToUsers']);
-        $this->middleware(PermissionHelper::roles()->delete())->only(['destroy', 'bulkDelete']);
-        $this->middleware(PermissionHelper::roles()->edit())->only(['update', 'syncToUsers', 'toggleStatus', 'bulkToggle']);
+class RoleController extends Controller implements HasMiddleware {
+    public static function middleware(): array {
+        return [
+            new Middleware(function ($request, $next) {
+                /** @var \App\Models\User $auth */
+                $auth = Auth::user();
+                if ($auth && ($auth->hasPermission('roles.view') || $auth->hasPermission('users.view'))) {
+                    return $next($request);
+                }
+                return Response::_403(BackMessage::get('forbidden'));
+            }, only: ['index']),
+            new Middleware(PermissionHelper::roles()->view(), only: ['show']),
+            new Middleware(PermissionHelper::roles()->create(), only: ['store']),
+            new Middleware(PermissionHelper::roles()->edit(), only: ['update', 'syncToUsers', 'toggleStatus', 'bulkToggle']),
+            new Middleware(PermissionHelper::roles()->delete(), only: ['destroy', 'bulkDelete']),
+        ];
     }
 
     /**

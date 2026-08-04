@@ -28,22 +28,26 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class UserController extends Controller {
+class UserController extends Controller implements HasMiddleware {
     use \App\Traits\InteractsWithCsv;
 
-    public function __construct() {
-        $this->middleware(PermissionHelper::users()->view())->only(['index', 'show']);
-        $this->middleware(PermissionHelper::users()->create())->only(['store', 'import', 'downloadTemplate']);
-        $this->middleware(PermissionHelper::users()->edit())->only([
-            'update',
-            'assignRole',
-            'grantPermission',
-            'revokePermission',
-            'syncPermissions',
-            'bulkAction'
-        ]);
-        $this->middleware(PermissionHelper::users()->delete())->only(['destroy']);
+    public static function middleware(): array {
+        return [
+            new Middleware(PermissionHelper::users()->view(), only: ['index', 'show']),
+            new Middleware(PermissionHelper::users()->create(), only: ['store', 'import', 'downloadTemplate']),
+            new Middleware(PermissionHelper::users()->edit(), only: [
+                'update',
+                'assignRole',
+                'grantPermission',
+                'revokePermission',
+                'syncPermissions',
+                'bulkAction',
+            ]),
+            new Middleware(PermissionHelper::users()->delete(), only: ['destroy']),
+        ];
     }
 
     /**
@@ -82,16 +86,10 @@ class UserController extends Controller {
                     ->orWhere('name->am', 'ilike', "%{$search}%")
                     ->orWhere('email', 'ilike', "%{$search}%")
                     ->orWhereHas('info', function ($qi) use ($search) {
-                        $qi->where('user_university_id', 'ilike', "%{$search}%");
+                        $qi->where('registration_id', 'ilike', "%{$search}%");
                     });
             });
         })
-            ->when($request->user_type, function ($query, $type) {
-                $types = is_array($type) ? $type : explode(',', $type);
-                $query->whereHas('info', function ($q) use ($types) {
-                    $q->whereIn('user_type', $types);
-                });
-            })
             ->when($request->status, function ($query, $status) {
                 if ($status === 'active') {
                     $query->where('is_active', true);
@@ -183,8 +181,7 @@ class UserController extends Controller {
 
             // 4. Create User Info
             $userInfoData = [
-                'user_university_id' => $data['user_university_id'],
-                'user_type'          => $data['user_type'] ?? Type::STUDENT,
+                'registration_id'    => $data['registration_id'],
                 'gender'             => $data['gender'] ?? null,
                 'phone_number'       => $data['phone_number'] ?? null,
                 'date_of_birth'      => $data['date_of_birth'] ?? null,
@@ -245,8 +242,7 @@ class UserController extends Controller {
                 // Prepare User Info fields
                 $userInfoData = [];
                 $infoFields = [
-                    'user_university_id',
-                    'user_type',
+                    'registration_id',
                     'gender',
                     'phone_number',
                     'date_of_birth',
@@ -281,7 +277,7 @@ class UserController extends Controller {
                     $user->info()->updateOrCreate(
                         ['user_id' => $user->id],
                         array_merge(
-                            ['user_university_id' => 'TEMP-' . Str::random(8)], // Fallback for create
+                            ['registration_id' => 'TEMP-' . Str::random(8)], // Fallback for create
                             $userInfoData
                         )
                     );
@@ -607,16 +603,15 @@ class UserController extends Controller {
     public function import(Request $request) {
         return $this->importFromCsvAsync($request, [
             'type' => 'user_import',
-            'required_columns' => ['name', 'email', 'user_university_id', 'gender'],
+            'required_columns' => ['name', 'email', 'registration_id', 'gender'],
             'validation_rules' => [
                 'role' => 'required|exists:roles,slug',
             ],
             'attributes' => [
                 'name' => BackMessage::get('attributes.name'),
                 'email' => BackMessage::get('attributes.email'),
-                'user_university_id' => BackMessage::get('attributes.user_university_id'),
+                'registration_id' => BackMessage::get('attributes.registration_id'),
                 'gender' => BackMessage::get('attributes.gender'),
-                'user_type' => BackMessage::get('attributes.user_type'),
                 'phone_number' => BackMessage::get('attributes.phone_number'),
                 'date_of_birth' => BackMessage::get('attributes.date_of_birth'),
                 'address' => BackMessage::get('attributes.address'),
@@ -632,7 +627,7 @@ class UserController extends Controller {
      * Process single row for User import (called by Job)
      */
     public function processImportRow(array $data, int $rowNum, array $context = []) {
-        $data['user_type'] = $data['user_type'] ?? \App\Constants\Type::STUDENT;
+        $data['gender'] = strtolower($data['gender'] ?? 'male');
 
         \Illuminate\Support\Facades\Validator::make(
             $data,
@@ -652,8 +647,7 @@ class UserController extends Controller {
         ]);
 
         $user->info()->create([
-            'user_university_id' => $data['user_university_id'],
-            'user_type' => $data['user_type'],
+            'registration_id' => $data['registration_id'],
             'gender' => strtolower($data['gender']),
             'phone_number' => !empty($data['phone_number']) ? '+251' . $data['phone_number'] : null,
             'date_of_birth' => $data['date_of_birth'] ?? null,
@@ -699,8 +693,8 @@ class UserController extends Controller {
     public function downloadTemplate() {
         return $this->downloadCsvTemplate(
             'users_import_template',
-            ['name', 'email', 'user_university_id', 'gender', 'phone_number', 'user_type', 'date_of_birth', 'address'],
-            ['Daniel Wasihun', 'daniel@etsub.qmt', 'WDU123456', 'male', '911223344', 'student', '2000-01-01', 'Addis Ababa']
+            ['name', 'email', 'registration_id', 'gender', 'phone_number', 'date_of_birth', 'address'],
+            ['Daniel Wasihun', 'daniel@etsub.qmt', 'SB123456', 'male', '911223344', '2000-01-01', 'Addis Ababa']
         );
     }
 

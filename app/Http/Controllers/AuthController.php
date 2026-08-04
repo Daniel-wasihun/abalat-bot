@@ -47,8 +47,7 @@ class AuthController extends Controller implements HasMiddleware {
 
                 // Create User Info
                 $userInfoData = [
-                    'user_university_id' => $request->user_university_id,
-                    'user_type'          => $request->user_type ?? Type::STUDENT,
+                    'registration_id'    => $request->registration_id,
                     'gender'             => $request->gender,
                     'phone_number'       => $request->phone_number,
                     'date_of_birth'      => $request->date_of_birth,
@@ -349,8 +348,7 @@ class AuthController extends Controller implements HasMiddleware {
             } else {
                 // Determine sensible defaults if missing
                 $createData = [
-                    'user_university_id' => 'EXT-' . $user->id . '-' . mt_rand(1000, 9999),
-                    'user_type' => 'student', // Admin can change this later
+                    'registration_id' => 'EXT-' . $user->id . '-' . mt_rand(1000, 9999),
                     'gender' => $data['gender'] ?? 'male',
                     'date_of_birth' => $infoData['date_of_birth'] ?? null,
                     'address' => $infoData['address'] ?? null,

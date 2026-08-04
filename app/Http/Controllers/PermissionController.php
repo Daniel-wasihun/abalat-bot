@@ -15,23 +15,26 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Helpers\Response;
 use App\Services\BackMessage;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class PermissionController extends Controller {
-    public function __construct() {
-        $this->middleware(function ($request, $next) {
-            /** @var \App\Models\User $auth */
-            $auth = Auth::user();
-            if ($auth && ($auth->hasPermission('permissions.view') ||
-                $auth->hasPermission('users.edit') ||
-                $auth->hasPermission('roles.edit'))) {
-                return $next($request);
-            }
-            return Response::_403(BackMessage::get('forbidden'));
-        })->only('index');
-
-        $this->middleware(PermissionHelper::permissions()->create())->only('store');
-        $this->middleware(PermissionHelper::permissions()->edit())->only(['update', 'toggleStatus', 'bulkToggle']);
-        $this->middleware(PermissionHelper::permissions()->delete())->only(['destroy', 'bulkDelete']);
+class PermissionController extends Controller implements HasMiddleware {
+    public static function middleware(): array {
+        return [
+            new Middleware(function ($request, $next) {
+                /** @var \App\Models\User $auth */
+                $auth = Auth::user();
+                if ($auth && ($auth->hasPermission('permissions.view') ||
+                    $auth->hasPermission('users.edit') ||
+                    $auth->hasPermission('roles.edit'))) {
+                    return $next($request);
+                }
+                return Response::_403(BackMessage::get('forbidden'));
+            }, only: ['index', 'options']),
+            new Middleware(PermissionHelper::permissions()->create(), only: ['store']),
+            new Middleware(PermissionHelper::permissions()->edit(), only: ['update', 'toggleStatus', 'bulkToggle']),
+            new Middleware(PermissionHelper::permissions()->delete(), only: ['destroy', 'bulkDelete']),
+        ];
     }
 
     /**
