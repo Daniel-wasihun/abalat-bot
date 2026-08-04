@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Repositories\Contracts\FeedbackRepositoryInterface;
 use App\Repositories\Contracts\UserRepositoryInterface;
-use App\Services\FirestoreService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Str;
 
@@ -13,14 +12,12 @@ class FeedbackService
     public function __construct(
         protected FeedbackRepositoryInterface $feedbackRepo,
         protected UserRepositoryInterface     $userRepo,
-        protected TelegramBotService          $botService,
-        protected FirestoreService            $firestoreService
+        protected TelegramBotService          $botService
     ) {}
 
     /**
      * Send an admin reply to a user via Telegram and persist it to:
      *  1. The feedback document's `replies` array (for the dashboard UI)
-     *  2. The `feedbackReplies` Firestore collection (for spec compliance)
      */
     public function replyToFeedback(string $id, string $messageText, string $authorName, string $adminId = 'admin'): array
     {
@@ -71,37 +68,8 @@ class FeedbackService
             throw new \Exception('Failed to send message via Telegram Bot API. Please check the bot token and user chat ID.');
         }
 
-        // ── Build reply record ────────────────────────────────
-        $replyId  = (string) Str::uuid();
-        $replyDoc = [
-            'id'         => $replyId,
-            'feedbackId' => $id,
-            'adminId'    => $adminId,
-            'author'     => $authorName,
-            'message'    => $messageText,
-            'createdAt'  => now()->toIso8601String(),
-        ];
-
-        // ── 1. Update feedback document's replies array ───────
-        $existing = $this->feedbackRepo->findById($id);
-        $replies  = $existing['replies'] ?? [];
-        $replies[] = $replyDoc;
-
-        $this->firestoreService
-            ->collection('feedback')
-            ->doc($id)
-            ->update([
-                'replies'   => $replies,
-                'status'    => 'Resolved',
-                'updatedAt' => now()->toIso8601String(),
-            ]);
-
-        // ── 2. Write to separate feedbackReplies collection ───
-        $this->firestoreService
-            ->collection('feedbackReplies')
-            ->add($replyDoc);
-
-        return $this->feedbackRepo->findById($id);
+        // ── Persist using repository ────────────
+        return $this->feedbackRepo->addReply($id, $messageText, $authorName, $adminId);
     }
 
     public function getFilteredFeedback(array $filters = []): array
