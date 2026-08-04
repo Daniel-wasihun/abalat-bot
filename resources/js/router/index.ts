@@ -13,6 +13,12 @@ import { useLanguageStore } from "@/stores/languageStore";
  */
 const userManagementRoutes: RouteRecordRaw[] = [
     {
+        path: "users",
+        name: "users",
+        meta: { title: "nav.users", permission: "users.view" },
+        component: () => import("@/Views/UserManagement/UsersView.vue"),
+    },
+    {
         path: "roles",
         name: "roles",
         meta: { title: "nav.roles", permission: "roles.view" },
