@@ -68,7 +68,7 @@ export const useAuthStore = defineStore("auth", () => {
 
     const setAuth = (newToken: string, userData: any, sessionId?: string) => {
         token.value = newToken;
-        Cookies.set("access_token", newToken, { expires: 30, sameSite: "Lax" });
+        Cookies.set("access_token", newToken, { expires: 30, sameSite: "Lax", path: "/" });
 
         // ⚡ CRITICAL: Set session ID BEFORE Echo reconnects.
         // Echo's channel subscription triggers POST /broadcasting/auth, which runs
@@ -80,6 +80,7 @@ export const useAuthStore = defineStore("auth", () => {
             Cookies.set("current_session_id", sessionId, {
                 expires: 30,
                 sameSite: "Lax",
+                path: "/"
             });
         } else if (userData?.sessions) {
             const current = userData.sessions.find((s: any) => s.is_current);
@@ -88,6 +89,7 @@ export const useAuthStore = defineStore("auth", () => {
                 Cookies.set("current_session_id", current.session_id, {
                     expires: 30,
                     sameSite: "Lax",
+                    path: "/"
                 });
             }
         }
@@ -152,6 +154,7 @@ export const useAuthStore = defineStore("auth", () => {
                         Cookies.set("current_session_id", current.session_id, {
                             expires: 30,
                             sameSite: "Lax",
+                            path: "/"
                         });
                     }
                 }
@@ -179,8 +182,8 @@ export const useAuthStore = defineStore("auth", () => {
             token.value = null;
             user.value = null;
             currentSessionId.value = null;
-            Cookies.remove("access_token");
-            Cookies.remove("current_session_id");
+            Cookies.remove("access_token", { path: "/" });
+            Cookies.remove("current_session_id", { path: "/" });
 
             if (typeof echo.disconnect === "function") {
                 echo.disconnect();

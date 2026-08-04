@@ -276,6 +276,16 @@ export const useUserStore = defineStore(
             filters[key] = value;
         };
 
+        const handleSort = (key: string) => {
+            if (filters.sort_by === key) {
+                filters.sort_order = filters.sort_order === "asc" ? "desc" : "asc";
+            } else {
+                filters.sort_by = key;
+                filters.sort_order = "desc";
+            }
+            fetchUsers(1, true);
+        };
+
         const resetFilters = () => {
             const isDefault =
                 filters.sort_by === "" &&
@@ -828,6 +838,7 @@ export const useUserStore = defineStore(
             searchUsers,
             activeImports,
             clearCache,
+            handleSort,
 
         };
     },

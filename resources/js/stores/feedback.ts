@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import axios from 'axios';
+import apiClient from '@/api/apiClient';
 
 // ─────────────────────────────────────────────
 //  Types
@@ -50,6 +50,8 @@ interface Filters {
     language: string;
     priority: string;
     status: string;
+    sort_by?: string;
+    sort_order?: 'asc' | 'desc';
 }
 
 interface FeedbackState {
@@ -142,6 +144,17 @@ export const useFeedbackStore = defineStore('feedback', {
             this.fetchFeedback(true);
         },
 
+        handleSort(key: string): void {
+            if (this.filters.sort_by === key) {
+                this.filters.sort_order = this.filters.sort_order === 'asc' ? 'desc' : 'asc';
+            } else {
+                this.filters.sort_by = key;
+                this.filters.sort_order = 'desc'; // Default to descending
+            }
+            this.pagination.current_page = 1;
+            this.fetchFeedback(true);
+        },
+
         async fetchFeedback(forceRefresh = false): Promise<void> {
             const key = this.activeKey;
 
@@ -166,7 +179,7 @@ export const useFeedbackStore = defineStore('feedback', {
             this.loading = true;
             this.error = null;
 
-            const request = axios.get('/bot/feedback', {
+            const request = apiClient.get('/bot/feedback', {
                 params: {
                     page: this.pagination.current_page,
                     per_page: this.pagination.per_page,
@@ -196,14 +209,14 @@ export const useFeedbackStore = defineStore('feedback', {
             key: string,
             value: string
         ): Promise<void> {
-            await axios.put(`/bot/feedback/${id}/${key}`, { [key]: value });
+            await apiClient.put(`/bot/feedback/${id}/${key}`, { [key]: value });
             const item = this.feedbackList.find((f) => f.id === id);
             if (item) (item as any)[key] = value;
             invalidateCache();
         },
 
         async addNote(id: string, noteText: string): Promise<NoteItem[]> {
-            const res = await axios.post(`/bot/feedback/${id}/notes`, {
+            const res = await apiClient.post(`/bot/feedback/${id}/notes`, {
                 note: noteText,
             });
             const item = this.feedbackList.find((f) => f.id === id);
@@ -216,7 +229,7 @@ export const useFeedbackStore = defineStore('feedback', {
             id: string,
             replyText: string
         ): Promise<FeedbackItem> {
-            const res = await axios.post(`/bot/feedback/${id}/reply`, {
+            const res = await apiClient.post(`/bot/feedback/${id}/reply`, {
                 message: replyText,
             });
             const updated: FeedbackItem = res.data.feedback;
@@ -227,7 +240,7 @@ export const useFeedbackStore = defineStore('feedback', {
         },
 
         async deleteFeedback(id: string): Promise<void> {
-            await axios.delete(`/bot/feedback/${id}`);
+            await apiClient.delete(`/bot/feedback/${id}`);
             this.feedbackList = this.feedbackList.filter((f) => f.id !== id);
             invalidateCache();
         },
