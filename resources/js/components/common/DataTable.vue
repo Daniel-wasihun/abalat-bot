@@ -147,14 +147,16 @@ const handleScroll = () => {
 
     <div
       ref="scrollContainer"
-      class="overflow-auto custom-scrollbar relative flex-1"
+      class="custom-scrollbar relative flex-1"
+      :class="items.length ? 'overflow-auto' : 'overflow-x-hidden overflow-y-auto'"
       style="max-height: calc(100vh - 200px)"
       @scroll="handleScroll">
       <!-- High-Priority Header Injection Slot -->
       <slot name="header-top" />
 
       <table
-        class="w-full text-left text-sm text-main-text min-w-max border-collapse">
+        class="w-full text-left text-sm text-main-text border-collapse"
+        :class="items.length ? 'min-w-max' : 'min-w-full table-fixed'">
         <thead
           class="sticky top-0 z-40 bg-card-bg/95 backdrop-blur-md border-b border-card-border text-sm font-normal text-main-text/90 capitalize tracking-[0.15em] "
           style="transition: transform 200ms ease, opacity 200ms ease"
@@ -287,7 +289,7 @@ const handleScroll = () => {
               "
               class="px-6 py-16 text-center">
               <div
-                class="flex flex-col items-center text-main-text/50">
+                class="flex flex-col items-center justify-center text-main-text/50 sticky left-0 right-0 w-full max-w-xl mx-auto">
                 <component
                   :is="emptyIcon || SearchX"
                   class="w-12 h-12 text-main-text/20 mb-3" />
