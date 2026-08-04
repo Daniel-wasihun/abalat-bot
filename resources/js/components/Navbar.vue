@@ -97,24 +97,24 @@
       <transition name="fade">
         <div v-if="showProfileModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
           <div class="w-full max-w-md bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl p-6">
-            <h3 class="text-lg font-bold text-slate-900 dark:text-slate-100 mb-5">Edit Profile</h3>
+            <h3 class="text-lg font-bold text-slate-900 dark:text-slate-100 mb-5">{{ t('profile.editProfile') }}</h3>
             <form @submit.prevent="saveProfile" class="space-y-4">
               <div>
-                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Name</label>
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">{{ t('profile.name') }}</label>
                 <input v-model="profileForm.name" type="text" required class="input-base" />
               </div>
               <div>
-                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Email Address</label>
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">{{ t('profile.emailAddress') }}</label>
                 <input v-model="profileForm.email" type="email" required class="input-base" />
               </div>
               <div>
-                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Avatar Image URL</label>
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">{{ t('profile.avatarImageUrl') }}</label>
                 <input v-model="profileForm.avatar" type="url" placeholder="https://..." class="input-base" />
               </div>
               <div class="flex justify-end gap-3 pt-2">
                 <button type="button" @click="showProfileModal = false" class="btn-ghost">{{ t('common.cancel') }}</button>
                 <button type="submit" :disabled="isSaving" class="btn-primary">
-                  {{ isSaving ? t('common.saving') : t('common.save') + ' Profile' }}
+                  {{ isSaving ? t('common.saving') : t('profile.saveChanges') }}
                 </button>
               </div>
             </form>
@@ -128,24 +128,24 @@
       <transition name="fade">
         <div v-if="showPasswordModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
           <div class="w-full max-w-md bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl p-6">
-            <h3 class="text-lg font-bold text-slate-900 dark:text-slate-100 mb-5">Change Password</h3>
+            <h3 class="text-lg font-bold text-slate-900 dark:text-slate-100 mb-5">{{ t('profile.changePassword') }}</h3>
             <form @submit.prevent="savePassword" class="space-y-4">
               <div>
-                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Current Password</label>
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">{{ t('profile.currentPassword') }}</label>
                 <input v-model="passwordForm.current" type="password" required class="input-base" />
               </div>
               <div>
-                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">New Password</label>
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">{{ t('profile.newPassword') }}</label>
                 <input v-model="passwordForm.new" type="password" required class="input-base" />
               </div>
               <div>
-                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Confirm New Password</label>
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">{{ t('profile.confirmNewPassword') }}</label>
                 <input v-model="passwordForm.confirm" type="password" required class="input-base" />
               </div>
               <div class="flex justify-end gap-3 pt-2">
                 <button type="button" @click="showPasswordModal = false" class="btn-ghost">{{ t('common.cancel') }}</button>
                 <button type="submit" :disabled="isSaving" class="btn-primary">
-                  {{ isSaving ? t('common.saving') : 'Update Password' }}
+                  {{ isSaving ? t('common.saving') : t('profile.updatePassword') }}
                 </button>
               </div>
             </form>

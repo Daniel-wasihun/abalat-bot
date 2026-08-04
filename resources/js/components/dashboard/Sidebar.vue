@@ -192,6 +192,14 @@ interface MenuGroup {
   condition?: () => boolean;
 }
 
+const isSuperAdmin = computed(() => {
+  const u = authStore.user as any;
+  if (!u) return false;
+  if (u.is_super_admin) return true;
+  const slug = (u.role?.slug || '').toLowerCase().replace(/[\s_]/g, '-');
+  return ['super-admin', 'superadmin'].includes(slug);
+});
+
 const menuGroups: MenuGroup[] = [
   {
     name: "nav.main",
@@ -200,7 +208,7 @@ const menuGroups: MenuGroup[] = [
         name: "dashboard",
         icon: LayoutDashboard,
         to: "/dashboard",
-        condition: () => perms.dashboard.canView.value,
+        condition: () => isSuperAdmin.value || perms.dashboard.canView.value,
       },
     ],
   },
@@ -211,48 +219,53 @@ const menuGroups: MenuGroup[] = [
         name: "nav.feedback",
         icon: MessageSquare,
         to: "/dashboard/telegram-bot/feedback",
-        condition: () => perms.bot.canView.value,
+        condition: () => isSuperAdmin.value || perms.bot.canView.value,
       },
       {
         name: "nav.bot_users",
         icon: Users,
         to: "/dashboard/telegram-bot/users",
-        condition: () => perms.bot.canManage?.value ?? authStore.isStaff,
+        condition: () => isSuperAdmin.value || perms.bot.canManage?.value || authStore.isStaff,
       },
       {
         name: "nav.notifications",
         icon: Bell,
         to: "/dashboard/telegram-bot/notifications",
-        condition: () => perms.bot.canNotify?.value ?? authStore.isStaff,
+        condition: () => isSuperAdmin.value || perms.bot.canNotify?.value || authStore.isStaff,
       },
       {
         name: "nav.bot_settings",
         icon: Settings,
         to: "/dashboard/telegram-bot/settings",
-        condition: () => perms.bot.canManage?.value ?? authStore.isStaff,
+        condition: () => isSuperAdmin.value || perms.bot.canManage?.value || authStore.isStaff,
       },
     ],
   },
   {
     name: "nav.system",
-    condition: () => authStore.isStaff,
+    condition: () => isSuperAdmin.value || authStore.isStaff,
     items: [
       {
         name: "nav.user_management",
         icon: ShieldCheck,
         to: "/dashboard/system/user-management/roles",
         condition: () =>
-          perms.roles.canView.value || perms.permissions.canView.value,
+          isSuperAdmin.value || perms.roles.canView.value || perms.permissions.canView.value,
         children: [
+          {
+            name: "nav.users",
+            to: "/dashboard/system/user-management/users",
+            condition: () => isSuperAdmin.value || perms.users.canView.value,
+          },
           {
             name: "nav.roles",
             to: "/dashboard/system/user-management/roles",
-            condition: () => perms.roles.canView.value,
+            condition: () => isSuperAdmin.value || perms.roles.canView.value,
           },
           {
             name: "nav.permissions",
             to: "/dashboard/system/user-management/permissions",
-            condition: () => perms.permissions.canView.value,
+            condition: () => isSuperAdmin.value || perms.permissions.canView.value,
           },
         ],
       },
