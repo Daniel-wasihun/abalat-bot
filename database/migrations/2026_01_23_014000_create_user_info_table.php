@@ -12,8 +12,7 @@ return new class extends Migration {
         Schema::create('user_info', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->unique()->constrained()->cascadeOnDelete();
-            $table->string('user_university_id')->unique();
-            $table->enum('user_type', ['student', 'teacher', 'staff'])->default('student');
+            $table->string('registration_id')->unique();
             $table->enum('gender', ['male', 'female']);
             $table->string('phone_number')->nullable();
             $table->date('date_of_birth')->nullable();
@@ -23,8 +22,6 @@ return new class extends Migration {
             $table->text('suspension_reason')->nullable();
             $table->timestamps();
             $table->softDeletes();
-
-            $table->index('user_type');
         });
     }
 
