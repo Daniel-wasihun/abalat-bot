@@ -150,10 +150,8 @@ const getRoleStyles = (role: any) => {
  <span
  class="px-3 py-1.5 rounded-xl bg-brand-blue/5 text-brand-blue text-[13px] font-normal border border-brand-blue/10 tracking-wide font-mono shrink-0 whitespace-nowrap">
  #{{
- user.university_id ||
- user.info?.user_university_id ||
+ user.info?.registration_id ||
  user.id_number ||
- user.employee_id ||
  "N/A"
  }}
  </span>

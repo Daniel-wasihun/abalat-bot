@@ -291,29 +291,12 @@ const hasExpiringAccess = computed(
  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
  <div
  v-for="(val, label) in {
- 'user.university_id': {
+ 'user.registration_id': {
  value:
- user.info?.user_university_id ||
+ user.info?.registration_id ||
  user.info?.id_number ||
- user.info?.employee_id ||
  user.university_id,
  icon: Hash,
- },
- 'user.account_type': {
- value: user.info?.user_type
- ? localize(
- userStore.userTypes[
- user.info.user_type
- ],
- currentLanguage,
- ) || $tr('type.' + user.info.user_type)
- : null,
- icon:
- user.info?.user_type === 'student'
- ? UserIcon
- : user.info?.user_type === 'teacher'
- ? GraduationCap
- : LayoutGrid,
  },
  'user.gender': {
  value: user.info?.gender

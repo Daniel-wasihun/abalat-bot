@@ -12,7 +12,6 @@ import ProfileTab from "./UserEditTabs/ProfileTab.vue";
 import RoleTab from "./UserEditTabs/RoleTab.vue";
 import PermissionsTab from "./UserEditTabs/PermissionsTab.vue";
 import ConfirmActionModal from "@/components/common/ConfirmActionModal.vue";
-import ScheduleModal from "@/components/common/ScheduleModal.vue";
 
 import { useLanguageStore } from "@/stores/languageStore";
 
@@ -39,7 +38,6 @@ const {
  activeTab,
  showConfirmModal,
  loading,
- showScheduleModal,
  scheduleForm,
  errors,
  syncState,
@@ -173,12 +171,5 @@ watch(
  :loading="loading"
  @close="showConfirmModal = false"
  @confirm="submitAction" />
-
- <ScheduleModal
- :show="showScheduleModal"
- :form="scheduleForm"
- :submitting="loading"
- @close="showScheduleModal = false"
- @submit="updateSchedule" />
  </Modal>
 </template>

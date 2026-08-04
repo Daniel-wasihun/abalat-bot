@@ -18,8 +18,7 @@ export function useUserEditLogic(props: { user: any }, emit: any, $tr: any) {
     const profileForm = ref<Record<string, any>>({
         name: "",
         email: "",
-        user_university_id: "",
-        user_type: "",
+        registration_id: "",
         phone_number: "",
         gender: "",
         date_of_birth: "",
@@ -55,9 +54,15 @@ export function useUserEditLogic(props: { user: any }, emit: any, $tr: any) {
     const syncState = (user: any) => {
         if (!user) {
             profileForm.value = {
-                name: "", email: "", user_university_id: "",
-                user_type: "", phone_number: "", gender: "",
-                date_of_birth: "", address: "", is_active: true, role: "",
+                name: "",
+                email: "",
+                registration_id: "",
+                phone_number: "",
+                gender: "",
+                date_of_birth: "",
+                address: "",
+                is_active: true,
+                role: "",
             };
             selectedRole.value = "";
             selectedPermissions.value = [];
@@ -68,8 +73,7 @@ export function useUserEditLogic(props: { user: any }, emit: any, $tr: any) {
         profileForm.value = {
             name: localize(user.name, languageStore.currentLanguage) || "",
             email: user.email || "",
-            user_university_id: user.info?.user_university_id || "",
-            user_type: user.info?.user_type || user.user_type || "",
+            registration_id: user.info?.registration_id || "",
             phone_number: user.info?.phone_number || "",
             gender: (user.info?.gender || "").toLowerCase(),
             date_of_birth: user.info?.date_of_birth || "",

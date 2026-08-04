@@ -12,19 +12,13 @@ import {
  Save,
  Calendar,
  Check,
- X,
- Pencil,
- Users,
  Shield,
- GraduationCap,
  User,
- Library,
  Phone,
  Mail,
  UserSquare2,
  MapPin,
  XCircle,
- Info,
 } from "lucide-vue-next";
 import FormSelect from "@/components/common/FormSelect.vue";
 import Button from "@/components/common/Button.vue";
@@ -66,24 +60,6 @@ const handleRemoveAvatar = () => emit("remove-avatar");
 const clearFieldError = (field: string) => emit("clear-field-error", field);
 const openConfirm = () => emit("open-confirm", "profile");
 
-const userTypeOptions = computed<{ label: string; value: any; icon: any }[]>(
- () => [
- { label: String($tr("filter.select_type")), value: "", icon: Users },
- ...Object.entries(userStore.userTypes).map(([val, label]) => ({
- label: localize(label, currentLanguage.value) as string,
- value: val,
- icon:
- val === "student"
- ? User
- : val === "teacher"
- ? GraduationCap
- : Users,
- })),
- ],
-);
-
-
-
 const roleOptions = computed<{ label: string; value: any; icon: any }[]>(() => [
  { label: String($tr("filter.select_role")), value: "", icon: Shield },
  ...userStore.allRoles.map((role: any) => ({
@@ -92,8 +68,6 @@ const roleOptions = computed<{ label: string; value: any; icon: any }[]>(() => [
  icon: Shield,
  })),
 ]);
-
-
 
 const genderOptions = computed(() => [
  { value: 'male', label: $tr('user.male') },
@@ -162,19 +136,22 @@ const genderOptions = computed(() => [
  @input="clearFieldError('email')" />
 
  <FormField
- v-model="profileForm.user_university_id"
+ v-model="profileForm.registration_id"
  :label="$tr('user.id_number')"
- :placeholder="$tr('user.university_id')"
+ placeholder="SB123456"
  required
  :icon="UserSquare2"
- :error="errors.user_university_id"
- @input="clearFieldError('user_university_id')" />
+ :error="errors.registration_id"
+ @input="clearFieldError('registration_id')" />
 
  <FormSelect v-if="!user"
  v-model="profileForm.role"
  :options="roleOptions"
  :icon="Shield"
- :label="$tr('role.role')" />
+ required
+ :label="$tr('role.role')"
+ :error="errors.role"
+ @change="clearFieldError('role')" />
  </div>
  </div>
 
@@ -182,20 +159,7 @@ const genderOptions = computed(() => [
 
  <!-- Secondary Information Grid -->
  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-x-6 gap-y-5 text-left items-end">
- <!-- Row 1: Organizational -->
- <div class="lg:col-span-4">
- <FormSelect
- v-model="profileForm.user_type"
- :options="userTypeOptions"
- :label="$tr('user.user_type')"
- required
- :icon="Users"
- :error="errors.user_type"
- @change="clearFieldError('user_type')" />
- </div>
-
-
-
+ <!-- Row 1: Gender & Contact -->
  <div class="lg:col-span-4">
  <FormRadioGroup
  v-model="profileForm.gender"

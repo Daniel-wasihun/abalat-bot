@@ -18,7 +18,7 @@ export const createProfileSchema = (withParams: any) =>
             .string()
             .min(1, "validation.required")
             .email("validation.email"),
-        user_university_id: z
+        registration_id: z
             .string()
             .min(1, "validation.required")
             .regex(
@@ -30,7 +30,6 @@ export const createProfileSchema = (withParams: any) =>
                     d_max: ID_MAX_DIGITS,
                 }),
             ),
-        user_type: z.string().min(1, "validation.required"),
         phone_number: z
             .string()
             .nullable()
@@ -45,7 +44,7 @@ export const createProfileSchema = (withParams: any) =>
             .refine((val) => ["male", "female"].includes(val.toLowerCase()), {
                 message: "validation.gender_format",
             }),
-        role: z.string().optional(),
+        role: z.string().min(1, "validation.required"),
     });
 
 export const roleSchema = z.object({
