@@ -150,7 +150,7 @@ apiClient.interceptors.response.use(
             !error.config?.url?.includes("/login") &&
             window.location.pathname !== "/login"
         ) {
-            Cookies.remove("access_token");
+            Cookies.remove("access_token", { path: "/" });
             const langStore = useLanguageStore();
 
             const isAm = Cookies.get("lang") === "am";
