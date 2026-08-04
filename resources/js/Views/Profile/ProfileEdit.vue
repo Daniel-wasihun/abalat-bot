@@ -88,8 +88,8 @@ const handleUpdateProfile = async () => {
  <div class="pb-6 font-sans">
  <div class="premium-card p-6 md:p-8 bg-card-bg border border-card-border">
  <div class="mb-6 flex items-center justify-between border-b border-card-border pb-4">
- <h2 class="text-lg font-normal text-main-text tracking-tight capitalize">Identity settings</h2>
- <span class="text-[11px] text-main-text/30 capitalize font-normal">Confidential registry</span>
+ <h2 class="text-lg font-normal text-main-text tracking-tight capitalize">{{ $tr('profile.identitySettings', 'Identity settings') }}</h2>
+ <span class="text-[11px] text-main-text/30 capitalize font-normal">{{ $tr('profile.confidentialRegistry', 'Confidential registry') }}</span>
  </div>
 
  <form @submit.prevent="handleUpdateProfile" class="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -119,7 +119,7 @@ const handleUpdateProfile = async () => {
  </label>
  </div>
  <div class="text-center">
- <p class="text-[11px] font-normal text-main-text/30 capitalize">Profile photo</p>
+ <p class="text-[11px] font-normal text-main-text/30 capitalize">{{ $tr('profile.profilePhoto', 'Profile photo') }}</p>
  <p class="text-[9px] text-main-text/20 mt-1 capitalize">Max 5mb • jpg/png</p>
  </div>
  </div>
@@ -177,7 +177,7 @@ const handleUpdateProfile = async () => {
  <template #icon>
  <Save class="w-4 h-4" />
  </template>
- <span class="capitalize">Save changes</span>
+ <span class="capitalize">{{ $tr('profile.saveChanges', 'Save changes') }}</span>
  </Button>
  </div>
  </div>

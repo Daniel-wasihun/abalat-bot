@@ -200,25 +200,25 @@ onMounted(() => {
 
  <div class="grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-3">
  <div class="space-y-0.5">
- <p class="text-[9px] font-normal text-main-text/30 capitalize tracking-wide">Location</p>
+ <p class="text-[9px] font-normal text-main-text/30 capitalize tracking-wide">{{ $tr('profile.location', 'Location') }}</p>
  <p class="text-[13px] font-normal text-main-text/70 truncate capitalize">
  {{ session.location || "Unknown" }}
  </p>
  </div>
  <div class="space-y-0.5">
- <p class="text-[9px] font-normal text-main-text/30 capitalize tracking-wide">Platform</p>
+ <p class="text-[9px] font-normal text-main-text/30 capitalize tracking-wide">{{ $tr('profile.platform', 'Platform') }}</p>
  <p class="text-[13px] font-normal text-main-text/70 truncate capitalize">
  {{ session.platform || "Unknown" }}
  </p>
  </div>
  <div class="space-y-0.5">
- <p class="text-[9px] font-normal text-main-text/30 capitalize tracking-wide">Ip address</p>
+ <p class="text-[9px] font-normal text-main-text/30 capitalize tracking-wide">{{ $tr('profile.ipAddress', 'Ip address') }}</p>
  <p class="text-[13px] font-mono font-normal text-main-text/70">
  {{ session.ip_address }}
  </p>
  </div>
  <div class="space-y-0.5">
- <p class="text-[9px] font-normal text-main-text/30 capitalize tracking-wide">Activity</p>
+ <p class="text-[9px] font-normal text-main-text/30 capitalize tracking-wide">{{ $tr('profile.activity', 'Activity') }}</p>
  <p class="text-[13px] font-normal text-main-text/70 truncate capitalize">
  {{ session.last_active_at_human }}
  </p>
@@ -238,7 +238,7 @@ onMounted(() => {
  <template #icon>
  <LogOut class="w-3.5 h-3.5" />
  </template>
- <span class="capitalize">Logout</span>
+ <span class="capitalize">{{ $tr('profile.logout', 'Logout') }}</span>
  </Button>
  </div>
  </div>

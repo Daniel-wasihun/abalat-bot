@@ -39,8 +39,8 @@ const profileData = computed(() => {
  icon: Phone,
  },
  {
- label: "user.university_id",
- value: authStore.user?.info?.user_university_id,
+ label: "user.registration_id",
+ value: authStore.user?.info?.registration_id,
  icon: Hash,
  },
  {
@@ -123,7 +123,7 @@ const profileData = computed(() => {
  <div class="w-11 h-11 rounded-xl bg-main-text/3 flex items-center justify-center border border-card-border">
  <UserCircle class="w-5 h-5 text-main-text/30" />
  </div>
- <h2 class="text-xl font-normal text-main-text tracking-tight capitalize">Personal information</h2>
+ <h2 class="text-xl font-normal text-main-text tracking-tight capitalize">{{ $tr('profile.personalInformation', 'Personal information') }}</h2>
  </div>
  </div>
 

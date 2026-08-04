@@ -72,8 +72,8 @@ const $tr = (key: string, def: string) => langStore.translate(key) || def;
  <div class="pb-6 font-sans">
  <div class="premium-card p-6 md:p-8 bg-card-bg border border-card-border">
  <div class="mb-6 flex items-center justify-between border-b border-card-border pb-4">
- <h2 class="text-lg font-normal text-main-text tracking-tight capitalize">Security credentials</h2>
- <span class="text-[11px] text-main-text/30 capitalize font-normal">Authentication safe</span>
+ <h2 class="text-lg font-normal text-main-text tracking-tight capitalize">{{ $tr('profile.securityCredentials', 'Security credentials') }}</h2>
+ <span class="text-[11px] text-main-text/30 capitalize font-normal">{{ $tr('profile.authenticationSafe', 'Authentication safe') }}</span>
  </div>
 
  <form @submit.prevent="handleChangePassword" class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
@@ -151,7 +151,7 @@ const $tr = (key: string, def: string) => langStore.translate(key) || def;
  <template #icon>
  <ShieldCheck class="w-4 h-4" />
  </template>
- <span class="capitalize">Update password</span>
+ <span class="capitalize">{{ $tr('profile.updatePassword', 'Update password') }}</span>
  </Button>
  </div>
  </form>
