@@ -12,6 +12,7 @@ interface FeedbackRepositoryInterface
     public function updatePriority(string $id, string $priority): void;
     public function updateCategory(string $id, string $category): void;
     public function addInternalNote(string $id, string $note, string $author): void;
+    public function addReply(string $id, string $message, string $author, string $adminId = null): array;
     public function delete(string $id): void;
     public function getStats(): array;
 }
