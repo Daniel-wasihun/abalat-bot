@@ -13,8 +13,7 @@ class UserInfo extends Model {
 
     protected $fillable = [
         'user_id',
-        'user_university_id',
-        'user_type',
+        'registration_id',
         'gender',
         'phone_number',
         'date_of_birth',
