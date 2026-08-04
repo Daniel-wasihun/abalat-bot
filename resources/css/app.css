@@ -1,527 +1,608 @@
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Ethiopic:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
-/* ============================================================
-   Class-based dark mode
-   ============================================================ */
-@custom-variant dark (&:where(.dark, .dark *));
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+@source '../**/*.vue';
 
-/* ============================================================
-   Design System Tokens — Ethiopian Gold/Amber Primary
-   ============================================================ */
+/**
+ * Senbet Design System
+ * --------------------------------------------------------------------------
+ * Global theme configuration using modern CSS variables and Tailwind 4 @theme.
+ * Optimization: Tokens defined here automatically generate hundreds of utility
+ * classes (text-*, bg-*, hover:*, etc.) with native opacity modifier support.
+ */
+
 @theme {
-  /* Primary — Ethiopian ecclesiastical gold / warm amber */
-  --color-primary-50:  #fffbeb;
-  --color-primary-100: #fef3c7;
-  --color-primary-200: #fde68a;
-  --color-primary-300: #fcd34d;
-  --color-primary-400: #fbbf24;
-  --color-primary-500: #f59e0b;
-  --color-primary-600: #d97706;
-  --color-primary-700: #b45309;
-  --color-primary-800: #92400e;
-  --color-primary-900: #78350f;
-  --color-primary-950: #451a03;
+    /* Site-wide Blue Scale */
+    --color-primary-50: #eff6ff;
+    --color-primary-100: #dbeafe;
+    --color-primary-200: #bfdbfe;
+    --color-primary-300: #93c5fd;
+    --color-primary-400: #60a5fa;
+    --color-primary-500: #3b82f6;
+    --color-primary-600: #2563eb;
+    --color-primary-700: #1d4ed8;
+    --color-primary-800: #1e40af;
+    --color-primary-900: #1e3a8a;
+    --color-primary-950: #172554;
 
-  /* Slate extras */
-  --color-slate-850: #1a2436;
-  --color-slate-950: #0d1117;
+    /* Typography Configuration */
+    --font-sans:
+        "Poppins", "Outfit", "Inter", "system-ui", "-apple-system", sans-serif;
+    --font-size-xs: 0.75rem; /* 12px */
+    --font-size-sm: 0.875rem; /* 14px */
+    --font-size-base: 1rem; /* 16px */
+    --font-size-lg: 1.125rem; /* 18px */
 
-  /* Typography */
-  --font-sans: 'Inter', 'Noto Sans Ethiopic', system-ui, -apple-system,
-    BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-ethiopic: 'Noto Sans Ethiopic', sans-serif;
+    /* Global Animation Tokens */
+    --animate-loading: loading 1.5s infinite ease-in-out;
+    --animate-pulse-slow: pulse-slow 2s infinite ease-in-out;
+    --animate-float-slow: floatSlow 8s ease-in-out infinite;
+    --animate-float-reverse: floatReverse 7s ease-in-out infinite;
+    --animate-fade-up: fadeInUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    --animate-shimmer: shimmer 2s infinite linear;
+    --animate-fade-in: fadeIn 1s ease-out forwards;
+    --animate-pulse-subtle: pulse-subtle 2s infinite ease-in-out;
+
+    /* Custom Shadows - Smooth and Deep */
+    --shadow-top: 0 -4px 6px -1px rgba(0, 0, 0, 0.05);
+    --shadow-premium:
+        0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05),
+        0 20px 25px -5px rgba(0, 0, 0, 0.05);
+    --shadow-accent: 0 10px 15px -3px
+        color-mix(in srgb, var(--accent) 15%, transparent);
+
+    /* Glass Effect Tokens */
+    --glass-blur: blur(16px);
+    --glass-bg: color-mix(in srgb, var(--card-bg) 95%, transparent);
+    --glass-border: color-mix(in srgb, var(--card-border) 60%, transparent);
+
+    @keyframes shimmer {
+        from {
+            transform: translateX(-100%);
+        }
+        to {
+            transform: translateX(100%);
+        }
+    }
+
+    @keyframes loading {
+        0% {
+            left: -40%;
+            width: 40%;
+        }
+        50% {
+            width: 60%;
+        }
+        100% {
+            left: 100%;
+            width: 40%;
+        }
+    }
+
+    @keyframes pulse-slow {
+        0%,
+        100% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.05);
+        }
+    }
+
+    @keyframes floatSlow {
+        0%,
+        100% {
+            transform: translate(0, 0) rotate(12deg);
+        }
+        50% {
+            transform: translate(0, -15px) rotate(12deg);
+        }
+    }
+
+    @keyframes floatReverse {
+        0%,
+        100% {
+            transform: translate(0, 0) rotate(-12deg);
+        }
+        50% {
+            transform: translate(0, 15px) rotate(-12deg);
+        }
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes float {
+        0%,
+        100% {
+            transform: translateY(0);
+        }
+        50% {
+            transform: translateY(-10px);
+        }
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+
+    @keyframes pulse-subtle {
+        0%,
+        100% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0.7;
+        }
+    }
+
+    /* Semantic Theme Mappings */
+    --color-main-bg: var(--bg-main);
+    --color-main-text: var(--text-main);
+    --color-card-bg: var(--card-bg);
+    --color-card-hover: var(--card-hover);
+    --color-card-border: var(--card-border);
+    --color-form-bg: var(--form-bg);
+    --color-input-bg: var(--input-bg);
+    --color-input-border: var(--input-border);
+    --color-accent: var(--accent);
+    --color-accent-hover: var(--accent-hover);
+    --color-accent-light: var(--accent-light);
+    --color-nav-accent: var(--nav-accent);
+    --color-nav-accent-hover: var(--nav-accent-hover);
+    --color-nav-accent-light: var(--nav-accent-light);
+
+    /* Brand-specific tokens for native utility generation */
+    --color-brand-blue: var(--brand-blue);
+    --color-brand-blue-dark: var(--brand-blue-dark);
+    --color-brand-yellow: var(--brand-yellow);
+    --color-brand-red: var(--brand-red);
+    --color-brand-green: var(--brand-green);
+    --color-brand-dark: var(--brand-dark);
+
+    /* Unified Z-Index System - Orchestrated for multi-layer stacking */
+    --z-dropdown: 11000;
+    --z-sticky: 100;
+    --z-modal: 10000;
+    --z-tooltip: 12000;
 }
 
-/* ============================================================
-   Base Layer
-   ============================================================ */
 @layer base {
-  *, *::before, *::after { box-sizing: border-box; }
+    /**
+   * Base Layer: Reset and Theme Definition
+   * -------------------------------------
+   */
 
-  html { scroll-behavior: smooth; }
+    :root {
+        color-scheme: light;
+        /* Core Light Palette */
+        --bg-body: #fafafa;
+        --bg-main: #ffffff;
+        --text-main: #0f172a;
+        --card-bg: #ffffff;
+        --card-hover: #f1f5f9;
+        --card-border: #e2e8f0;
+        --form-bg: #ffffff;
+        --input-bg: #f8fafc;
+        --input-border: rgba(0, 0, 0, 0.15);
 
-  body {
-    font-family: var(--font-sans);
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    background-color: #f8fafc;
-    color: #0f172a;
-    transition: background-color 220ms ease, color 220ms ease;
-  }
+        /* Branding & Accent definitions */
+        --accent: #0b529c;
+        --accent-hover: #083a6e;
+        --accent-light: #053c77;
+        --brand-blue: #0b529c;
+        --brand-blue-dark: #083a6e;
+        --brand-yellow: #fba81c;
+        --brand-red: #ef4444;
+        --brand-green: #10b981;
+        --brand-dark: #1e293b;
+        --calendar-filter: invert(0);
 
-  .dark body {
-    background-color: #0a0f1a;
-    color: #f1f5f9;
-  }
+        /* Navigation Specific (Match Brand Blue in Light) */
+        --nav-accent: #0b529c;
+        --nav-accent-hover: #083a6e;
+        --nav-accent-light: #053c77;
 
-  /* Ethiopic text gets proper font */
-  :lang(am), [lang="am"],
-  .font-ethiopic {
-    font-family: var(--font-ethiopic);
-  }
-}
+        /* Skeleton System */
+        --skeleton-bg: rgba(0, 0, 0, 0.04);
+        --skeleton-shimmer: rgba(0, 0, 0, 0.07);
+    }
 
-/* ============================================================
-   Keyframe Animations
-   ============================================================ */
-@keyframes shimmer {
-  0%   { background-position: -400px 0; }
-  100% { background-position: 400px 0; }
-}
+    .dark {
+        color-scheme: dark;
+        /* Core Dark Palette */
+        --bg-body: #0a0e1a;
+        --bg-main: #0a0e1a;
+        --text-main: #f1f5f9;
+        --card-bg: #141a29;
+        --card-hover: #1c2438;
+        --card-border: #1e293b;
+        --form-bg: #111624;
+        --input-bg: #1c2438;
+        --input-border: rgba(255, 255, 255, 0.15);
 
-@keyframes pulse-ring {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50%       { opacity: 0.5; transform: scale(1.15); }
-}
+        /* Dark Mode (Buttons stay Blue, Nav turns Yellow) */
+        --accent: #fba81c;
+        --accent-hover: #f59e0b;
+        --accent-light: #fbbf24;
+        --brand-blue: #0b529c;
+        --brand-blue-dark: #083a6e;
+        --brand-yellow: #fba81c;
+        --brand-red: #ef4444;
+        --brand-green: #10b981;
+        --brand-dark: #0f172a;
 
-@keyframes slide-up {
-  from { opacity: 0; transform: translateY(12px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
+        /* Navigation Specific (Brand Yellow in Dark) */
+        --nav-accent: #fba81c;
+        --nav-accent-hover: #f59e0b;
+        --nav-accent-light: #fbbf24;
 
-@keyframes slide-in-right {
-  from { opacity: 0; transform: translateX(24px); }
-  to   { opacity: 1; transform: translateX(0); }
-}
+        /* Skeleton System */
+        --skeleton-bg: rgba(255, 255, 255, 0.05);
+        --skeleton-shimmer: rgba(255, 255, 255, 0.08);
 
-@keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50%       { transform: translateY(-6px); }
-}
+        /* Calendars need inversion in dark mode */
+        --calendar-filter: invert(1);
+    }
 
-@keyframes gradient-shift {
-  0%   { background-position: 0% 50%; }
-  50%  { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
+    /* Global Body Styling */
+    body {
+        background-color: var(--bg-body);
+        color: var(--text-main);
+        font-size: 16px;
+        font-family: var(--font-sans);
+        @apply antialiased;
+    }
 
-@keyframes count-up {
-  from { opacity: 0; transform: translateY(8px) scale(0.92); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
-}
+    /* Instant Theme Switch — suppresses ALL transitions/animations on toggle.
+       Colors update exactly like the body background: immediately, zero delay.
+       Active only for one paint frame (≤16ms), so normal hover/focus
+       animations still work right after the switch. */
+    :root.theme-transitioning,
+    :root.theme-transitioning *,
+    :root.theme-transitioning *::before,
+    :root.theme-transitioning *::after {
+        transition-duration: 0ms !important;
+        transition-delay: 0ms !important;
+        animation-duration: 0ms !important;
+        animation-delay: 0ms !important;
+    }
 
-/* ============================================================
-   Animation Utility Classes
-   ============================================================ */
-.animate-slide-up        { animation: slide-up 0.35s ease-out forwards; }
-.animate-slide-in-right  { animation: slide-in-right 0.3s ease-out forwards; }
-.animate-float           { animation: float 4s ease-in-out infinite; }
-.animate-count-up        { animation: count-up 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
-.animate-gradient        {
-  background-size: 200% 200%;
-  animation: gradient-shift 4s ease infinite;
-}
+    /* View Transitions (Chrome) — skip cross-fade entirely so the theme
+       snaps instantly even with startViewTransition enabled. */
+    ::view-transition-group(root) {
+        animation-duration: 0ms;
+    }
 
-/* ============================================================
-   Skeleton / Shimmer Loader
-   ============================================================ */
-.skeleton {
-  background: linear-gradient(
-    90deg,
-    #e2e8f0 25%,
-    #f1f5f9 50%,
-    #e2e8f0 75%
-  );
-  background-size: 400px 100%;
-  animation: shimmer 1.4s ease-in-out infinite;
-  border-radius: 8px;
-}
+    ::view-transition-old(root),
+    ::view-transition-new(root) {
+        animation-duration: 0ms;
+    }
 
-.dark .skeleton {
-  background: linear-gradient(
-    90deg,
-    #1e293b 25%,
-    #334155 50%,
-    #1e293b 75%
-  );
-  background-size: 400px 100%;
-  animation: shimmer 1.4s ease-in-out infinite;
-}
+    /* Global Form Element Defaults */
+    input,
+    textarea,
+    select,
+    button {
+        font-family: inherit;
+        background-color: var(--input-bg);
+        color: var(--text-main);
+        border-color: var(--card-border);
+        cursor: pointer;
+        /* Only animate interaction properties (transform, shadow, opacity).
+           Do NOT include color/background here — that causes 500ms lag on
+           every theme switch since CSS variables update instantly but
+           transition-all animates the resulting property change. */
+        transition:
+            transform 150ms ease,
+            box-shadow 150ms ease,
+            opacity 150ms ease;
+    }
 
-/* ============================================================
-   Glassmorphism Utilities
-   ============================================================ */
-.glass {
-  background: rgba(255, 255, 255, 0.72);
-  backdrop-filter: blur(16px) saturate(180%);
-  -webkit-backdrop-filter: blur(16px) saturate(180%);
-}
-.dark .glass {
-  background: rgba(10, 15, 26, 0.80);
-  backdrop-filter: blur(16px) saturate(180%);
-  -webkit-backdrop-filter: blur(16px) saturate(180%);
-}
+    /* Browser specific autofill resets */
+    .dark input:-webkit-autofill {
+        -webkit-text-fill-color: #f1f5f9;
+        -webkit-box-shadow: 0 0 0px 1000px var(--input-bg) inset;
+        transition: background-color 5000s ease-in-out 0s;
+    }
 
-.glass-card {
-  background: rgba(255, 255, 255, 0.88);
-  backdrop-filter: blur(20px) saturate(160%);
-  -webkit-backdrop-filter: blur(20px) saturate(160%);
-  border: 1px solid rgba(226, 232, 240, 0.65);
-}
-.dark .glass-card {
-  background: rgba(15, 23, 42, 0.85);
-  backdrop-filter: blur(20px) saturate(160%);
-  -webkit-backdrop-filter: blur(20px) saturate(160%);
-  border: 1px solid rgba(51, 65, 85, 0.6);
-}
-
-/* ============================================================
-   Gradient Utilities
-   ============================================================ */
-.gradient-gold {
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #b45309 100%);
-}
-.gradient-gold-soft {
-  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-}
-.dark .gradient-gold-soft {
-  background: linear-gradient(135deg, #451a03 0%, #78350f 100%);
-}
-.gradient-hero {
-  background: linear-gradient(135deg, #0a0f1a 0%, #1a2436 40%, #451a03 100%);
-}
-.text-gradient-gold {
-  background: linear-gradient(135deg, #fbbf24, #d97706);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+    /* Native Date Picker Theme Alignment */
+    input[type="date"]::-webkit-calendar-picker-indicator {
+        cursor: pointer;
+        border-radius: 4px;
+        filter: var(--calendar-filter);
+        @apply transition-all opacity-100;
+    }
 }
 
-/* ============================================================
-   Custom Scrollbars
-   ============================================================ */
-::-webkit-scrollbar        { width: 5px; height: 5px; }
-::-webkit-scrollbar-track  { background: transparent; }
-::-webkit-scrollbar-thumb  {
-  background-color: #cbd5e1;
-  border-radius: 9999px;
-  transition: background-color 150ms;
-}
-.dark ::-webkit-scrollbar-thumb        { background-color: #334155; }
-::-webkit-scrollbar-thumb:hover         { background-color: #94a3b8; }
-.dark ::-webkit-scrollbar-thumb:hover   { background-color: #475569; }
+@layer components {
+    /**
+   * Component Layer: Complex Design Patterns
+   * ---------------------------------------
+   */
 
-/* ============================================================
-   Component Utilities
-   ============================================================ */
+    /* Modern Glassmorphism Card Effect */
+    .glass-card {
+        background-color: var(--glass-bg);
+        border-color: var(--glass-border);
+        backdrop-filter: var(--glass-blur);
+        -webkit-backdrop-filter: var(--glass-blur);
+        box-shadow: var(--shadow-premium);
+        /* No color transitions — theme variables update instantly */
+        @apply border;
+    }
 
-/* Card surface — enhanced with subtle inner glow on hover */
-.card {
-  @apply rounded-2xl border border-slate-200/70 bg-white shadow-sm
-         dark:border-slate-800/50 dark:bg-slate-900/90
-         transition-shadow duration-200;
-}
-.card:hover { box-shadow: 0 4px 24px -4px rgba(0,0,0,0.07); }
-.dark .card:hover { box-shadow: 0 4px 24px -4px rgba(0,0,0,0.40); }
+    /* Glass Header/Sidebar Base */
+    .glass-layout {
+        background-color: var(--glass-bg);
+        border-color: var(--glass-border);
+        backdrop-filter: var(--glass-blur);
+        -webkit-backdrop-filter: var(--glass-blur);
+        /* No color transitions — theme variables update instantly */
+    }
 
-/* Stat card — golden accent top border */
-.stat-card {
-  @apply rounded-2xl border border-slate-200/70 bg-white shadow-sm
-         dark:border-slate-800/50 dark:bg-slate-900/90
-         transition-shadow duration-200 p-5 flex items-center justify-between;
-  position: relative;
-  overflow: hidden;
-}
-.stat-card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, #f59e0b, #d97706);
-  border-radius: 2px 2px 0 0;
-  opacity: 0;
-  transition: opacity 200ms;
-}
-.stat-card:hover::before { opacity: 1; }
+    /* Premium Rounded Card Structure */
+    .premium-card {
+        background-color: var(--card-bg);
+        border-color: var(--card-border);
+        /* No color transition — instant theme update via CSS variables */
+        @apply border shadow-sm rounded-3xl;
+    }
 
-/* Input / Select base */
-.input-base {
-  @apply w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/80
-         text-sm text-slate-900 placeholder-slate-400
-         focus:bg-white focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none
-         dark:border-slate-700 dark:bg-slate-800/80 dark:text-slate-100 dark:placeholder-slate-500
-         dark:focus:bg-slate-900 dark:focus:border-primary-400
-         transition-all duration-150;
-}
+    /* Centralized Public Page Container */
+    .public-container {
+        @apply w-full mx-auto max-w-480 px-6 md:px-12 lg:px-20 xl:px-25;
+    }
 
-/* Badge */
-.badge {
-  @apply inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold
-         uppercase tracking-wider;
-}
+    /* Universal Protocol Submission Button Style */
+    .protocol-submit {
+        @apply flex items-center gap-3 px-12 py-4 text-white rounded-xl text-sm font-bold hover:scale-[1.02] active:scale-95 transition-all shadow-xl;
+    }
 
-/* Primary button — golden */
-.btn-primary {
-  @apply px-4 py-2 text-sm font-semibold text-white
-         rounded-lg disabled:opacity-50 disabled:cursor-not-allowed
-         transition-all duration-200;
-  background: linear-gradient(135deg, #f59e0b, #d97706);
-  box-shadow: 0 4px 14px -2px rgba(217, 119, 6, 0.35), 0 0 0 1px rgba(217,119,6,0.18);
-}
-.btn-primary:hover:not(:disabled) {
-  background: linear-gradient(135deg, #fbbf24, #f59e0b);
-  box-shadow: 0 6px 20px -2px rgba(217, 119, 6, 0.50), 0 0 0 1px rgba(245,158,11,0.3);
-  transform: translateY(-1px);
-}
-.btn-primary:active:not(:disabled) { transform: translateY(0); }
+    /* Dashboard Status Card */
+    .dashboard-stat-card {
+        @apply relative p-6 rounded-xl overflow-hidden transition-all border-2 cursor-pointer;
+    }
+    .dashboard-stat-card-success {
+        @apply bg-emerald-500/3 border-emerald-500/10 hover:bg-emerald-500/[0.06] hover:border-emerald-500/30;
+    }
+    .dashboard-stat-card-error {
+        @apply bg-rose-500/3 border-rose-500/10 hover:bg-rose-500/[0.06] hover:border-rose-500/30;
+    }
+    .dashboard-stat-card-disabled {
+        @apply bg-main-text/2 border-card-border opacity-40 cursor-not-allowed;
+    }
 
-/* Ghost button */
-.btn-ghost {
-  @apply px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100
-         dark:text-slate-300 dark:hover:bg-slate-800 rounded-lg transition-colors duration-150;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.06), 0 0 0 1px rgba(148,163,184,0.18);
-}
-.btn-ghost:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.08), 0 0 0 1px rgba(148,163,184,0.28); }
+    /* Inverted Border Radius for Navigation Tabs (Folder Style) */
+    .active-tab-curve::before,
+    .active-tab-curve::after {
+        content: "";
+        position: absolute;
+        bottom: 0px;
+        width: 20px;
+        height: 20px;
+        pointer-events: none;
+        z-index: -1;
+    }
+    .active-tab-curve::before {
+        left: -20px;
+        background:
+            radial-gradient(
+                circle at 0 0,
+                transparent 19px,
+                var(--card-border) 19.5px,
+                var(--card-border) 20px,
+                transparent 20px
+            ),
+            radial-gradient(
+                circle at 0 0,
+                transparent 19.5px,
+                var(--card-bg) 20px
+            );
+    }
+    .active-tab-curve::after {
+        right: -20px;
+        background:
+            radial-gradient(
+                circle at 100% 0,
+                transparent 19px,
+                var(--card-border) 19.5px,
+                var(--card-border) 20px,
+                transparent 20px
+            ),
+            radial-gradient(
+                circle at 100% 0,
+                transparent 19.5px,
+                var(--card-bg) 20px
+            );
+    }
 
-/* Danger button */
-.btn-danger {
-  @apply px-4 py-2 text-sm font-semibold text-red-600
-         hover:bg-red-50 dark:hover:bg-red-950/20
-         rounded-lg transition-all duration-150;
-  box-shadow: 0 1px 4px rgba(220,38,38,0.08), 0 0 0 1px rgba(220,38,38,0.15);
-}
-.btn-danger:hover {
-  box-shadow: 0 2px 8px rgba(220,38,38,0.14), 0 0 0 1px rgba(220,38,38,0.25);
-}
+    /* Smooth Layout Reflow Transitions */
+    .layout-transition {
+        transition:
+            width 0.3s ease-in-out,
+            padding-left 0.3s ease-in-out,
+            transform 0.3s ease-in-out;
+    }
 
-/* Success button */
-.btn-success {
-  @apply px-4 py-2 text-sm font-semibold text-white bg-emerald-600
-         hover:bg-emerald-500 rounded-lg
-         disabled:opacity-50 transition-all duration-150;
-  box-shadow: 0 4px 12px -2px rgba(5,150,105,0.35), 0 0 0 1px rgba(5,150,105,0.2);
-}
+    /* Primary Action Button (Standardized) */
+    .btn-primary-action {
+        @apply h-12 px-6 text-white rounded-xl shadow-xl transition-all active:scale-95 flex items-center gap-3 cursor-pointer justify-center min-w-[140px];
+        background-color: #0b529c;
+        box-shadow:
+            0 10px 15px -3px rgba(30, 58, 138, 0.1),
+            0 4px 6px -4px rgba(30, 58, 138, 0.1);
+    }
+    .btn-primary-action:hover {
+        background-color: var(--accent-hover);
+    }
+    .btn-primary-action:disabled {
+        @apply opacity-50 cursor-not-allowed active:scale-100;
+    }
 
-/* ============================================================
-   AppButton Component Styles (.app-btn)
-   ============================================================ */
+    /* Standard Premium Button */
+    .premium-button {
+        @apply flex items-center justify-center px-4 py-2 rounded-xl font-medium transition-all duration-300 active:scale-95 border cursor-pointer h-10;
+        @apply shadow-sm hover:shadow-md;
+    }
 
-/* Base — shared by all variants */
-.app-btn {
-  @apply inline-flex items-center justify-center gap-1.5 font-semibold
-         rounded-lg disabled:opacity-50 disabled:cursor-not-allowed
-         transition-all duration-200 select-none;
-  /* Clean, noticeable default ring */
-  outline: none;
-}
-.app-btn:focus-visible {
-  outline: 2px solid #f59e0b;
-  outline-offset: 2px;
-}
+    /* Premium Badge / Tag */
+    .premium-badge {
+        @apply inline-flex items-center px-2.5 py-1 rounded-xl text-xs font-normal border transition-all duration-300 select-none;
+    }
 
-/* ── Sizes ───────────────────────── */
-.app-btn--sm { @apply px-3 py-1.5 text-xs; }
-.app-btn--md { @apply px-4 py-2 text-sm; }
-.app-btn--lg { @apply px-5 py-2.5 text-base; }
+    /* Premium Input / Select field */
+    .btn-bulk-green {
+        @apply flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-bold transition-all duration-300 active:scale-95 hover:-translate-y-1 cursor-pointer shadow-lg shadow-black/10;
+        @apply bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 hover:bg-emerald-600 hover:text-white hover:shadow-lg hover:shadow-emerald-500/25;
+        svg {
+            @apply w-4.5 h-4.5 stroke-[2.5];
+        }
+    }
+    .btn-bulk-yellow {
+        @apply flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-bold transition-all duration-300 active:scale-95 hover:-translate-y-1 cursor-pointer shadow-lg shadow-black/10;
+        @apply bg-amber-500/10 text-amber-600 border border-amber-500/20 hover:bg-amber-600 hover:text-white hover:shadow-lg hover:shadow-amber-500/25;
+        svg {
+            @apply w-4.5 h-4.5 stroke-[2.5];
+        }
+    }
+    .btn-bulk-rose {
+        @apply flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-bold transition-all duration-300 active:scale-95 hover:-translate-y-1 cursor-pointer shadow-lg shadow-black/10;
+        @apply bg-rose-500/10 text-rose-600 border border-rose-500/20 hover:bg-rose-600 hover:text-white hover:shadow-lg hover:shadow-rose-500/25;
+        svg {
+            @apply w-4.5 h-4.5 stroke-[2.5];
+        }
+    }
 
-/* ── Primary (golden) ────────────── */
-.app-btn--primary {
-  @apply text-white;
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-  box-shadow:
-    0 4px 14px -2px rgba(217,119,6,0.38),
-    0 0 0 1.5px rgba(217,119,6,0.22),
-    inset 0 1px 0 rgba(255,255,255,0.18);
-}
-.app-btn--primary:hover:not(:disabled) {
-  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-  box-shadow:
-    0 6px 20px -2px rgba(217,119,6,0.52),
-    0 0 0 1.5px rgba(245,158,11,0.35),
-    inset 0 1px 0 rgba(255,255,255,0.2);
-  transform: translateY(-1px);
-}
-.app-btn--primary:active:not(:disabled) { transform: translateY(0); }
+    .premium-input {
+        @apply h-11 px-4 bg-card-bg border border-input-border rounded-xl text-sm font-normal transition-all duration-300 outline-none;
+        @apply focus:border-brand-blue/30 focus:ring-4 focus:ring-brand-blue/5 hover:border-brand-blue/20;
+    }
 
-/* ── Ghost ───────────────────────── */
-.app-btn--ghost {
-  @apply text-slate-600 dark:text-slate-300
-         hover:bg-slate-100 dark:hover:bg-slate-800;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.06), 0 0 0 1px rgba(148,163,184,0.22);
-}
-.app-btn--ghost:hover:not(:disabled) {
-  box-shadow: 0 2px 8px rgba(0,0,0,0.09), 0 0 0 1px rgba(148,163,184,0.32);
-}
-
-/* ── Danger ──────────────────────── */
-.app-btn--danger {
-  @apply text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20;
-  box-shadow: 0 1px 4px rgba(220,38,38,0.08), 0 0 0 1px rgba(220,38,38,0.18);
-}
-.app-btn--danger:hover:not(:disabled) {
-  box-shadow: 0 2px 10px rgba(220,38,38,0.15), 0 0 0 1px rgba(220,38,38,0.28);
-}
-
-/* ── Success ─────────────────────── */
-.app-btn--success {
-  @apply text-white bg-emerald-600 hover:bg-emerald-500;
-  box-shadow: 0 4px 12px -2px rgba(5,150,105,0.38), 0 0 0 1px rgba(5,150,105,0.22);
-}
-
-/* ── Outline ─────────────────────── */
-.app-btn--outline {
-  @apply text-amber-700 dark:text-amber-400
-         bg-amber-50/60 dark:bg-amber-950/20
-         hover:bg-amber-100/80 dark:hover:bg-amber-950/40;
-  box-shadow:
-    0 2px 8px rgba(245,158,11,0.12),
-    0 0 0 1.5px rgba(245,158,11,0.35);
-}
-.app-btn--outline:hover:not(:disabled) {
-  box-shadow:
-    0 4px 14px rgba(245,158,11,0.2),
-    0 0 0 1.5px rgba(245,158,11,0.5);
-  transform: translateY(-1px);
+    /* Custom Print Studio Accent - More vibrant saturated blue */
+    .btn-print-accent {
+        background-color: #1e5a99 !important;
+    }
+    .btn-print-accent:hover {
+        background-color: #164679 !important;
+    }
 }
 
-/* ── Outline Danger ──────────────── */
-.app-btn--outline-danger {
-  @apply text-red-600 dark:text-red-400
-         bg-red-50/60 dark:bg-red-950/20
-         hover:bg-red-100/80 dark:hover:bg-red-950/40;
-  box-shadow:
-    0 1px 4px rgba(220,38,38,0.08),
-    0 0 0 1.5px rgba(220,38,38,0.28);
-}
-.app-btn--outline-danger:hover:not(:disabled) {
-  box-shadow:
-    0 3px 10px rgba(220,38,38,0.15),
-    0 0 0 1.5px rgba(220,38,38,0.42);
-}
+@layer utilities {
+    /**
+   * Utility Layer: Functional Classes and Fixes
+   * -------------------------------------------
+   */
 
-/* Table row */
-.table-row-base {
-  @apply border-b border-slate-100 dark:border-slate-800/70
-         hover:bg-amber-50/30 dark:hover:bg-amber-950/10
-         transition-colors duration-100;
-}
+    /* =====================================================
+     * GLOBAL SKELETON SHIMMER SYSTEM
+     * Single source of truth for all loading states.
+     * Use .skeleton on any element to make it shimmer.
+     * ===================================================== */
+    .skeleton {
+        position: relative;
+        overflow: hidden;
+        background-color: var(--skeleton-bg);
+        border-radius: 0.5rem;
+    }
 
-/* Icon button */
-.icon-btn {
-  @apply p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100
-         dark:hover:text-slate-200 dark:hover:bg-slate-800
-         transition-all duration-150;
-}
+    .skeleton::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+            90deg,
+            transparent 0%,
+            var(--skeleton-shimmer) 50%,
+            transparent 100%
+        );
+        animation: shimmer 1.8s infinite ease-in-out;
+    }
 
-/* Section heading */
-.section-heading {
-  @apply text-xl font-bold text-slate-800 dark:text-slate-100 tracking-tight;
-}
-.section-subheading {
-  @apply text-xs text-slate-400 mt-0.5 font-medium;
-}
+    /* Standardized Custom Scrollbar Logic */
+    .custom-scrollbar {
+        scrollbar-width: thin;
+        scrollbar-color: var(--card-border) transparent;
+    }
 
-/* Divider */
-.divider {
-  @apply border-t border-slate-100 dark:border-slate-800;
-}
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
 
-/* Language badge — Ethiopian flag inspired */
-.lang-badge-am {
-  @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold
-         bg-amber-50 text-amber-700 border border-amber-200
-         dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-800;
-}
-.lang-badge-en {
-  @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold
-         bg-blue-50 text-blue-700 border border-blue-200
-         dark:bg-blue-950/30 dark:text-blue-400 dark:border-blue-800;
-}
-.lang-badge-om {
-  @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold
-         bg-emerald-50 text-emerald-700 border border-emerald-200
-         dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-800;
-}
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+    }
 
-/* ============================================================
-   Page Transitions
-   ============================================================ */
-.fade-enter-active,
-.fade-leave-active  { transition: opacity 0.18s ease; }
-.fade-enter-from,
-.fade-leave-to      { opacity: 0; }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: var(--card-border);
+        border-radius: 10px;
+        transition: background 0.3s;
+    }
 
-.page-enter-active  { animation: slide-up 0.28s ease-out; }
-.page-leave-active  { animation: slide-up 0.20s ease-in reverse; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: var(--accent);
+    }
 
-/* ============================================================
-   Toast Transition
-   ============================================================ */
-.toast-enter-active,
-.toast-leave-active { transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
-.toast-enter-from   { opacity: 0; transform: translateY(-20px) scale(0.90); }
-.toast-leave-to     { opacity: 0; transform: translateY(10px)  scale(0.92); }
+    /* Global Utility for hiding scrollbars while maintaining functionality */
+    .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
 
-/* ============================================================
-   Modal Transition
-   ============================================================ */
-.modal-enter-active,
-.modal-leave-active { transition: opacity 0.2s ease; }
-.modal-enter-from,
-.modal-leave-to     { opacity: 0; }
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
 
-.modal-enter-active .modal-panel,
-.modal-leave-active .modal-panel { transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); }
-.modal-enter-from .modal-panel   { opacity: 0; transform: scale(0.94) translateY(12px); }
-.modal-leave-to .modal-panel     { opacity: 0; transform: scale(0.96) translateY(8px); }
+    /* Reusable containers for responsive minimum viewport heights */
+    .min-h-table-viewport {
+        min-height: calc(100vh - 320px);
+    }
 
-/* ============================================================
-   Dropdown Transition
-   ============================================================ */
-.dropdown-enter-active,
-.dropdown-leave-active { transition: all 0.12s ease-out; }
-.dropdown-enter-from,
-.dropdown-leave-to     { opacity: 0; transform: scale(0.95) translateY(-4px); }
-
-/* ============================================================
-   Tab Transition
-   ============================================================ */
-.tab-content-enter-active { animation: slide-up 0.22s ease-out; }
-
-/* ============================================================
-   Focus Visible Ring
-   ============================================================ */
-:focus-visible {
-  outline: 2px solid #f59e0b;
-  outline-offset: 2px;
-  border-radius: 4px;
+    .min-h-view-container {
+        min-height: calc(100vh - 280px);
+    }
 }
 
-/* ============================================================
-   Progress Bar (broadcast)
-   ============================================================ */
-.progress-bar {
-  height: 6px;
-  border-radius: 999px;
-  background: linear-gradient(90deg, #f59e0b, #d97706, #f59e0b);
-  background-size: 200% 100%;
-  animation: shimmer 2s linear infinite;
+/* Scroll Reveal Animations */
+.reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Dynamic sidebar padding for all view wrappers */
-@media (min-width: 1024px) {
-  .lg\:pl-64 {
-    padding-left: var(--sidebar-width, 256px) !important;
-    transition: padding-left 0.2s ease;
-  }
+.reveal.active {
+    opacity: 1;
+    transform: translateY(0);
 }
 
-/* Modal panel buttons — clean flat/subtle style without noticeable shadow outlines */
-.modal-panel .app-btn,
-.modal-panel .btn-primary,
-.modal-panel .btn-ghost,
-.modal-panel .btn-danger,
-.modal-panel .btn-success {
-  box-shadow: none !important;
+.scroll-progress-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    z-index: 200;
 }
-.modal-panel .app-btn--primary,
-.modal-panel .btn-primary {
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
-  border-color: transparent !important;
-  color: #ffffff !important;
-}
-.modal-panel .app-btn--ghost,
-.modal-panel .btn-ghost {
-  border: 1px solid rgba(148, 163, 184, 0.25) !important;
+
+.scroll-progress-bar {
+    height: 100%;
+    background: linear-gradient(to right, #0b529c, #fba81c);
+    width: 0%;
 }

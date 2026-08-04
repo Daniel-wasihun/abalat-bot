@@ -35,4 +35,12 @@ return [
         ],
     ],
 
+    'verify' => [
+        'api_key' => env('FINANCE_VERIFY_API_KEY'),
+    ],
+
+    'gemini' => [
+        'key' => env('GEMINI_API_KEY'),
+    ],
+
 ];

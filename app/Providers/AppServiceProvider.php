@@ -3,36 +3,47 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use App\Repositories\Contracts\UserRepositoryInterface;
-use App\Repositories\Firestore\FirestoreUserRepository;
-use App\Repositories\Contracts\FeedbackRepositoryInterface;
-use App\Repositories\Firestore\FirestoreFeedbackRepository;
-use App\Repositories\Contracts\NotificationRepositoryInterface;
-use App\Repositories\Firestore\FirestoreNotificationRepository;
-use App\Repositories\Contracts\AdminRepositoryInterface;
-use App\Repositories\Firestore\FirestoreAdminRepository;
-use App\Repositories\Contracts\SettingRepositoryInterface;
-use App\Repositories\Firestore\FirestoreSettingRepository;
 
-class AppServiceProvider extends ServiceProvider
-{
+class AppServiceProvider extends ServiceProvider {
     /**
      * Register any application services.
      */
-    public function register(): void
-    {
-        $this->app->singleton(UserRepositoryInterface::class, FirestoreUserRepository::class);
-        $this->app->singleton(FeedbackRepositoryInterface::class, FirestoreFeedbackRepository::class);
-        $this->app->singleton(NotificationRepositoryInterface::class, FirestoreNotificationRepository::class);
-        $this->app->singleton(AdminRepositoryInterface::class, FirestoreAdminRepository::class);
-        $this->app->singleton(SettingRepositoryInterface::class, FirestoreSettingRepository::class);
+    public function register(): void {
+        \Illuminate\Database\Eloquent\Builder::macro('chronological', function () {
+            /** @var \Illuminate\Database\Eloquent\Builder $this */
+            /** @var \Illuminate\Database\Eloquent\Model $model */
+            $model = $this->getModel();
+            if ($model instanceof \Illuminate\Database\Eloquent\Model && $model->usesTimestamps()) {
+                return $this->orderByDesc($model->getUpdatedAtColumn())
+                    ->orderByDesc($model->getCreatedAtColumn());
+            }
+            return $this->orderByDesc($model->getKeyName());
+        });
     }
 
     /**
      * Bootstrap any application services.
      */
-    public function boot(): void
-    {
-        //
+    public function boot(): void {
+        // Define Rate Limiters
+        $this->configureRateLimiting();
+    }
+
+    /**
+     * Configure the rate limiters for the application.
+     */
+    protected function configureRateLimiting(): void {
+        \Illuminate\Support\Facades\RateLimiter::for('api', function (\Illuminate\Http\Request $request) {
+            return \Illuminate\Cache\RateLimiting\Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
+        });
+
+        \Illuminate\Support\Facades\RateLimiter::for('auth', function (\Illuminate\Http\Request $request) {
+            return \Illuminate\Cache\RateLimiting\Limit::perMinute(5)->by($request->ip())->response(function () {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Too many attempts. Please try again in a minute.',
+                ], 429);
+            });
+        });
     }
 }

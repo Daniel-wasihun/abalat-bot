@@ -1,224 +1,66 @@
-# ⛪ EOTC Sunday School Telegram Feedback & Broadcast System
+# Senbet School Feedback System
 
-A complete, production-ready Telegram Bot and Web Dashboard built for the **Ethiopian Orthodox Tewahedo Church (EOTC) Sunday School**. This system allows the Sunday School administration to collect categorized feedback from members in three languages (Amharic, Oromifa, English), manage incoming inquiries via a beautiful admin dashboard, and broadcast messages back to specific groups of subscribers.
+A comprehensive school feedback management system featuring a Laravel backend, Vue.js/Tailwind CSS frontend dashboard, and a Telegram Bot interface for real-time interaction.
 
-## ✨ Key Features
+## Features
 
-- **Multi-lingual Telegram Bot**: Supports Amharic (default), Oromifa, and English. Users can switch their preferred language on the fly.
-- **EOTC Specific Categories**: Feedback is natively categorized into church-specific areas:
-  - Spiritual Education (ትምህርተ ሃይማኖትና መንፈሳዊ ትምህርት)
-  - Choir & Hymns (መዝሙርና ማኅሌት አገልግሎት)
-  - Liturgy & Service (ሥርዓተ አምልኮና ቅዳሴ)
-  - General Inquiry (አጠቃላይ ጥያቄና አስተያየት)
-- **Comprehensive Admin Dashboard**: A responsive, modern Vue 3 interface powered by Tailwind CSS v4.
-- **Broadcast Wizard**: Send rich broadcast messages (with photos or documents) to targeted segments or manually selected users.
-- **Data Persistence**: Uses Google Cloud Firestore for a scalable production database with an automatic fallback to local JSON files if the network or credentials are unavailable.
-- **Exporting**: Generate detailed PDF and CSV reports for administrative review.
-- **Asynchronous Processing**: Uses Laravel Queues to respect Telegram's strict rate limits (30 msgs/sec) during mass broadcasts.
+- **Admin Dashboard**: A modern, responsive Vue.js frontend for managing users, feedback, and system configuration.
+- **Telegram Bot Integration**: Powered by Nutgram, allowing users to submit feedback directly via Telegram.
+- **Role-Based Access Control**: Granular permissions system for managing different levels of staff access.
+- **Real-time Updates**: Integrated with Laravel Reverb for real-time WebSocket communication.
+- **Background Processing**: Robust queue system for handling asynchronous tasks like notifications and data imports.
 
-## 🛠 Tech Stack
+## Prerequisites
 
-- **Backend**: Laravel 11, PHP 8.3
-- **Frontend**: Vue 3 (Composition API), Vite, Tailwind CSS v4
-- **Database**: Google Cloud Firestore (via `google/cloud-firestore`) & Local JSON Storage
-- **Authentication**: Custom JWT implementation for the admin panel
+Before running the application, ensure you have the following installed:
+- PHP 8.2 or higher
+- Composer
+- Node.js & npm
+- PostgreSQL (or your preferred database)
 
----
+## Setup & Installation
 
-## 💻 Development Setup
+1. **Clone the repository and install dependencies**:
+   Run the all-in-one setup command which will install PHP and Node dependencies, copy `.env.example` to `.env`, generate the app key, run database migrations, and build the frontend assets:
+   ```bash
+   composer setup
+   ```
 
-Follow these steps to set up the project on your local machine for development.
+2. **Configure your Environment**:
+   Update your `.env` file with your specific database credentials and Telegram Bot token:
+   ```env
+   DB_CONNECTION=pgsql
+   DB_HOST=127.0.0.1
+   DB_PORT=5432
+   DB_DATABASE=your_database
+   DB_USERNAME=your_username
+   DB_PASSWORD=your_password
 
-### 1. Prerequisites
-- **PHP** >= 8.2
-- **Composer** (PHP Package Manager)
-- **Node.js** >= 18 & **npm**
-- **Telegram Bot Token** (Get it from [@BotFather](https://t.me/BotFather))
+   TELEGRAM_TOKEN=your_bot_token_here
+   ```
 
-### 2. Installation
+## Running the Application
 
-Clone the repository and install dependencies:
+### Development Mode
+
+To run the application locally for development, use the comprehensive dev command. This will concurrently start the Laravel backend, the Vite dev server, the Reverb WebSocket server, the queue listener, and the Telegram bot polling:
+
 ```bash
-git clone <repository-url>
-cd Bot
-
-# Install PHP dependencies
-composer install
-
-# Install JS dependencies
-npm install
+composer dev
 ```
 
-### 3. Environment Configuration
+You can then access the dashboard at: **http://localhost:8000** (or whichever port artisan serve binds to).
 
-Copy the `.env.example` file to `.env`:
+### Production Mode
+
+For a production environment, use:
+
 ```bash
-cp .env.example .env
-php artisan key:generate
+composer prod-start
 ```
 
-Update your `.env` file with your specific variables. Pay special attention to:
-```env
-# Telegram Bot
-TELEGRAM_BOT_TOKEN="your-bot-token"
-TELEGRAM_WEBHOOK_URL="https://your-ngrok-url.ngrok.app/api/telegram/webhook"
+This will run database migrations, optimize configuration, and concurrently start all required background services (serve, reverb, queue workers, and the bot listener).
 
-# Firebase (Optional for local dev, will fallback to local JSON if omitted)
-FIREBASE_PROJECT_ID="abalat-guday"
-FIREBASE_CREDENTIALS_PATH="storage/app/firebase-credentials.json"
+## License
 
-# Admin Auth Secret
-JWT_SECRET="generate-a-long-random-string-here"
-```
-
-### 4. Running the Development Servers
-
-You will need multiple terminal tabs to run the backend, frontend, and queue worker.
-
-**Tab 1: Start the Laravel Backend server**
-```bash
-php artisan serve
-```
-
-**Tab 2: Start the Vite Frontend server**
-```bash
-npm run dev
-```
-
-**Tab 3: Start the Laravel Queue Worker (for broadcasting messages)**
-```bash
-php artisan queue:work
-```
-
-### 5. Setting up the Telegram Webhook (Local)
-To test the Telegram bot locally, you must expose your local server to the internet using a tool like [ngrok](https://ngrok.com/).
-```bash
-ngrok http 8000
-```
-Copy the secure `https` URL from ngrok, paste it into `TELEGRAM_WEBHOOK_URL` in your `.env`, and register the webhook:
-```bash
-php artisan telegram:set-webhook
-```
-
-### 6. Accessing the Dashboard
-Go to `http://localhost:8000` in your browser. 
-If the database is fresh, the system will automatically seed a Super Admin user upon your first login attempt.
-- **Default Email:** `admin@example.com`
-- **Default Password:** `password123`
-
-*(Change this password immediately after logging in!)*
-
----
-
-## 🚀 Production Deployment
-
-Deploying to production requires optimizing the application and ensuring strict security measures.
-
-### 1. Server Requirements
-Ensure your production server (e.g., Ubuntu VPS, AWS EC2, DigitalOcean Droplet) has PHP, Composer, Node.js, and a web server like Nginx or Apache installed.
-
-### 2. Prepare the Environment
-Pull the code to your production server and install dependencies without development packages:
-```bash
-composer install --optimize-autoloader --no-dev
-npm install
-```
-
-### 3. Build Frontend Assets
-Compile the Vue application and Tailwind CSS for production:
-```bash
-npm run build
-```
-
-### 4. Configure Production `.env`
-Ensure your `.env` is set for production:
-```env
-APP_ENV=production
-APP_DEBUG=false
-APP_URL=https://your-production-domain.com
-
-# Ensure this points to your actual domain
-TELEGRAM_WEBHOOK_URL="https://your-production-domain.com/api/telegram/webhook"
-```
-Place your actual Firebase JSON credentials at `storage/app/firebase-credentials.json` to enable cloud persistence.
-
-### 5. Optimize Laravel
-Cache the configuration, routes, and views to maximize performance:
-```bash
-php artisan config:cache
-php artisan route:cache
-php artisan view:cache
-```
-
-### 6. Register the Production Webhook
-Tell Telegram where to send live updates:
-```bash
-php artisan telegram:set-webhook
-```
-
-### 7. Run the Queue Worker as a Daemon
-In production, you should **not** run `php artisan queue:work` manually. Instead, use a process monitor like **Supervisor** to keep the queue worker running permanently in the background.
-
-Create a Supervisor configuration file (`/etc/supervisor/conf.d/bot-worker.conf`):
-```ini
-[program:bot-worker]
-process_name=%(program_name)s_%(process_num)02d
-command=php /path/to/your/Bot/artisan queue:work --sleep=3 --tries=3 --max-time=3600
-autostart=true
-autorestart=true
-stopasgroup=true
-killasgroup=true
-user=www-data
-numprocs=1
-redirect_stderr=true
-stdout_logfile=/path/to/your/Bot/storage/logs/worker.log
-stopwaitsecs=3600
-```
-Update supervisor to read the new config:
-```bash
-sudo supervisorctl reread
-sudo supervisorctl update
-sudo supervisorctl start bot-worker:*
-```
-
-### 8. Web Server Configuration (Nginx Example)
-Point your web server to the `public` directory.
-```nginx
-server {
-    listen 80;
-    server_name your-production-domain.com;
-    root /path/to/your/Bot/public;
-
-    add_header X-Frame-Options "SAMEORIGIN";
-    add_header X-Content-Type-Options "nosniff";
-
-    index index.php;
-
-    charset utf-8;
-
-    location / {
-        try_files $uri $uri/ /index.php?$query_string;
-    }
-
-    location = /favicon.ico { access_log off; log_not_found off; }
-    location = /robots.txt  { access_log off; log_not_found off; }
-
-    error_page 404 /index.php;
-
-    location ~ \.php$ {
-        fastcgi_pass unix:/var/run/php/php8.3-fpm.sock;
-        fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
-        include fastcgi_params;
-    }
-
-    location ~ /\.(?!well-known).* {
-        deny all;
-    }
-}
-```
-
-## 🔒 Security Best Practices
-- **Restrict Storage Permissions**: Ensure the `storage` and `bootstrap/cache` directories are writable by the web server (e.g., `chmod -R 775 storage bootstrap/cache` and `chown -R www-data:www-data storage bootstrap/cache`).
-- **Protect Credentials**: Never commit your `.env` or `storage/app/firebase-credentials.json` files to source control. They are already in `.gitignore`.
-- **Change Default Admin**: Update the default `admin@example.com` password immediately after your first login on production.
-- **SSL Certificate**: Telegram requires webhooks to run over HTTPS. Ensure your production domain is secured with an SSL certificate (e.g., Let's Encrypt).
+This project is licensed under the [MIT license](https://opensource.org/licenses/MIT).

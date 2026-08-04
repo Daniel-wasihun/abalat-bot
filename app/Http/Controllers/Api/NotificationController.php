@@ -59,8 +59,7 @@ class NotificationController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $admin = $request->attributes->get('admin');
-        $sentBy = $admin['name'] ?? 'Admin';
+        $sentBy = $request->user()->name ?? 'Admin';
 
         $notification = $this->notificationService->createAndBroadcast($request->all(), $sentBy);
 

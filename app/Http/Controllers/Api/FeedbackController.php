@@ -16,7 +16,7 @@ class FeedbackController extends Controller
         $filters = $request->only(['status', 'priority', 'category', 'search', 'language']);
         $items   = $this->feedbackService->getFilteredFeedback($filters);
 
-        $perPage  = max(1, (int) $request->get('per_page', 10));
+        $perPage  = max(1, (int) $request->get('per_page', 15));
         $page     = max(1, (int) $request->get('page', 1));
         $total    = count($items);
         $paginated = array_slice($items, ($page - 1) * $perPage, $perPage);
