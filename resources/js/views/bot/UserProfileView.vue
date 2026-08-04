@@ -182,10 +182,10 @@
                     <table class="w-full text-left text-xs">
                       <thead>
                         <tr class="border-b border-slate-100 dark:border-slate-800 text-slate-400 font-semibold uppercase tracking-wider pb-2">
-                          <th class="pb-3">Category</th>
-                          <th class="pb-3">Message</th>
-                          <th class="pb-3">Status</th>
-                          <th class="pb-3">Date</th>
+                          <th class="pb-3">{{ t('feedback.category') }}</th>
+                          <th class="pb-3">{{ t('feedback.message') }}</th>
+                          <th class="pb-3">{{ t('feedback.status') }}</th>
+                          <th class="pb-3">{{ t('feedback.date') }}</th>
                         </tr>
                       </thead>
                       <tbody class="divide-y divide-slate-100 dark:divide-slate-800/60">
@@ -272,12 +272,12 @@
             
             <form @submit.prevent="sendDirectNotification" class="space-y-4">
               <div>
-                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Notification Title</label>
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">{{ t('notifications.campaignTitle') }}</label>
                 <input v-model="directNotif.title" type="text" required placeholder="e.g. የነገው ጉባኤ ማሳሰቢያ" class="input-base text-xs" />
               </div>
               
               <div>
-                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Message Content</label>
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">{{ t('notifications.messageContent') }}</label>
                 <textarea v-model="directNotif.message" rows="5" required placeholder="Write direct telegram notification content..." class="input-base text-xs resize-none" />
               </div>
 

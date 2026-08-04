@@ -20,40 +20,55 @@
         </template>
       </PageTitle>
 
-      <!-- Filters -->
-      <FilterBar :active-filters="activeFilterCount" @clear="clearFilters">
+      <!-- Table Toolbar (LMS-matching design) -->
+      <TableToolbar
+        v-model="feedbackStore.filters.search"
+        :placeholder="t('feedback.search')"
+        :show-filters="showFilters"
+        :has-active-filters="activeFilterCount > 0"
+        :filter-label="t('common.filters')"
+        :reset-label="t('common.reset')"
+        :loading="feedbackStore.loading"
+        @update:model-value="debouncedFetch"
+        @toggle-filters="showFilters = !showFilters"
+        @reset="clearFilters"
+      >
         <template #filters>
-          <SearchInput
-            v-model="filters.search"
-            :placeholder="t('feedback.search')"
-            @update:model-value="debouncedFetch"
-          />
           <FormSelect
-            v-model="filters.category"
+            v-model="feedbackStore.filters.category"
             :options="[{ value: '', label: t('feedback.allCategories') }, ...categoryOptions]"
             :placeholder="t('feedback.allCategories')"
             @change="fetchFeedback"
           />
           <FormSelect
-            v-model="filters.language"
+            v-model="feedbackStore.filters.language"
             :options="[{ value: '', label: t('feedback.allLanguages') }, ...languageOptions]"
             :placeholder="t('feedback.allLanguages')"
             @change="fetchFeedback"
           />
           <FormSelect
-            v-model="filters.priority"
+            v-model="feedbackStore.filters.priority"
             :options="[{ value: '', label: t('feedback.allPriorities') }, ...priorityOptions]"
             :placeholder="t('feedback.allPriorities')"
             @change="fetchFeedback"
           />
           <FormSelect
-            v-model="filters.status"
+            v-model="feedbackStore.filters.status"
             :options="[{ value: '', label: t('feedback.allStatuses') }, ...statusOptions]"
             :placeholder="t('feedback.allStatuses')"
             @change="fetchFeedback"
           />
         </template>
-      </FilterBar>
+        <template #actions>
+          <button
+            @click="exportData('csv')"
+            class="flex items-center gap-2 px-4 h-11 rounded-xl border border-card-border/60 text-main-text/60 hover:text-brand-blue hover:border-brand-blue/30 hover:bg-brand-blue/5 transition-all text-xs font-bold active:scale-95"
+          >
+            <ArrowDownTrayIcon class="w-4 h-4" />
+            <span class="hidden sm:inline">{{ t('feedback.exportCsv') }}</span>
+          </button>
+        </template>
+      </TableToolbar>
 
       <!-- Data Table -->
       <DataTable
@@ -62,6 +77,9 @@
         :loading="feedbackStore.loading"
         :empty-message="t('feedback.empty')"
         :empty-title="t('feedback.empty')"
+        :empty-desc="t('feedback.emptyDesc')"
+        :sort-by="feedbackStore.filters.sort_by"
+        :sort-order="feedbackStore.filters.sort_order"
         :pagination="{
           currentPage: pagination.current_page,
           lastPage: pagination.last_page || 1,
@@ -69,6 +87,7 @@
           perPage: pagination.per_page,
         }"
         @row-click="openDetail"
+        @sort="feedbackStore.handleSort"
         @page-change="changePage"
         @per-page-change="changePerPage"
       >
@@ -240,7 +259,7 @@
                   </div>
                   <div class="p-4 rounded-xl border border-dashed border-amber-200 dark:border-amber-800 bg-amber-50/10 flex items-center justify-between text-xs">
                     <div>
-                      <p class="font-bold text-slate-800 dark:text-slate-200">Notes Log</p>
+                      <p class="font-bold text-slate-800 dark:text-slate-200">{{ t('feedback.notesLog') }}</p>
                       <p class="text-[10px] text-slate-400 mt-0.5">{{ selectedItem.internalNotes?.length || 0 }} notes registered</p>
                     </div>
                     <AppButton variant="outline" size="sm" @click="openNotes(selectedItem); selectedItem = null">Manage Notes →</AppButton>
@@ -335,8 +354,7 @@ import { ref, computed, onMounted, inject } from 'vue';
 
 // Reusable UI components
 import PageTitle       from '@/components/common/PageTitle.vue';
-import FilterBar       from '@/components/common/FilterBar.vue';
-import SearchInput     from '@/components/common/SearchInput.vue';
+import TableToolbar    from '@/components/common/TableToolbar.vue';
 import FormSelect      from '@/components/common/FormSelect.vue';
 import DataTable       from '@/components/common/DataTable.vue';
 import ActionDropdown  from '@/components/common/ActionDropdown.vue';
@@ -369,6 +387,13 @@ const {
 const feedbackStore = useFeedbackStore();
 const showToast = inject('showToast') as any;
 
+// UI state
+const showFilters = ref(sessionStorage.getItem('feedback_filters_visible') === 'true');
+const toggleFilters = () => {
+  showFilters.value = !showFilters.value;
+  sessionStorage.setItem('feedback_filters_visible', String(showFilters.value));
+};
+
 // Modal state
 const selectedItem      = ref<any>(null);
 const notesItem         = ref<any>(null);
@@ -393,11 +418,11 @@ const openLightbox = ({ url, type, fileName }: any) => {
 // Computed from store
 const feedbackList = computed(() => feedbackStore.feedbackList);
 const pagination   = computed(() => feedbackStore.pagination);
-const filters      = computed(() => feedbackStore.filters);
 
-const activeFilterCount = computed(() =>
-  Object.values(filters.value).filter(v => v !== '').length
-);
+const activeFilterCount = computed(() => {
+  const f = feedbackStore.filters;
+  return [f.category, f.language, f.priority, f.status].filter(v => v !== '').length;
+});
 
 const clearFilters = () => {
   feedbackStore.filters.search   = '';
@@ -405,19 +430,21 @@ const clearFilters = () => {
   feedbackStore.filters.language = '';
   feedbackStore.filters.priority = '';
   feedbackStore.filters.status   = '';
+  feedbackStore.filters.sort_by  = undefined;
+  feedbackStore.filters.sort_order = 'desc';
   feedbackStore.fetchFeedback(true);
 };
 
-// Column definitions for DataTable
+// Column definitions for DataTable — all with sortable where applicable
 const columns = computed(() => [
-  { key: 'sender',    label: t('feedback.sender'),   width: '200px' },
-  { key: 'language',  label: t('feedback.language'),  width: '80px'  },
-  { key: 'category',  label: t('feedback.category'),  width: '160px' },
-  { key: 'message',   label: t('feedback.message'),   width: '240px' },
-  { key: 'priority',  label: t('feedback.priority'),  width: '100px' },
-  { key: 'status',    label: t('feedback.status'),    width: '110px' },
-  { key: 'createdAt', label: t('feedback.date'),      width: '110px' },
-  { key: 'actions',   label: '',                       width: '60px', align: 'right' as const },
+  { key: 'sender',    label: t('feedback.sender'),   width: '200px', sortable: true  },
+  { key: 'language',  label: t('feedback.language'),  width: '80px',  sortable: true  },
+  { key: 'category',  label: t('feedback.category'),  width: '160px', sortable: true  },
+  { key: 'message',   label: t('feedback.message'),   width: '240px', sortable: false },
+  { key: 'priority',  label: t('feedback.priority'),  width: '100px', sortable: true  },
+  { key: 'status',    label: t('feedback.status'),    width: '110px', sortable: true  },
+  { key: 'createdAt', label: t('feedback.date'),      width: '110px', sortable: true  },
+  { key: 'actions',   label: '',                       width: '60px',  align: 'right' as const },
 ]);
 
 // Row action definitions
@@ -527,7 +554,7 @@ const deleteItemConfirmed = async () => {
 };
 
 const exportData = (format: string) => {
-  const q = new URLSearchParams({ ...filters.value, token: localStorage.getItem('admin_token') || '' }).toString();
+  const q = new URLSearchParams({ ...feedbackStore.filters, token: localStorage.getItem('admin_token') || '' }).toString();
   window.open(`/api/feedback/export/${format}?${q}`, '_blank');
 };
 

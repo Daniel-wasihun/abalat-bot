@@ -1,223 +1,257 @@
 <template>
-  <main class="flex-grow p-4 md:p-6 lg:p-8 space-y-6 overflow-y-auto">
+  <main class="flex-grow p-4 md:p-6 lg:p-8 space-y-6 overflow-y-auto font-sans">
 
-        <!-- Welcome Banner -->
-        <div class="card p-6 bg-gradient-to-r from-amber-600 via-amber-700 to-amber-800 text-white shadow-lg relative overflow-hidden">
-          <div class="absolute -right-10 -bottom-10 opacity-10 text-white pointer-events-none">
-            <svg class="w-64 h-64" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 2L2 22h20L12 2zm0 3.8L18.5 19H5.5L12 5.8z"/>
+    <!-- Welcome Banner -->
+    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-brand-blue via-brand-blue/90 to-brand-blue-dark p-6 md:p-8 text-white shadow-lg">
+      <!-- Decorative vector art -->
+      <div class="absolute -right-6 -bottom-10 opacity-10 text-white pointer-events-none select-none">
+        <svg class="w-72 h-72" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 2L2 22h20L12 2zm0 3.8L18.5 19H5.5L12 5.8z"/>
+        </svg>
+      </div>
+
+      <div class="relative z-10 space-y-2">
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white/10 text-xs font-bold tracking-widest text-blue-200 uppercase backdrop-blur-sm">
+          ⛪ {{ t('dashboard.welcome') }}
+        </span>
+        <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight">
+          {{ t('nav.signedInAs') }} {{ localize(authStore.user?.name) || 'Admin' }}
+        </h1>
+        <p class="text-xs md:text-sm text-blue-100/90 max-w-2xl font-medium leading-relaxed">
+          Overview of student, teacher, and parent inquiries, feedback responses, and communication broadcasts for the Senbet School LMS.
+        </p>
+      </div>
+    </div>
+
+    <!-- Loading skeleton -->
+    <div v-if="loading" class="space-y-6 animate-pulse">
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div v-for="i in 6" :key="i" class="h-28 rounded-3xl skeleton bg-main-text/5 border border-card-border" />
+      </div>
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="h-80 lg:col-span-2 rounded-3xl skeleton bg-main-text/5 border border-card-border" />
+        <div class="h-80 rounded-3xl skeleton bg-main-text/5 border border-card-border" />
+      </div>
+    </div>
+
+    <!-- Dashboard content -->
+    <div v-else class="space-y-6 animate-slide-up">
+
+      <!-- 6 Stat Cards Grid -->
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div
+          v-for="card in statCards"
+          :key="card.label"
+          class="premium-card p-5 flex flex-col gap-4 relative overflow-hidden cursor-pointer transition-all duration-300 hover:border-brand-blue/30 group"
+        >
+          <!-- Icon Bubble -->
+          <div
+            class="w-10 h-10 rounded-xl flex items-center justify-center border transition-all duration-300 shrink-0"
+            :class="[card.iconBg, card.iconColor]"
+          >
+            <component :is="card.icon" class="w-5 h-5 transition-transform duration-300 group-hover:scale-110" :stroke-width="1.5" />
+          </div>
+
+          <!-- Value / Label -->
+          <div class="space-y-1">
+            <p class="text-2xl font-black text-main-text font-mono tracking-tight leading-none">
+              {{ card.value }}
+            </p>
+            <span class="text-[10px] font-bold text-main-text/40 uppercase tracking-widest block truncate">
+              {{ card.label }}
+            </span>
+          </div>
+
+          <!-- Sub Info -->
+          <div class="flex items-center gap-1.5 text-[11px] font-semibold mt-auto" :class="card.subColor">
+            <span class="w-1.5 h-1.5 rounded-full" :class="card.dotColor || 'bg-main-text/20'" />
+            <span class="truncate">{{ card.sub }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Language distribution row -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div
+          v-for="lang in languageCards"
+          :key="lang.code"
+          class="premium-card p-4 flex items-center justify-between transition-all duration-300 hover:border-brand-blue/20"
+        >
+          <div class="flex items-center gap-3">
+            <span class="text-3xl filter drop-shadow-sm select-none">{{ lang.flag }}</span>
+            <div>
+              <h4 class="text-xs font-bold text-main-text">{{ lang.name }}</h4>
+              <p class="text-[10px] text-main-text/40 font-medium font-mono">{{ lang.sub }}</p>
+            </div>
+          </div>
+          <div class="text-right">
+            <span class="text-xl font-bold font-mono text-brand-blue dark:text-blue-400">{{ lang.count }}</span>
+            <span class="text-[10px] text-main-text/30 block uppercase tracking-wider font-semibold">users</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chart + Activity Feed -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <!-- SVG Line Chart Card -->
+        <div class="premium-card p-6 lg:col-span-2 flex flex-col gap-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-base font-bold text-main-text">{{ t('dashboard.trends') }}</h2>
+              <p class="text-xs text-main-text/40 mt-0.5">{{ t('dashboard.past7days') }}</p>
+            </div>
+            <span class="px-2.5 py-1 text-[10px] font-bold text-brand-blue bg-brand-blue/5 dark:bg-brand-blue/10 dark:text-blue-400 rounded-lg border border-brand-blue/20 dark:border-brand-blue/30">
+              {{ t('dashboard.weeklyData') }}
+            </span>
+          </div>
+
+          <!-- SVG Chart Area -->
+          <div class="flex-1 h-60 min-h-[220px]">
+            <svg viewBox="0 0 580 180" class="w-full h-full overflow-visible">
+              <!-- Grid lines -->
+              <line v-for="y in [20,60,100,140]" :key="y" x1="40" :y1="y" x2="560" :y2="y"
+                    stroke="currentColor" class="text-slate-100 dark:text-slate-800/50" stroke-dasharray="4 2" />
+              <line x1="40" y1="150" x2="560" y2="150" stroke="currentColor" class="text-slate-200 dark:text-slate-700" />
+
+              <!-- Area under Feedback Line -->
+              <path :d="`M 60 150 ` + getChartPath(chartData.feedback) + ` L 540 150 Z`"
+                    fill="url(#grad-feedback)" opacity="0.1" />
+
+              <!-- Area under Users Line -->
+              <path :d="`M 60 150 ` + getChartPath(chartData.users) + ` L 540 150 Z`"
+                    fill="url(#grad-users)" opacity="0.1" />
+
+              <!-- Feedback Path -->
+              <path :d="getChartPath(chartData.feedback)" fill="none" stroke="#0b529c" stroke-width="3" stroke-linecap="round" />
+              <circle v-for="(val, i) in chartData.feedback" :key="`f-${i}`"
+                :cx="60 + i * 80"
+                :cy="150 - (Math.max(...chartData.feedback, 1) ? (val / Math.max(...chartData.feedback, 1)) * 120 : 0)"
+                r="4" fill="#ffffff" stroke="#0b529c" stroke-width="2.5" />
+
+              <!-- Users Path -->
+              <path :d="getChartPath(chartData.users)" fill="none" stroke="#10b981" stroke-width="3" stroke-linecap="round" />
+              <circle v-for="(val, i) in chartData.users" :key="`u-${i}`"
+                :cx="60 + i * 80"
+                :cy="150 - (Math.max(...chartData.users, 1) ? (val / Math.max(...chartData.users, 1)) * 120 : 0)"
+                r="4" fill="#ffffff" stroke="#10b981" stroke-width="2.5" />
+
+              <!-- X-Axis Labels -->
+              <text v-for="(label, i) in chartData.labels" :key="`l-${i}`"
+                    :x="60 + i * 80" y="170" text-anchor="middle"
+                    class="text-[9px] font-bold fill-main-text/40 font-mono">
+                {{ label }}
+              </text>
+
+              <!-- Gradients definition -->
+              <defs>
+                <linearGradient id="grad-feedback" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#0b529c" />
+                  <stop offset="100%" stop-color="#0b529c" stop-opacity="0" />
+                </linearGradient>
+                <linearGradient id="grad-users" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#10b981" />
+                  <stop offset="100%" stop-color="#10b981" stop-opacity="0" />
+                </linearGradient>
+              </defs>
             </svg>
           </div>
-          <div class="relative z-10 space-y-1">
-            <span class="text-xs uppercase font-bold tracking-widest text-amber-200">{{ t('dashboard.welcome') }}</span>
-            <h1 class="text-2xl font-bold tracking-tight">{{ t('nav.signedInAs') }} Admin</h1>
-            <p class="text-xs text-amber-100/90 max-w-xl font-medium leading-relaxed">
-              Overview of student, teacher, and parent inquiries, feedback responses, and communication broadcasts.
-            </p>
+
+          <!-- Chart Legends -->
+          <div class="flex gap-4 justify-end text-[10px] text-main-text/50 font-semibold pr-3 pt-2 border-t border-card-border/40">
+            <div class="flex items-center gap-1.5">
+              <span class="w-3 h-1.5 rounded-full bg-brand-blue inline-block" />
+              {{ t('dashboard.feedbackLine') }}
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="w-3 h-1.5 rounded-full bg-emerald-500 inline-block" />
+              {{ t('dashboard.usersLine') }}
+            </div>
           </div>
         </div>
 
-        <!-- Loading skeleton -->
-        <div v-if="loading" class="space-y-6 animate-pulse">
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-            <div v-for="i in 6" :key="i" class="h-28 rounded-2xl skeleton" />
+        <!-- Recent Activity Feed Card -->
+        <div class="premium-card p-6 flex flex-col gap-4">
+          <div class="flex items-center justify-between">
+            <h2 class="text-base font-bold text-main-text">{{ t('dashboard.recentActivity') }}</h2>
+            <span class="flex h-2 w-2 relative">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            </span>
           </div>
-          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div class="h-80 lg:col-span-2 rounded-2xl skeleton" />
-            <div class="h-80 rounded-2xl skeleton" />
+
+          <!-- Empty state -->
+          <div v-if="!activities.length" class="flex-grow flex flex-col items-center justify-center gap-2.5 text-center py-12">
+            <div class="w-12 h-12 rounded-2xl bg-nav-accent/5 flex items-center justify-center">
+              <Clock class="w-5 h-5 text-main-text/30" />
+            </div>
+            <div>
+              <p class="text-sm font-semibold text-main-text/60">{{ t('dashboard.noActivity') }}</p>
+              <p class="text-xs text-main-text/30 mt-0.5">{{ t('dashboard.noActivitySub') }}</p>
+            </div>
           </div>
-        </div>
 
-        <!-- Dashboard content -->
-        <div v-else class="space-y-6 animate-slide-up">
-
-          <!-- 6 Stat Cards Grid -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+          <!-- Activity items -->
+          <div v-else class="space-y-3 overflow-y-auto max-h-72 flex-grow pr-1 custom-scrollbar">
             <div
-              v-for="card in statCards"
-              :key="card.label"
-              class="stat-card group hover:scale-[1.02] transition-transform duration-200"
+              v-for="act in activities"
+              :key="act.id"
+              class="flex gap-3 text-xs p-3 rounded-2xl bg-main-bg/30 border border-card-border/20 hover:bg-nav-accent/5 transition-all duration-200"
             >
-              <div class="space-y-1">
-                <span class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block truncate">
-                  {{ card.label }}
-                </span>
-                <p class="text-2xl font-extrabold text-slate-800 dark:text-slate-100 font-mono tracking-tight">{{ card.value }}</p>
-                <div class="flex items-center gap-1 text-[11px] font-semibold" :class="card.subColor">
-                  <span class="w-1.5 h-1.5 rounded-full animate-pulse" :class="card.dotColor" v-if="card.dot" />
-                  <span class="truncate">{{ card.sub }}</span>
-                </div>
+              <!-- Icon bubble -->
+              <div
+                class="w-7 h-7 rounded-lg shrink-0 flex items-center justify-center mt-0.5"
+                :class="act.type === 'feedback'
+                  ? 'bg-brand-blue/10 text-brand-blue'
+                  : 'bg-brand-blue/10 text-brand-blue'"
+              >
+                <component :is="act.type === 'feedback' ? MessageSquare : User" class="w-4 h-4" />
               </div>
-              <div class="p-3 rounded-xl shrink-0 group-hover:rotate-6 transition-transform duration-200" :class="card.iconBg">
-                <component :is="card.icon" class="w-5 h-5" :class="card.iconColor" />
-              </div>
-            </div>
-          </div>
 
-          <!-- Language distribution & Quick Stats row -->
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div v-for="lang in languageCards" :key="lang.code" class="card p-4 flex items-center justify-between bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/60">
-              <div class="flex items-center gap-3">
-                <span class="text-2xl">{{ lang.flag }}</span>
-                <div>
-                  <h4 class="text-xs font-bold text-slate-800 dark:text-slate-100">{{ lang.name }}</h4>
-                  <p class="text-[10px] text-slate-400 font-medium">{{ lang.sub }}</p>
-                </div>
-              </div>
-              <div class="text-right">
-                <span class="text-lg font-bold font-mono text-amber-600 dark:text-amber-400">{{ lang.count }}</span>
-                <span class="text-[10px] text-slate-400 block">users</span>
+              <!-- Message body -->
+              <div class="flex-1 min-w-0">
+                <p class="font-bold text-main-text leading-snug truncate">{{ act.title }}</p>
+                <p class="text-main-text/50 truncate mt-0.5">{{ act.description }}</p>
+                <span class="text-[10px] text-main-text/30 block mt-1 font-mono font-medium">{{ formatTime(act.time) }}</span>
               </div>
             </div>
-          </div>
-
-          <!-- Chart + Activity Feed -->
-          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-            <!-- SVG Line Chart -->
-            <div class="card p-6 lg:col-span-2 flex flex-col gap-4 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/60">
-              <div class="flex items-center justify-between">
-                <div>
-                  <h2 class="text-base font-bold text-slate-800 dark:text-slate-100">{{ t('dashboard.trends') }}</h2>
-                  <p class="text-xs text-slate-400 mt-0.5">{{ t('dashboard.past7days') }}</p>
-                </div>
-                <span class="px-2.5 py-1 text-[10px] font-bold text-amber-700 bg-amber-50 dark:bg-amber-950/40 dark:text-amber-400 rounded-lg border border-amber-200/60 dark:border-amber-800/40">
-                  {{ t('dashboard.weeklyData') }}
-                </span>
-              </div>
-
-              <div class="flex-1 h-60 min-h-[220px]">
-                <svg viewBox="0 0 580 180" class="w-full h-full overflow-visible">
-                  <!-- Grid lines -->
-                  <line v-for="y in [20,60,100,140]" :key="y" x1="40" :y1="y" x2="560" :y2="y"
-                        stroke="currentColor" class="text-slate-100 dark:text-slate-800/80" stroke-dasharray="4 2" />
-                  <line x1="40" y1="150" x2="560" y2="150" stroke="currentColor" class="text-slate-200 dark:text-slate-700" />
-
-                  <!-- Area under Feedback Line -->
-                  <path :d="`M 60 150 ` + getChartPath(chartData.feedback) + ` L 540 150 Z`"
-                        fill="url(#grad-feedback)" opacity="0.12" />
-
-                  <!-- Area under Users Line -->
-                  <path :d="`M 60 150 ` + getChartPath(chartData.users) + ` L 540 150 Z`"
-                        fill="url(#grad-users)" opacity="0.12" />
-
-                  <!-- Feedback Path -->
-                  <path :d="getChartPath(chartData.feedback)" fill="none" stroke="#f59e0b" stroke-width="3" stroke-linecap="round" />
-                  <circle v-for="(val, i) in chartData.feedback" :key="`f-${i}`"
-                    :cx="60 + i * 80"
-                    :cy="150 - (Math.max(...chartData.feedback, 1) ? (val / Math.max(...chartData.feedback, 1)) * 120 : 0)"
-                    r="4" fill="#ffffff" stroke="#f59e0b" stroke-width="2" />
-
-                  <!-- Users Path -->
-                  <path :d="getChartPath(chartData.users)" fill="none" stroke="#10b981" stroke-width="3" stroke-linecap="round" />
-                  <circle v-for="(val, i) in chartData.users" :key="`u-${i}`"
-                    :cx="60 + i * 80"
-                    :cy="150 - (Math.max(...chartData.users, 1) ? (val / Math.max(...chartData.users, 1)) * 120 : 0)"
-                    r="4" fill="#ffffff" stroke="#10b981" stroke-width="2" />
-
-                  <!-- X-Axis Labels -->
-                  <text v-for="(label, i) in chartData.labels" :key="`l-${i}`"
-                        :x="60 + i * 80" y="170" text-anchor="middle"
-                        class="text-[9px] font-bold fill-slate-400 dark:fill-slate-500 font-mono">
-                    {{ label }}
-                  </text>
-
-                  <!-- Gradients definition -->
-                  <defs>
-                    <linearGradient id="grad-feedback" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stop-color="#f59e0b" />
-                      <stop offset="100%" stop-color="#f59e0b" stop-opacity="0" />
-                    </linearGradient>
-                    <linearGradient id="grad-users" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stop-color="#10b981" />
-                      <stop offset="100%" stop-color="#10b981" stop-opacity="0" />
-                    </linearGradient>
-                  </defs>
-                </svg>
-              </div>
-
-              <!-- Legends -->
-              <div class="flex gap-4 justify-end text-[10px] text-slate-500 font-semibold pr-3">
-                <div class="flex items-center gap-1.5">
-                  <span class="w-3 h-1 rounded bg-amber-500 inline-block" />
-                  {{ t('dashboard.feedbackLine') }}
-                </div>
-                <div class="flex items-center gap-1.5">
-                  <span class="w-3 h-1 rounded bg-emerald-500 inline-block" />
-                  {{ t('dashboard.usersLine') }}
-                </div>
-              </div>
-            </div>
-
-            <!-- Recent Activity Feed -->
-            <div class="card p-6 flex flex-col gap-4 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/60">
-              <div class="flex items-center justify-between">
-                <h2 class="text-base font-bold text-slate-800 dark:text-slate-100">{{ t('dashboard.recentActivity') }}</h2>
-                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
-              </div>
-
-              <!-- Activity skeleton -->
-              <div v-if="loading" class="space-y-3 animate-pulse">
-                <div v-for="i in 5" :key="i" class="flex gap-3 p-2.5">
-                  <div class="w-7 h-7 skeleton rounded-lg shrink-0 mt-0.5" />
-                  <div class="flex-1 space-y-1.5">
-                    <div class="h-3 skeleton rounded w-3/4" />
-                    <div class="h-2.5 skeleton rounded w-full" />
-                    <div class="h-2 skeleton rounded w-16 mt-1" />
-                  </div>
-                </div>
-              </div>
-
-              <div v-else-if="!activities.length" class="flex-1 flex flex-col items-center justify-center gap-2 text-center py-8">
-                <div class="w-11 h-11 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
-                  <ClockIcon class="w-5 h-5 text-slate-400" />
-                </div>
-                <p class="text-sm font-semibold text-slate-500 dark:text-slate-400">{{ t('dashboard.noActivity') }}</p>
-                <p class="text-xs text-slate-400">{{ t('dashboard.noActivitySub') }}</p>
-              </div>
-
-              <div v-else class="space-y-3 overflow-y-auto max-h-72 flex-1 pr-1">
-                <div v-for="act in activities" :key="act.id" class="flex gap-3 text-xs p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                  <div
-                    class="mt-0.5 w-7 h-7 rounded-lg shrink-0 flex items-center justify-center"
-                    :class="act.type === 'feedback'
-                      ? 'bg-amber-50 text-amber-600 dark:bg-amber-950/30 dark:text-amber-400'
-                      : 'bg-blue-50 text-blue-600 dark:bg-blue-950/30 dark:text-blue-400'"
-                  >
-                    <component :is="act.type === 'feedback' ? ChatIcon : UserIcon" class="w-4 h-4" />
-                  </div>
-                  <div class="flex-1 min-w-0">
-                    <p class="font-semibold text-slate-800 dark:text-slate-200 leading-snug">{{ act.title }}</p>
-                    <p class="text-slate-500 dark:text-slate-400 truncate mt-0.5">{{ act.description }}</p>
-                    <span class="text-[10px] text-slate-400 block mt-1 font-mono">{{ formatTime(act.time) }}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
           </div>
         </div>
+
+      </div>
+    </div>
   </main>
 </template>
 
 <script setup lang="ts">
 import { useLanguageStore } from "@/stores/languageStore";
+import { useAuthStore } from "@/stores/authStore";
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import axios from 'axios';
 
+// Lucide Icons (matching LMS premium cards)
 import {
-  UsersIcon,
-  ChatBubbleLeftRightIcon as ChatIcon,
-  ClipboardDocumentListIcon,
-  MegaphoneIcon,
-  UserIcon,
-  ClockIcon,
-  CheckCircleIcon,
-  EnvelopeOpenIcon,
-} from '@heroicons/vue/24/outline';
+  Users,
+  MessageSquare,
+  ClipboardList,
+  Bell,
+  MailOpen,
+  CheckCircle2,
+  Clock,
+  User,
+} from 'lucide-vue-next';
 
 const languageStore = useLanguageStore();
+const authStore = useAuthStore();
+
 const t = (k: string, p?: Record<string, any>) => languageStore.translate(k, p);
+
+const localize = (val: any) => {
+  if (!val) return "";
+  return typeof val === "object"
+    ? val[languageStore.currentLanguage] || val["en"] || ""
+    : val;
+};
 
 const loading    = ref(true);
 const activities = ref<any[]>([]);
@@ -243,59 +277,59 @@ const statCards = computed(() => [
     label:     t('dashboard.statSubscribers'),
     value:     stats.value.totalUsers,
     sub:       t('dashboard.statActive', { count: stats.value.activeUsers }),
-    subColor:  'text-slate-500',
-    icon:      UsersIcon,
+    subColor:  'text-main-text/50',
+    icon:      Users,
     iconColor: 'text-blue-600 dark:text-blue-400',
-    iconBg:    'bg-blue-50 dark:bg-blue-950/40',
+    iconBg:    'bg-blue-500/10 border-blue-500/20',
   },
   {
     label:     t('dashboard.statFeedback'),
     value:     stats.value.totalFeedback,
     sub:       t('dashboard.statFeedbackNew', { count: stats.value.newFeedback }),
-    subColor:  stats.value.newFeedback > 0 ? 'text-amber-600' : 'text-slate-400',
+    subColor:  stats.value.newFeedback > 0 ? 'text-brand-blue' : 'text-main-text/40',
     dot:       stats.value.newFeedback > 0,
-    dotColor:  'bg-amber-500',
-    icon:      ChatIcon,
-    iconColor: 'text-amber-600 dark:text-amber-400',
-    iconBg:    'bg-amber-50 dark:bg-amber-950/40',
+    dotColor:  'bg-brand-blue',
+    icon:      MessageSquare,
+    iconColor: 'text-brand-blue dark:text-blue-400',
+    iconBg:    'bg-brand-blue/10 border-brand-blue/20',
   },
   {
     label:     t('dashboard.statUnread'),
     value:     stats.value.unreadFeedback,
     sub:       stats.value.unreadFeedback > 0 ? t('dashboard.statActionRequired') : t('dashboard.statAllRead'),
-    subColor:  stats.value.unreadFeedback > 0 ? 'text-red-500' : 'text-slate-400',
+    subColor:  stats.value.unreadFeedback > 0 ? 'text-rose-500' : 'text-main-text/40',
     dot:       stats.value.unreadFeedback > 0,
-    dotColor:  'bg-red-500',
-    icon:      ClipboardDocumentListIcon,
-    iconColor: 'text-red-600 dark:text-red-400',
-    iconBg:    'bg-red-50 dark:bg-red-950/40',
+    dotColor:  'bg-rose-500',
+    icon:      ClipboardList,
+    iconColor: 'text-rose-600 dark:text-rose-400',
+    iconBg:    'bg-rose-500/10 border-rose-500/20',
   },
   {
     label:     t('dashboard.statReplies'),
     value:     stats.value.repliedFeedback,
     sub:       t('dashboard.statRepliesSub'),
-    subColor:  'text-slate-400',
-    icon:      EnvelopeOpenIcon,
+    subColor:  'text-main-text/40',
+    icon:      MailOpen,
     iconColor: 'text-purple-600 dark:text-purple-400',
-    iconBg:    'bg-purple-50 dark:bg-purple-950/40',
+    iconBg:    'bg-purple-500/10 border-purple-500/20',
   },
   {
     label:     t('dashboard.statBroadcasts'),
     value:     stats.value.broadcastsSent,
     sub:       t('dashboard.statBroadcastsSub'),
-    subColor:  'text-slate-400',
-    icon:      MegaphoneIcon,
+    subColor:  'text-main-text/40',
+    icon:      Bell,
     iconColor: 'text-indigo-600 dark:text-indigo-400',
-    iconBg:    'bg-indigo-50 dark:bg-indigo-950/40',
+    iconBg:    'bg-indigo-500/10 border-indigo-500/20',
   },
   {
     label:     t('dashboard.statResolved'),
     value:     stats.value.closedFeedback,
     sub:       t('dashboard.statResolvedSub'),
-    subColor:  'text-slate-400',
-    icon:      CheckCircleIcon,
+    subColor:  'text-main-text/40',
+    icon:      CheckCircle2,
     iconColor: 'text-emerald-600 dark:text-emerald-400',
-    iconBg:    'bg-emerald-50 dark:bg-emerald-950/40',
+    iconBg:    'bg-emerald-500/10 border-emerald-500/20',
   },
 ]);
 

@@ -1,171 +1,117 @@
 <template>
   <div class="flex flex-col flex-1 min-w-0">
-  <main class="flex-grow p-4 md:p-6 lg:p-8 space-y-5 overflow-y-auto">
+    <main class="flex-grow p-4 md:p-6 lg:p-8 space-y-5 overflow-y-auto">
 
-        <div>
-          <h2 class="text-xl font-bold text-slate-800 dark:text-slate-100">{{ t('users.title') }}</h2>
-          <p class="text-xs text-slate-400 mt-0.5">{{ t('users.subtitle') }}</p>
-        </div>
+      <!-- Page header -->
+      <PageTitle
+        :title="t('users.title')"
+        :subtitle="t('users.subtitle')"
+        :icon="UserGroupIcon"
+        icon-bg-class="bg-indigo-500/10"
+        icon-color-class="text-indigo-500"
+      />
 
-        <!-- Search & Filter bar -->
-        <div class="card p-4 grid grid-cols-1 sm:grid-cols-3 gap-3 items-center">
-          <div class="relative sm:col-span-2">
-            <input v-model="search" @input="debouncedFetch" type="text"
-                   :placeholder="t('users.searchPlaceholder')"
-                   class="input-base pl-9 text-xs" />
-            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-          </div>
-          
-          <select v-model="filterLang" @change="fetchUsers" class="input-base text-xs">
-            <option value="">{{ t('users.allLanguages') }}</option>
-            <option v-for="opt in languageOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
-          </select>
-        </div>
+      <!-- Search & Filter bar (LMS-matching TableToolbar) -->
+      <TableToolbar
+        v-model="search"
+        :placeholder="t('users.searchPlaceholder')"
+        :show-filters="showFilters"
+        :has-active-filters="filterLang !== '' || filterStatus !== ''"
+        :filter-label="t('common.filters')"
+        :reset-label="t('common.reset')"
+        :loading="loadingUsers"
+        @update:model-value="debouncedFetch"
+        @toggle-filters="showFilters = !showFilters"
+        @reset="clearFilters"
+      >
+        <template #filters>
+          <FormSelect
+            v-model="filterLang"
+            :options="[{ value: '', label: t('users.allLanguages') }, ...languageOptions]"
+            :placeholder="t('users.allLanguages')"
+            @change="fetchUsers"
+          />
+          <FormSelect
+            v-model="filterStatus"
+            :options="[{ value: '', label: t('users.allStatuses') }, { value: 'true', label: t('user.active') }, { value: 'false', label: t('user.banned') }]"
+            :placeholder="t('users.allStatuses')"
+            @change="fetchUsers"
+          />
+        </template>
+      </TableToolbar>
 
-        <!-- Users table -->
-        <div class="card overflow-hidden">
-          <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs">
-              <thead>
-                <tr class="border-b border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-900/50 text-slate-400 font-semibold uppercase tracking-wide">
-                  <th class="px-4 py-3">{{ t('users.telegramId') }}</th>
-                  <th class="px-4 py-3">{{ t('users.name') }}</th>
-                  <th class="px-4 py-3">{{ t('users.username') }}</th>
-                  <th class="px-4 py-3">{{ t('users.language') }}</th>
-                  <th class="px-4 py-3">{{ t('users.status') }}</th>
-                  <th class="px-4 py-3 font-mono">{{ t('users.feedbacks') }}</th>
-                  <th class="px-4 py-3">{{ t('users.joined') }}</th>
-                  <th class="px-4 py-3 text-right">{{ t('users.actions') }}</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
-                <!-- Table Skeleton Loader -->
-                <template v-if="loadingUsers">
-                  <tr v-for="i in 5" :key="`skel-${i}`" class="animate-pulse border-b border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900">
-                    <td class="px-4 py-4"><div class="h-3.5 w-20 bg-slate-200 dark:bg-slate-800 rounded" /></td>
-                    <td class="px-4 py-4"><div class="h-3.5 w-28 bg-slate-200 dark:bg-slate-800 rounded" /></td>
-                    <td class="px-4 py-4"><div class="h-3.5 w-20 bg-slate-200 dark:bg-slate-800 rounded" /></td>
-                    <td class="px-4 py-4"><div class="h-5 w-14 bg-slate-200 dark:bg-slate-800 rounded-full" /></td>
-                    <td class="px-4 py-4"><div class="h-5 w-16 bg-slate-200 dark:bg-slate-800 rounded-full" /></td>
-                    <td class="px-4 py-4"><div class="h-3.5 w-8 bg-slate-200 dark:bg-slate-800 rounded mx-auto" /></td>
-                    <td class="px-4 py-4"><div class="h-3.5 w-20 bg-slate-200 dark:bg-slate-800 rounded" /></td>
-                    <td class="px-4 py-4 text-right">
-                      <div class="flex justify-end gap-1.5">
-                        <div class="h-7 w-20 bg-slate-200 dark:bg-slate-800 rounded-lg" />
-                        <div class="h-7 w-20 bg-slate-200 dark:bg-slate-800 rounded-lg" />
-                        <div class="h-7 w-12 bg-slate-200 dark:bg-slate-800 rounded-lg" />
-                      </div>
-                    </td>
-                  </tr>
-                </template>
+      <!-- Users table -->
+      <div class="card overflow-hidden">
+        <DataTable
+          :items="users"
+          :columns="columns"
+          :loading="loadingUsers"
+          :empty-message="t('users.empty')"
+          :empty-desc="t('users.emptyDesc')"
+          :sort-by="sortBy"
+          :sort-order="sortOrder"
+          :pagination="{
+            currentPage: pagination.current_page,
+            lastPage: pagination.last_page || 1,
+            total: pagination.total,
+            perPage: pagination.per_page,
+          }"
+          @sort="handleSort"
+          @page-change="changePage"
+          @per-page-change="changePerPage"
+        >
+          <!-- Telegram ID -->
+          <template #cell-telegramId="{ item }">
+            <span class="font-mono font-semibold text-slate-600 dark:text-slate-300 select-all">{{ item.telegramId }}</span>
+          </template>
 
-                <tr v-else-if="!users.length">
-                  <td colspan="8" class="px-4 py-10 text-center text-slate-400">{{ t('users.empty') }}</td>
-                </tr>
-
-                <tr v-else v-for="user in users" :key="user.id" class="table-row-base">
-                  <td class="px-4 py-3 font-mono font-semibold text-slate-600 dark:text-slate-300 select-all">{{ user.telegramId }}</td>
-                  <td class="px-4 py-3 font-semibold text-slate-800 dark:text-slate-200">
-                    {{ user.firstName }} {{ user.lastName }}
-                  </td>
-                  <td class="px-4 py-3 text-slate-600 dark:text-slate-400 font-mono">
-                    <a v-if="user.username" :href="`https://t.me/${user.username}`" target="_blank" class="hover:underline hover:text-amber-500">
-                      @{{ user.username }}
-                    </a>
-                    <span v-else>—</span>
-                  </td>
-                  <td class="px-4 py-3">
-                    <span :class="getLanguageBadgeClass(user.preferredLanguage || user.language || 'am')">
-                      <span>{{ getLanguageFlag(user.preferredLanguage || user.language || 'am') }}</span>
-                      {{ (user.preferredLanguage || user.language || 'am').toUpperCase() }}
-                    </span>
-                  </td>
-                  <td class="px-4 py-3">
-                    <span class="badge select-none"
-                      :class="user.active === false
-                      ? 'bg-red-50 text-red-600 border border-red-200 dark:bg-red-950/30 dark:text-red-400 dark:border-red-800'
-                      : 'bg-emerald-50 text-emerald-600 border border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-800'">
-                      {{ user.active === false ? t('user.banned') : t('user.active') }}
-                    </span>
-                  </td>
-                  <td class="px-4 py-3 font-semibold text-slate-600 dark:text-slate-400 font-mono">{{ user.feedbackCount || 0 }}</td>
-                  <td class="px-4 py-3 text-slate-400 whitespace-nowrap">{{ formatDate(user.joinedAt) }}</td>
-                  <td class="px-4 py-3 text-right relative">
-                    <!-- Three vertical dots action trigger button -->
-                    <button
-                      @click.stop="toggleDropdown(user.id, $event)"
-                      class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-                      title="Actions"
-                    >
-                      <EllipsisVerticalIcon class="w-5 h-5" />
-                    </button>
-
-                    <!-- Row actions context dropdown overlay menu -->
-                    <div
-                      v-if="activeDropdownId === user.id"
-                      class="absolute right-4 top-10 mt-1 w-44 rounded-xl border border-slate-200 bg-white shadow-xl shadow-slate-200/60 dark:border-slate-800 dark:bg-slate-900 dark:shadow-slate-950/60 py-1.5 z-40 text-left"
-                    >
-                      <button
-                        @click="$router.push(`/users/${user.id}`); closeDropdown()"
-                        class="w-full flex items-center gap-2 px-3.5 py-2 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
-                      >
-                        <UserIcon class="w-4 h-4 text-slate-400" />
-                        {{ t('users.viewProfile') }}
-                      </button>
-                      <button
-                        @click="openDM(user); closeDropdown()"
-                        class="w-full flex items-center gap-2 px-3.5 py-2 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
-                      >
-                        <PaperAirplaneIcon class="w-4 h-4 text-slate-400" />
-                        {{ t('user.sendNotif') }}
-                      </button>
-                      <div class="border-t border-slate-100 dark:border-slate-800 my-1"></div>
-                      <button
-                        @click="toggleStatus(user); closeDropdown()"
-                        class="w-full flex items-center gap-2 px-3.5 py-2 text-xs font-semibold transition-colors"
-                        :class="user.active === false
-                          ? 'text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/20'
-                          : 'text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20'"
-                      >
-                        <component :is="user.active === false ? CheckCircleIcon : NoSymbolIcon" class="w-4 h-4" />
-                        {{ user.active === false ? t('user.unban') : t('user.ban') }}
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <!-- Pagination details -->
-          <div class="flex items-center justify-between px-4 py-3 border-t border-slate-100 dark:border-slate-800 text-xs text-slate-500">
-            <div class="flex items-center gap-4">
-              <span>{{ t('feedback.pageOf', { current: pagination.current_page, total: pagination.last_page || 1 }) }}</span>
-              <div class="flex items-center gap-2">
-                <span class="text-slate-400 whitespace-nowrap">Per page:</span>
-                <select v-model="pagination.per_page" @change="changePerPage" class="text-xs py-1 px-2 pr-8 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-0 focus:border-slate-200 dark:focus:border-slate-700 cursor-pointer">
-                  <option :value="10">10</option>
-                  <option :value="25">25</option>
-                  <option :value="50">50</option>
-                  <option :value="100">100</option>
-                </select>
-              </div>
+          <!-- User -->
+          <template #cell-user="{ item }">
+            <div class="font-semibold text-slate-800 dark:text-slate-200">
+              {{ item.firstName }} {{ item.lastName }}
             </div>
-            <div class="flex gap-2">
-              <button @click="changePage(pagination.current_page - 1)" :disabled="pagination.current_page <= 1"
-                      class="px-4 py-2 text-sm font-medium rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-40 transition-colors">
-                {{ t('feedback.prevPage') }}
-              </button>
-              <button @click="changePage(pagination.current_page + 1)" :disabled="pagination.current_page >= pagination.last_page"
-                      class="px-4 py-2 text-sm font-medium rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-40 transition-colors">
-                {{ t('feedback.nextPage') }}
-              </button>
-            </div>
-          </div>
-        </div>
-      </main>
+            <a v-if="item.username" :href="`https://t.me/${item.username}`" target="_blank" class="text-[10px] text-slate-400 font-mono hover:underline hover:text-amber-500">
+              @{{ item.username }}
+            </a>
+            <span v-else class="text-[10px] text-slate-400 font-mono">—</span>
+          </template>
+
+          <!-- Language -->
+          <template #cell-language="{ item }">
+            <span :class="getLanguageBadgeClass(item.preferredLanguage || item.language || 'am')" class="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full">
+              <span>{{ getLanguageFlag(item.preferredLanguage || item.language || 'am') }}</span>
+              {{ (item.preferredLanguage || item.language || 'am').toUpperCase() }}
+            </span>
+          </template>
+
+          <!-- Status -->
+          <template #cell-status="{ item }">
+            <span class="badge select-none text-[10px]"
+              :class="item.active === false
+              ? 'bg-red-50 text-red-600 border border-red-200 dark:bg-red-950/30 dark:text-red-400 dark:border-red-800'
+              : 'bg-emerald-50 text-emerald-600 border border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-800'">
+              {{ item.active === false ? t('user.banned') : t('user.active') }}
+            </span>
+          </template>
+
+          <!-- Feedbacks -->
+          <template #cell-feedbackCount="{ item }">
+            <span class="font-semibold text-slate-600 dark:text-slate-400 font-mono">{{ item.feedbackCount || 0 }}</span>
+          </template>
+
+          <!-- Joined -->
+          <template #cell-joinedAt="{ item }">
+            <span class="text-xs text-slate-400 whitespace-nowrap">{{ formatDate(item.joinedAt) }}</span>
+          </template>
+
+          <!-- Actions -->
+          <template #cell-actions="{ item }">
+            <ActionDropdown :item="item" :actions="getRowActions(item)" />
+          </template>
+        </DataTable>
+      </div>
+
+    </main>
 
     <!-- Direct Message Modal -->
     <teleport to="body">
@@ -176,7 +122,7 @@
               <div>
                 <h3 class="text-base font-bold text-slate-900 dark:text-slate-100">{{ t('user.sendNotif') }}</h3>
                 <p class="text-xs text-slate-400 mt-0.5">
-                  To: <span class="font-semibold text-slate-600 dark:text-slate-300 font-ethiopic">{{ targetUser.firstName }}</span>
+                  To: <span class="font-semibold text-slate-600 dark:text-slate-300">{{ targetUser.firstName }}</span>
                   (ID: {{ targetUser.telegramId }})
                 </p>
               </div>
@@ -190,13 +136,13 @@
                 <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">{{ t('feedback.message') }}</label>
                 <textarea v-model="dmText" rows="4" required
                           placeholder="Write your message to this subscriber…"
-                          class="input-base text-xs resize-none" />
+                          class="input-base text-xs w-full resize-none" />
               </div>
               <div class="flex justify-end gap-3">
-                <AppButton type="button" variant="ghost" size="sm" @click="targetUser = null">{{ t('common.cancel') }}</AppButton>
-                <AppButton type="submit" variant="primary" size="sm" :loading="sending">
+                <Button type="button" variant="ghost" @click="targetUser = null">{{ t('common.cancel') }}</Button>
+                <Button type="submit" variant="primary" :loading="sending">
                   {{ t('user.sendNotif') }}
-                </AppButton>
+                </Button>
               </div>
             </form>
           </div>
@@ -223,14 +169,13 @@
             </p>
             
             <div class="flex justify-end gap-3">
-              <AppButton variant="ghost" size="sm" @click="banConfirmItem = null">{{ t('common.cancel') }}</AppButton>
-              <AppButton
-                :variant="banConfirmItem.active === false ? 'success' : 'danger'"
-                size="sm"
+              <Button variant="ghost" @click="banConfirmItem = null">{{ t('common.cancel') }}</Button>
+              <Button
+                :variant="banConfirmItem.active === false ? 'primary' : 'danger'"
                 @click="executeToggleStatus"
               >
                 {{ banConfirmItem.active === false ? t('user.unbanBtn') : t('user.banBtn') }}
-              </AppButton>
+              </Button>
             </div>
           </div>
         </div>
@@ -239,96 +184,150 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { useLanguageStore } from "@/stores/languageStore";
 import { useEnumI18n } from '@/bot_enums';
-import { ref, onMounted, onUnmounted, inject } from 'vue';
-import AppButton from '@/components/AppButton.vue';
-import axios   from 'axios';
+import { ref, computed, onMounted, inject } from 'vue';
+import { useRouter } from 'vue-router';
+import apiClient from '@/api/apiClient';
 
-import { XMarkIcon, ExclamationTriangleIcon, CheckCircleIcon, EllipsisVerticalIcon, UserIcon, PaperAirplaneIcon, NoSymbolIcon } from '@heroicons/vue/24/outline';
+// Components
+import PageTitle from '@/components/common/PageTitle.vue';
+import TableToolbar from '@/components/common/TableToolbar.vue';
+import FormSelect from '@/components/common/FormSelect.vue';
+import DataTable from '@/components/common/DataTable.vue';
+import ActionDropdown from '@/components/common/ActionDropdown.vue';
+import Button from '@/components/common/Button.vue';
+
+import { 
+  UserGroupIcon, XMarkIcon, ExclamationTriangleIcon, 
+  CheckCircleIcon, UserIcon, PaperAirplaneIcon, NoSymbolIcon 
+} from '@heroicons/vue/24/outline';
 
 const languageStore = useLanguageStore();
-const t = (k, p) => languageStore.translate(k, p);
+const t = (k: string, p?: any) => languageStore.translate(k, p);
 const { languageOptions } = useEnumI18n();
+const router = useRouter();
 
-const users       = ref([]);
-const search      = ref('');
-const filterLang  = ref('');
-const targetUser  = ref(null);
-const dmText      = ref('');
-const sending     = ref(false);
+const users = ref<any[]>([]);
+const search = ref('');
+const filterLang = ref('');
+const filterStatus = ref('');
+const sortBy = ref('');
+const sortOrder = ref<'asc' | 'desc'>('desc');
+const showFilters = ref(sessionStorage.getItem('users_bot_filters_visible') === 'true');
+const targetUser = ref<any>(null);
+const dmText = ref('');
+const sending = ref(false);
 const loadingUsers = ref(false);
-const showToast   = inject('showToast');
+const showToast = inject('showToast') as any;
 
 const pagination = ref({ current_page: 1, last_page: 1, per_page: 10, total: 0 });
 
-// Dropdown state
-const activeDropdownId = ref(null);
+const banConfirmItem = ref<any>(null);
 
-const toggleDropdown = (id, event) => {
-  if (activeDropdownId.value === id) {
-    activeDropdownId.value = null;
+const activeFilterCount = computed(() => {
+  let c = 0;
+  if (search.value) c++;
+  if (filterLang.value) c++;
+  if (filterStatus.value) c++;
+  return c;
+});
+
+const clearFilters = () => {
+  search.value = '';
+  filterLang.value = '';
+  filterStatus.value = '';
+  pagination.value.current_page = 1;
+  fetchUsers();
+};
+
+const columns = computed(() => [
+  { key: 'telegramId', label: t('users.telegramId'), width: '120px', sortable: true  },
+  { key: 'user',       label: t('users.name'),       width: '200px', sortable: true  },
+  { key: 'language',   label: t('users.language'),   width: '100px', sortable: true  },
+  { key: 'status',     label: t('users.status'),     width: '100px', sortable: true  },
+  { key: 'feedbackCount', label: t('users.feedbacks'), width: '100px', sortable: false },
+  { key: 'joinedAt',   label: t('users.joined'),     width: '120px', sortable: true  },
+  { key: 'actions',    label: t('users.actions'),    width: '60px',  align: 'right' as const },
+]);
+
+const handleSort = (key: string) => {
+  if (sortBy.value === key) {
+    sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc';
   } else {
-    activeDropdownId.value = id;
+    sortBy.value = key;
+    sortOrder.value = 'desc';
   }
+  pagination.value.current_page = 1;
+  fetchUsers();
 };
 
-const closeDropdown = () => {
-  activeDropdownId.value = null;
-};
-
-// Global click handler to close dropdown when clicking outside
-const handleClickOutside = () => {
-  if (activeDropdownId.value) {
-    activeDropdownId.value = null;
+const getRowActions = (user: any) => [
+  {
+    label: t('users.viewProfile'),
+    icon: UserIcon,
+    onClick: () => router.push(`/users/${user.id}`),
+  },
+  {
+    label: t('user.sendNotif'),
+    icon: PaperAirplaneIcon,
+    onClick: () => openDM(user),
+  },
+  {
+    label: user.active === false ? t('user.unban') : t('user.ban'),
+    icon: user.active === false ? CheckCircleIcon : NoSymbolIcon,
+    colorClass: user.active === false ? 'text-emerald-500' : 'text-red-500',
+    onClick: () => toggleStatus(user),
   }
-};
-
-// Modal ban confirmation tracking
-const banConfirmItem = ref(null);
+];
 
 const fetchUsers = async () => {
   loadingUsers.value = true;
   try {
-    const params = {
+    const params: any = {
       search: search.value,
       page: pagination.value.current_page,
-      per_page: pagination.value.per_page
+      per_page: pagination.value.per_page,
     };
-    if (filterLang.value) {
-      params.language = filterLang.value;
+    if (filterLang.value) params.language = filterLang.value;
+    if (filterStatus.value) params.active = filterStatus.value;
+    if (sortBy.value) {
+      params.sort_by = sortBy.value;
+      params.sort_order = sortOrder.value;
     }
-    const res = await axios.get('/users', { params });
-    users.value = res.data.data || res.data;
+
+    const res = await apiClient.get('/bot/users', { params });
+    users.value = Array.isArray(res.data) ? res.data : (res.data.data || []);
     if (res.data.meta) {
       pagination.value = res.data.meta;
     }
   } catch (err) {
-    showToast('Failed to load subscribers', 'error');
+    showToast?.('Failed to load users', 'error');
   } finally {
     loadingUsers.value = false;
   }
 };
 
-let timer;
+let timer: ReturnType<typeof setTimeout>;
 const debouncedFetch = () => {
   clearTimeout(timer);
   pagination.value.current_page = 1;
   timer = setTimeout(fetchUsers, 350);
 };
 
-const changePage = (page) => {
+const changePage = (page: number) => {
   pagination.value.current_page = page;
   fetchUsers();
 };
 
-const changePerPage = () => {
+const changePerPage = (size: number) => {
+  pagination.value.per_page = size;
   pagination.value.current_page = 1;
   fetchUsers();
 };
 
-const toggleStatus = (user) => {
+const toggleStatus = (user: any) => {
   banConfirmItem.value = user;
 };
 
@@ -337,39 +336,39 @@ const executeToggleStatus = async () => {
   const user = banConfirmItem.value;
   banConfirmItem.value = null;
   try {
-    await axios.post(`/users/${user.id}/toggle-status`);
-    showToast(t('user.statusUpdated'));
+    await apiClient.post(`/bot/users/${user.id}/toggle-status`);
+    showToast?.(t('user.statusUpdated'));
     fetchUsers();
   } catch {
-    showToast(t('user.statusUpdateFailed'), 'error');
+    showToast?.(t('user.statusUpdateFailed'), 'error');
   }
 };
 
-const openDM = (user) => { targetUser.value = user; dmText.value = ''; };
+const openDM = (user: any) => { targetUser.value = user; dmText.value = ''; };
 
 const sendDM = async () => {
   sending.value = true;
   try {
-    await axios.post(`/users/${targetUser.value.id}/message`, { message: dmText.value });
-    showToast(t('user.messageSent'));
+    await apiClient.post(`/bot/users/${targetUser.value.id}/message`, { message: dmText.value });
+    showToast?.(t('user.messageSent'));
     targetUser.value = null;
   } catch { 
-    showToast(t('user.messageSendFailed'), 'error'); 
+    showToast?.(t('user.messageSendFailed'), 'error'); 
   } finally { 
     sending.value = false; 
   }
 };
 
-const getLanguageBadgeClass = (lang) => {
+const getLanguageBadgeClass = (lang: string) => {
   switch (lang) {
-    case 'am': return 'lang-badge-am';
-    case 'en': return 'lang-badge-en';
-    case 'om': return 'lang-badge-om';
-    default: return 'lang-badge-en';
+    case 'am': return 'lang-badge-am bg-amber-50 text-amber-600 border border-amber-200';
+    case 'en': return 'lang-badge-en bg-blue-50 text-blue-600 border border-blue-200';
+    case 'om': return 'lang-badge-om bg-emerald-50 text-emerald-600 border border-emerald-200';
+    default: return 'lang-badge-en bg-slate-50 text-slate-600 border border-slate-200';
   }
 };
 
-const getLanguageFlag = (lang) => {
+const getLanguageFlag = (lang: string) => {
   switch (lang) {
     case 'am': return '🇪🇹';
     case 'om': return '🇪🇹';
@@ -378,14 +377,9 @@ const getLanguageFlag = (lang) => {
   }
 };
 
-const formatDate = (d) => d ? new Date(d).toLocaleDateString() : '—';
+const formatDate = (d: string) => d ? new Date(d).toLocaleDateString() : '—';
 
 onMounted(() => {
   fetchUsers();
-  document.addEventListener('click', handleClickOutside);
-});
-
-onUnmounted(() => {
-  document.removeEventListener('click', handleClickOutside);
 });
 </script>
