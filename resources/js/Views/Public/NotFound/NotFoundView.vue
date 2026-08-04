@@ -182,14 +182,11 @@ const navigationCards = [
  <div
  class="pt-8 flex flex-col md:flex-row items-center justify-between gap-6 border-t border-card-border/50 text-sm font-normal text-main-text/20 animate-in fade-in duration-1000 delay-500">
  <div class="flex items-center gap-6">
- <span
- >&copy; {{ new Date().getFullYear() }} Abugida LMS. All
- Reserved.</span
- >
+ <span>&copy; {{ new Date().getFullYear() }} Senbet System. All rights reserved.</span>
  </div>
- <div class="flex items-center gap-8">
+ <div class="flex items-center gap-4">
  <a
- href="mailto:support@abugida.pro"
+ href="mailto:support@senbetsystem.com"
  class="flex items-center gap-2 hover:text-accent transition-colors">
  <LifeBuoy class="w-4 h-4" />
  {{ $tr("not_found.support") }}
