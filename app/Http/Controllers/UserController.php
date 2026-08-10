@@ -58,7 +58,7 @@ class UserController extends Controller implements HasMiddleware {
         if (!$user instanceof \App\Models\User) {
             $user = \App\Models\User::findOrFail($user);
         }
-        return Response::_200(UserResource::success($user->load(['info', 'roles', 'directPermissions'])));
+        return Response::_200(UserResource::success($user->load(['info', 'roles', 'directPermissions', 'senbetMembership'])));
     }
 
     /**
@@ -75,7 +75,7 @@ class UserController extends Controller implements HasMiddleware {
      */
     private function applyFilters(Request $request) {
         $query = User::query()
-            ->with(['roles.permissions', 'directPermissions', 'info'])
+            ->with(['roles.permissions', 'directPermissions', 'info', 'senbetMembership'])
             ->whereDoesntHave('roles', function ($q) {
                 $q->where('slug', 'super-admin');
             });
@@ -147,19 +147,21 @@ class UserController extends Controller implements HasMiddleware {
         $currentUser = Auth::user();
 
         // 1. Permission & Hierarchy Check
-        if (isset($data['role'])) {
-            $role = Role::whereIn('slug', [$data['role'], 'super-admin'])->where('slug', $data['role'])->firstOrFail();
+        if (isset($data['roles']) && is_array($data['roles'])) {
+            $roles = Role::whereIn('slug', $data['roles'])->get();
             
             // Critical Rule: Only one Super Admin can exist in the entire system
-            if ($role->slug === 'super-admin') {
+            if ($roles->contains('slug', 'super-admin')) {
                 $hasSuperAdmin = User::whereHas('roles', fn($q) => $q->where('slug', 'super-admin'))->exists();
                 if ($hasSuperAdmin) {
                     return Response::_422('The system only allows one primary Super Administrator.');
                 }
             }
 
-            if (!$currentUser->canModifyRole($role)) {
-                return Response::_403(BackMessage::get('forbidden'));
+            foreach ($roles as $role) {
+                if (!$currentUser->canModifyRole($role)) {
+                    return Response::_403(BackMessage::get('forbidden'));
+                }
             }
         } else {
             return Response::_422(BackMessage::get('role_required'));
@@ -173,23 +175,36 @@ class UserController extends Controller implements HasMiddleware {
 
             // 3. Create Core User
             $user = User::create([
-                'name' => ['en' => $data['name']],
-                'email' => $data['email'],
+                'name' => ['en' => $data['name'] ?? 'No Name'], // name could be optional for students, handle properly
+                'email' => $data['email'] ?? null,
                 'password' => Hash::make($password),
                 'is_active' => $data['is_active'] ?? true,
             ]);
 
+            if (isset($data['name']) && $data['name']) {
+                $user->name = ['en' => $data['name']];
+            } else {
+                // If name is omitted, construct it from info fields (as name might be nullable now for students, although validation in UserRequest checks name based on $isRegister...)
+                // Actually the validation says 'name' is required for register. So it's safe.
+            }
+
             // 4. Create User Info
             $userInfoData = [
-                'registration_id'    => $data['registration_id'],
-                'gender'             => $data['gender'] ?? null,
-                'phone_number'       => $data['phone_number'] ?? null,
-                'date_of_birth'      => $data['date_of_birth'] ?? null,
-                'address'            => $data['address'] ?? null,
+                'registration_id'       => $data['registration_id'],
+                'gender'                => $data['gender'] ?? null,
+                'phone_number'          => $data['phone_number'] ?? null,
+                'address'               => $data['address'] ?? null,
+                'father_name'           => $data['father_name'] ?? null,
+                'grandfather_name'      => $data['grandfather_name'] ?? null,
+                'christian_name'        => $data['christian_name'] ?? null,
+                'spiritual_father_name' => $data['spiritual_father_name'] ?? null,
+                'sub_city'              => $data['sub_city'] ?? null,
+                'woreda'                => $data['woreda'] ?? null,
+                'house_number'          => $data['house_number'] ?? null,
             ];
 
             if ($request->has('phone_number') && $data['phone_number']) {
-                $userInfoData['phone_number'] = '+251' . $data['phone_number'];
+                $userInfoData['phone_number'] = '+251' . ltrim($data['phone_number'], '0');
             }
 
             if ($request->hasFile('profile_picture')) {
@@ -199,19 +214,68 @@ class UserController extends Controller implements HasMiddleware {
 
             $user->info()->create($userInfoData);
 
-            // 5. Assign Role
-            $user->roles()->attach($role->id, [
-                'assigned_by' => $currentUser->id,
-                'start_date'  => now(),
-                'is_active'   => true,
-            ]);
+            // 5. Assign Roles
+            $rolesSyncData = [];
+            foreach ($roles as $role) {
+                $rolesSyncData[$role->id] = [
+                    'assigned_by' => $currentUser->id,
+                    'start_date'  => now(),
+                    'is_active'   => true,
+                ];
+            }
+            $user->roles()->sync($rolesSyncData);
+
+            // 6. Senbet Membership
+            if (isset($data['is_member']) && ($data['is_member'] == true || $data['is_member'] == 'true' || $data['is_member'] == 1)) {
+                $membershipData = [
+                    'date_of_birth' => $data['senbet_date_of_birth'] ?? null,
+                    'education_level' => $data['education_level'] ?? null,
+                    'emergency_name' => $data['emergency_name'] ?? null,
+                    'emergency_phone' => $data['emergency_phone'] ?? null,
+                    'emergency_sub_city' => $data['emergency_sub_city'] ?? null,
+                    'emergency_woreda' => $data['emergency_woreda'] ?? null,
+                    'emergency_house_number' => $data['emergency_house_number'] ?? null,
+                    'emergency_address' => $data['emergency_address'] ?? null,
+                    'registration_date' => now(),
+                    'senbet_class' => $data['senbet_class'] ?? null,
+                    'previous_participation' => filter_var($data['previous_participation'] ?? false, FILTER_VALIDATE_BOOLEAN),
+                ];
+
+                if ($request->hasFile('previous_participation_document')) {
+                    $file = $request->file('previous_participation_document');
+                    $ext = strtolower($file->getClientOriginalExtension());
+                    if (in_array($ext, ['jpg', 'jpeg', 'png'])) {
+                        // Image to PDF conversion using TCPDF
+                        $pdf = new \TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+                        $pdf->SetCreator(PDF_CREATOR);
+                        $pdf->SetTitle('Previous Participation Document');
+                        $pdf->AddPage();
+                        $pdf->Image($file->getRealPath(), 15, 15, 180, 0, '', '', '', false, 300, '', false, false, 0);
+                        
+                        $pdfDir = storage_path('app/public/membership_documents');
+                        if (!file_exists($pdfDir)) mkdir($pdfDir, 0755, true);
+                        
+                        $filename = 'doc_' . time() . '_' . Str::random(5) . '.pdf';
+                        $pdf->Output($pdfDir . '/' . $filename, 'F');
+                        
+                        $membershipData['previous_participation_document'] = 'membership_documents/' . $filename;
+                    } else {
+                        $path = $file->store('membership_documents', 'public');
+                        $membershipData['previous_participation_document'] = $path;
+                    }
+                }
+
+                $user->senbetMembership()->create($membershipData);
+            }
 
             DB::commit();
 
-            // 6. Queue Welcome Email
-            Mail::to($user->email)->queue(new UserRegisteredMail($user, $password));
+            // 7. Queue Welcome Email if email exists
+            if ($user->email) {
+                Mail::to($user->email)->queue(new UserRegisteredMail($user, $password));
+            }
 
-            return Response::_201(UserResource::success($user->load('info', 'roles'), 'user_created_success'));
+            return Response::_201(UserResource::success($user->load('info', 'roles', 'senbetMembership'), 'user_created_success'));
         } catch (\Exception $e) {
             DB::rollBack();
             throw $e;
@@ -235,18 +299,40 @@ class UserController extends Controller implements HasMiddleware {
             DB::transaction(function () use ($user, $data, $request, $currentUser) {
                 $user->update([
                     'name'      => isset($data['name']) ? ['en' => $data['name']] : $user->name,
-                    'email'     => $data['email'] ?? $user->email,
+                    'email'     => array_key_exists('email', $data) ? $data['email'] : $user->email,
                     'is_active' => $data['is_active'] ?? $user->is_active,
                 ]);
+
+                if (isset($data['roles']) && is_array($data['roles'])) {
+                    $roles = Role::whereIn('slug', $data['roles'])->get();
+                    
+                    // Critical Rule: Super Admin validation
+                    if ($roles->contains('slug', 'super-admin')) {
+                        $hasSuperAdmin = User::whereHas('roles', fn($q) => $q->where('slug', 'super-admin'))
+                            ->where('users.id', '!=', $user->id)
+                            ->exists();
+                        if ($hasSuperAdmin) {
+                            throw new \Exception('The system only allows one primary Super Administrator.');
+                        }
+                    }
+
+                    $rolesSyncData = [];
+                    foreach ($roles as $role) {
+                        $rolesSyncData[$role->id] = [
+                            'assigned_by' => $currentUser->id,
+                            'start_date'  => now(),
+                            'is_active'   => true,
+                        ];
+                    }
+                    $user->roles()->sync($rolesSyncData);
+                }
 
                 // Prepare User Info fields
                 $userInfoData = [];
                 $infoFields = [
-                    'registration_id',
-                    'gender',
-                    'phone_number',
-                    'date_of_birth',
-                    'address'
+                    'registration_id', 'gender', 'phone_number', 'address',
+                    'father_name', 'grandfather_name', 'christian_name',
+                    'spiritual_father_name', 'sub_city', 'woreda', 'house_number'
                 ];
 
                 foreach ($infoFields as $field) {
@@ -254,8 +340,6 @@ class UserController extends Controller implements HasMiddleware {
                         $userInfoData[$field] = $data[$field];
                     }
                 }
-
-
 
                 // Handle Profile Picture
                 if ($request->hasFile('profile_picture')) {
@@ -271,7 +355,7 @@ class UserController extends Controller implements HasMiddleware {
 
                 if (!empty($userInfoData)) {
                     if (isset($userInfoData['phone_number']) && $userInfoData['phone_number']) {
-                        $userInfoData['phone_number'] = '+251' . $userInfoData['phone_number'];
+                        $userInfoData['phone_number'] = '+251' . ltrim($userInfoData['phone_number'], '0');
                     }
                     // Update or Create info
                     $user->info()->updateOrCreate(
@@ -282,12 +366,76 @@ class UserController extends Controller implements HasMiddleware {
                         )
                     );
                 }
+
+                // Update Senbet Membership
+                if (isset($data['is_member']) && ($data['is_member'] == true || $data['is_member'] == 'true' || $data['is_member'] == 1)) {
+                    $membershipData = [];
+                    $membershipFields = [
+                        'senbet_date_of_birth' => 'date_of_birth',
+                        'education_level' => 'education_level',
+                        'emergency_name' => 'emergency_name',
+                        'emergency_phone' => 'emergency_phone',
+                        'emergency_sub_city' => 'emergency_sub_city',
+                        'emergency_woreda' => 'emergency_woreda',
+                        'emergency_house_number' => 'emergency_house_number',
+                        'emergency_address' => 'emergency_address',
+                        'senbet_class' => 'senbet_class'
+                    ];
+
+                    foreach ($membershipFields as $reqField => $dbField) {
+                        if (array_key_exists($reqField, $data)) {
+                            $membershipData[$dbField] = $data[$reqField];
+                        }
+                    }
+
+                    if (isset($data['previous_participation'])) {
+                        $membershipData['previous_participation'] = filter_var($data['previous_participation'], FILTER_VALIDATE_BOOLEAN);
+                    }
+
+                    if ($request->hasFile('previous_participation_document')) {
+                        // Delete old if exists
+                        if ($user->senbetMembership && $user->senbetMembership->previous_participation_document) {
+                            \Illuminate\Support\Facades\Storage::disk('public')->delete($user->senbetMembership->previous_participation_document);
+                        }
+
+                        $file = $request->file('previous_participation_document');
+                        $ext = strtolower($file->getClientOriginalExtension());
+                        if (in_array($ext, ['jpg', 'jpeg', 'png'])) {
+                            // Convert to PDF
+                            $pdf = new \TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+                            $pdf->SetCreator(PDF_CREATOR);
+                            $pdf->AddPage();
+                            $pdf->Image($file->getRealPath(), 15, 15, 180, 0, '', '', '', false, 300, '', false, false, 0);
+                            $pdfDir = storage_path('app/public/membership_documents');
+                            if (!file_exists($pdfDir)) mkdir($pdfDir, 0755, true);
+                            $filename = 'doc_' . time() . '_' . Str::random(5) . '.pdf';
+                            $pdf->Output($pdfDir . '/' . $filename, 'F');
+                            $membershipData['previous_participation_document'] = 'membership_documents/' . $filename;
+                        } else {
+                            $path = $file->store('membership_documents', 'public');
+                            $membershipData['previous_participation_document'] = $path;
+                        }
+                    }
+
+                    if ($user->senbetMembership) {
+                        $user->senbetMembership()->update($membershipData);
+                    } else {
+                        $membershipData['registration_date'] = now();
+                        $user->senbetMembership()->create($membershipData);
+                    }
+                } elseif (isset($data['is_member']) && ($data['is_member'] == false || $data['is_member'] == 'false' || $data['is_member'] == 0)) {
+                    // if explicitly false, maybe delete or just leave it alone? Requirements say "optional".
+                    // For now, if they uncheck it, we soft delete it.
+                    if ($user->senbetMembership) {
+                        $user->senbetMembership()->delete();
+                    }
+                }
             });
         } catch (\Exception $e) {
             return Response::_422($e->getMessage());
         }
 
-        return Response::_200(UserResource::success($user->load(['info']), 'user_updated_success'));
+        return Response::_200(UserResource::success($user->load(['info', 'roles', 'senbetMembership']), 'user_updated_success'));
     }
 
     /**
@@ -364,7 +512,7 @@ class UserController extends Controller implements HasMiddleware {
             'updated_at' => now(),
         ]);
 
-        return Response::_200(UserResource::success($user->load(['roles']), 'role_assigned_success'));
+        return Response::_200(UserResource::success($user->load(['roles', 'senbetMembership']), 'role_assigned_success'));
     }
 
     /**
