@@ -214,7 +214,7 @@ const menuGroups = computed<MenuGroup[]>(() => [
         name: "dashboard",
         icon: LayoutDashboard,
         to: "/dashboard",
-        condition: () => isSuperAdmin.value || perms.dashboard.canView.value,
+        condition: () => perms.dashboard.canView.value,
       },
     ],
   },
@@ -225,53 +225,53 @@ const menuGroups = computed<MenuGroup[]>(() => [
         name: "nav.feedback",
         icon: MessageSquare,
         to: "/dashboard/telegram-bot/feedback",
-        condition: () => isSuperAdmin.value || perms.bot.canView.value,
+        condition: () => perms.bot.canView.value,
       },
       {
         name: "nav.bot_users",
         icon: Users,
         to: "/dashboard/telegram-bot/users",
-        condition: () => isSuperAdmin.value || perms.bot.canManage?.value || authStore.isStaff,
+        condition: () => perms.bot.canManage?.value || authStore.isStaff,
       },
       {
         name: "nav.notifications",
         icon: Bell,
         to: "/dashboard/telegram-bot/notifications",
-        condition: () => isSuperAdmin.value || perms.bot.canNotify?.value || authStore.isStaff,
+        condition: () => perms.bot.canNotify?.value || authStore.isStaff,
       },
       {
         name: "nav.bot_settings",
         icon: Settings,
         to: "/dashboard/telegram-bot/settings",
-        condition: () => isSuperAdmin.value || perms.bot.canManage?.value || authStore.isStaff,
+        condition: () => perms.bot.canManage?.value || authStore.isStaff,
       },
     ],
   },
   {
     name: "nav.system",
-    condition: () => isSuperAdmin.value || authStore.isStaff,
+    condition: () => authStore.isStaff,
     items: [
       {
         name: "nav.user_management",
         icon: ShieldCheck,
         to: "/dashboard/system/user-management/roles",
         condition: () =>
-          isSuperAdmin.value || perms.roles.canView.value || perms.permissions.canView.value,
+          perms.roles.canView.value || perms.permissions.canView.value,
         children: [
           {
             name: "nav.users",
             to: "/dashboard/system/user-management/users",
-            condition: () => isSuperAdmin.value || perms.users.canView.value,
+            condition: () => perms.users.canView.value,
           },
           {
             name: "nav.roles",
             to: "/dashboard/system/user-management/roles",
-            condition: () => isSuperAdmin.value || perms.roles.canView.value,
+            condition: () => perms.roles.canView.value,
           },
           {
             name: "nav.permissions",
             to: "/dashboard/system/user-management/permissions",
-            condition: () => isSuperAdmin.value || perms.permissions.canView.value,
+            condition: () => perms.permissions.canView.value,
           },
         ],
       },
@@ -281,7 +281,6 @@ const menuGroups = computed<MenuGroup[]>(() => [
     // Academic Management — only visible to users with at least one academic permission
     name: "nav.academic",
     condition: () =>
-      isSuperAdmin.value ||
       perms.academicCourses.canView.value ||
       perms.academicClasses.canView.value,
     items: [
@@ -290,8 +289,7 @@ const menuGroups = computed<MenuGroup[]>(() => [
         name: "nav.courses",
         icon: GraduationCap,
         to: "/dashboard/academic/courses",
-        condition: () =>
-          isSuperAdmin.value || perms.academicCourses.canView.value,
+        condition: () => perms.academicCourses.canView.value,
       },
       {
         // My Classes — teachers, students, and admin
@@ -299,7 +297,6 @@ const menuGroups = computed<MenuGroup[]>(() => [
         icon: BookOpen,
         to: "/dashboard/academic/my-classes",
         condition: () =>
-          isSuperAdmin.value ||
           perms.academicCourses.canView.value ||
           perms.academicClasses.canView.value,
       },
@@ -317,6 +314,7 @@ const isActive = (item: MenuItem): boolean => {
 const visibleItems = (items: MenuItem[]): MenuItem[] => {
   return items
     .filter((item) => {
+      if (isSuperAdmin.value) return true;
       if (item.condition && !item.condition()) return false;
       if (item.children?.length) {
         return item.children.some((child) => !child.condition || child.condition());
@@ -328,7 +326,7 @@ const visibleItems = (items: MenuItem[]): MenuItem[] => {
         return {
           ...item,
           children: item.children.filter(
-            (child) => !child.condition || child.condition(),
+            (child) => isSuperAdmin.value || !child.condition || child.condition(),
           ),
         };
       }
@@ -343,6 +341,7 @@ const filteredMenuGroups = computed(() => {
       items: visibleItems(group.items),
     }))
     .filter((group) => {
+      if (isSuperAdmin.value) return group.items.length > 0;
       if (group.condition && !group.condition()) return false;
       return group.items.length > 0;
     });
