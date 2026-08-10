@@ -415,7 +415,7 @@ export const useUserStore = defineStore(
 
         const assignRole = async (
             userId: number,
-            roleSlug: string,
+            roles: string[],
             startDate?: string,
             endDate?: string,
         ) => {
@@ -423,7 +423,7 @@ export const useUserStore = defineStore(
                 const response = await apiClient.post(
                     `/system/users/${userId}/assign-role`,
                     {
-                        role: roleSlug,
+                        roles,
                         start_date: startDate,
                         end_date: endDate,
                     },
