@@ -7,6 +7,9 @@ export const FALLBACK_ROUTE_PRIORITY: { name: string; permission?: string }[] =
     [
         // Dashboard is always the first choice
         { name: "dashboard", permission: "dashboard.view" },
+        // Academic — teachers and students land here first after dashboard
+        { name: "academic-my-classes", permission: "academic_classes.view" },
+        { name: "academic-courses", permission: "academic_courses.view" },
         // Bot management routes
         { name: "bot-feedback", permission: "bot.view" },
         { name: "bot-users", permission: "bot.manage" },

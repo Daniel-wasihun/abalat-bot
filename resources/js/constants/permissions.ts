@@ -9,6 +9,9 @@ export const Modules = {
     PERMISSIONS: "permissions",
     SECURITY: "security",
     BOT: "bot",
+    // Academic Management
+    ACADEMIC_COURSES: "academic_courses",
+    ACADEMIC_CLASSES: "academic_classes",
 } as const;
 
 export type Module = (typeof Modules)[keyof typeof Modules];
