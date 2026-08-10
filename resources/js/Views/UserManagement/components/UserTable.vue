@@ -145,7 +145,7 @@ const getRoleStyles = (role: any) => {
  @update:selected="emit('update:selectedIds', $event)"
  row-key="id">
  
- <TableColumn field="university_id" :header="$tr('user.info.university_id') || 'University ID'" width="160px" sortable>
+ <TableColumn field="registration_id" :header="$tr('user.info.registration_no') || 'Reg. No.'" width="160px" sortable>
  <template #default="{ row: user }">
  <span
  class="px-3 py-1.5 rounded-xl bg-brand-blue/5 text-brand-blue text-[13px] font-normal border border-brand-blue/10 tracking-wide font-mono shrink-0 whitespace-nowrap">

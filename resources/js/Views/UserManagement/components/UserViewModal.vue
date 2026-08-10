@@ -291,11 +291,11 @@ const hasExpiringAccess = computed(
  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
  <div
  v-for="(val, label) in {
- 'user.registration_id': {
+ 'user.registration_no': {
  value:
  user.info?.registration_id ||
  user.info?.id_number ||
- user.university_id,
+ user.registration_id,
  icon: Hash,
  },
  'user.gender': {

@@ -305,7 +305,7 @@ const clearUser = () => {
  <div class="flex items-center gap-2 mt-1 min-w-0">
  <span
  class="text-[10px] font-bold text-brand-blue bg-brand-blue/10 px-2 py-0.5 rounded-lg tracking-widest shrink-0"
- >#{{ user.university_id || user.info?.user_university_id || user.id_number || user.employee_id || "N/A" }}</span>
+ >#{{ user.info?.registration_id || user.id_number || "N/A" }}</span>
  <span class="text-[11px] font-medium text-main-text/30 truncate">{{ user.email }}</span>
  </div>
  </div>
