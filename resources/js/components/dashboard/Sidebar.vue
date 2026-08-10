@@ -7,6 +7,7 @@ import {
   onMounted,
   onUnmounted,
   type FunctionalComponent,
+  type Component,
 } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import {
@@ -26,6 +27,8 @@ import {
   PanelLeftClose,
   Bot,
   Key,
+  GraduationCap,
+  BookOpen,
 } from "lucide-vue-next";
 import { useAuthStore } from "@/stores/authStore";
 import { useLanguageStore } from "@/stores/languageStore";
@@ -70,12 +73,15 @@ const localize = (val: any) => {
 
 // Permissions
 const perms = {
-  dashboard: usePermissions(Modules.DASHBOARD),
-  users: usePermissions(Modules.USERS),
-  roles: usePermissions(Modules.ROLES),
-  permissions: usePermissions(Modules.PERMISSIONS),
-  security: usePermissions(Modules.SECURITY),
-  bot: usePermissions(Modules.BOT),
+  dashboard:        usePermissions(Modules.DASHBOARD),
+  users:            usePermissions(Modules.USERS),
+  roles:            usePermissions(Modules.ROLES),
+  permissions:      usePermissions(Modules.PERMISSIONS),
+  security:         usePermissions(Modules.SECURITY),
+  bot:              usePermissions(Modules.BOT),
+  // Academic modules
+  academicCourses:  usePermissions(Modules.ACADEMIC_COURSES),
+  academicClasses:  usePermissions(Modules.ACADEMIC_CLASSES),
 };
 
 const toggleMenu = (name: string) => {
@@ -180,7 +186,7 @@ const userInitial = computed(() => {
 
 interface MenuItem {
   name: string;
-  icon?: FunctionalComponent;
+  icon?: Component;
   to: string;
   condition?: () => boolean;
   children?: MenuItem[];
@@ -200,7 +206,7 @@ const isSuperAdmin = computed(() => {
   return ['super-admin', 'superadmin'].includes(slug);
 });
 
-const menuGroups: MenuGroup[] = [
+const menuGroups = computed<MenuGroup[]>(() => [
   {
     name: "nav.main",
     items: [
@@ -271,7 +277,35 @@ const menuGroups: MenuGroup[] = [
       },
     ],
   },
-];
+  {
+    // Academic Management — only visible to users with at least one academic permission
+    name: "nav.academic",
+    condition: () =>
+      isSuperAdmin.value ||
+      perms.academicCourses.canView.value ||
+      perms.academicClasses.canView.value,
+    items: [
+      {
+        // Course admin — create/edit/delete/assign teachers — admin+ only
+        name: "nav.courses",
+        icon: GraduationCap,
+        to: "/dashboard/academic/courses",
+        condition: () =>
+          isSuperAdmin.value || perms.academicCourses.canView.value,
+      },
+      {
+        // My Classes — teachers, students, and admin
+        name: "nav.my_classes",
+        icon: BookOpen,
+        to: "/dashboard/academic/my-classes",
+        condition: () =>
+          isSuperAdmin.value ||
+          perms.academicCourses.canView.value ||
+          perms.academicClasses.canView.value,
+      },
+    ],
+  },
+]);
 
 const isActive = (item: MenuItem): boolean => {
   if (item.children) return item.children.some((child) => isActive(child));
@@ -303,7 +337,7 @@ const visibleItems = (items: MenuItem[]): MenuItem[] => {
 };
 
 const filteredMenuGroups = computed(() => {
-  return menuGroups
+  return menuGroups.value
     .map((group) => ({
       ...group,
       items: visibleItems(group.items),
