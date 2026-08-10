@@ -364,13 +364,13 @@ class Oromiffa extends Lang {
 
             // Labootii eenyummaa
             'user.form.full_name'            => 'Maqaa',
-            'user.form.full_name_placeholder'=> 'fkn. Daniel Aklilu',
+            'user.form.full_name_placeholder'=> 'fkn. Daniel',
             'user.form.email'                => 'Teessoo Imeelii',
             'user.form.email_placeholder'    => 'user@example.com',
             'user.form.father_name'          => 'Maqaa Abbaa',
-            'user.form.father_name_placeholder' => 'Maqaa abbaa',
+            'user.form.father_name_placeholder' => 'fkn. Aklilu',
             'user.form.grandfather_name'     => 'Maqaa Abbaa Abbaa',
-            'user.form.grandfather_name_placeholder' => 'Maqaa abbaa abbaa',
+            'user.form.grandfather_name_placeholder' => 'fkn. Tadesse',
             'user.form.christian_name'       => 'Maqaa Kristiyaanaa',
             'user.form.christian_name_placeholder' => 'Maqaa cuuphaa / kristiyaanaa',
             'user.form.spiritual_father'     => 'Abbaa Hafuuraa',

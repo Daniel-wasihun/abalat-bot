@@ -4045,13 +4045,13 @@ class Amharic extends Lang
 
             // የዓይነት ፋሮዎች
             'user.form.full_name'            => 'ስም',
-            'user.form.full_name_placeholder'=> 'ለምሳ: ዳኒኤል አክሉ',
+            'user.form.full_name_placeholder'=> 'ለምሳሌ፡ ዳንኤል',
             'user.form.email'                => 'የኢሜይል አድራሻ',
             'user.form.email_placeholder'    => 'user@example.com',
             'user.form.father_name'          => 'የአባት ስም',
-            'user.form.father_name_placeholder' => 'የአባት ስም',
+            'user.form.father_name_placeholder' => 'ለምሳሌ፡ አክሊሉ',
             'user.form.grandfather_name'     => 'የአባት አባት ስም',
-            'user.form.grandfather_name_placeholder' => 'የአባት አባት ስም',
+            'user.form.grandfather_name_placeholder' => 'ለምሳሌ፡ ታደሰ',
             'user.form.christian_name'       => 'የክርስትና ስም',
             'user.form.christian_name_placeholder' => 'የምዓይት / የክርስትና ስም',
             'user.form.spiritual_father'     => 'የነጥብ አባት',

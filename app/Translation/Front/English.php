@@ -4089,13 +4089,13 @@ class English extends Lang {
 
             // Identity fields
             'user.form.full_name'            => 'First Name',
-            'user.form.full_name_placeholder'=> 'e.g. Daniel Aklilu',
+            'user.form.full_name_placeholder'=> 'e.g. Daniel',
             'user.form.email'                => 'Email Address',
             'user.form.email_placeholder'    => 'user@example.com',
             'user.form.father_name'          => "Father's Name",
-            'user.form.father_name_placeholder' => "Father's first name",
+            'user.form.father_name_placeholder' => 'e.g. Aklilu',
             'user.form.grandfather_name'     => "Grandfather's Name",
-            'user.form.grandfather_name_placeholder' => "Grandfather's first name",
+            'user.form.grandfather_name_placeholder' => 'e.g. Tadesse',
             'user.form.christian_name'       => 'Christian Name (ስም)',
             'user.form.christian_name_placeholder' => 'Baptismal / Christian name',
             'user.form.spiritual_father'     => 'Spiritual Father',
