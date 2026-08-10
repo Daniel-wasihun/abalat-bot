@@ -892,7 +892,8 @@ class Amharic extends Lang
             'field.total_year' => 'አጠቃላይ ዓመታት',
             'field.type' => 'አይነት',
             'field.user_type' => 'የመለያ ዓይነት',
-            'field.user_university_id' => 'ዩኒቨርሲቲ መታወቂያ',
+            'field.user_university_id' => 'የምዝገባ ቁጥር',
+            'field.registration_no'    => 'የምዝገባ ቁጥር',
             'field.week' => 'ሳምንት',
             'field.year' => 'ዓመት',
             'field.module.wishlists' => 'የግዢ ዝርዝር',
@@ -1481,8 +1482,10 @@ class Amharic extends Lang
             'user.temporary_role' => 'Temporary Role',
             'user.termination' => 'Scheduled Termination',
             'user.termination_threshold' => 'የማለቂያ ገደብ',
-            'user.university_id' => 'የዩኒቨርሲቲ መታወቂያ',
-            'user.info.university_id' => 'የዩኒቨርሲቲ መታወቂያ',
+            'user.registration_no'          => 'የምዝገባ ቁጥር',
+            'user.university_id'             => 'የምዝገባ ቁጥር',
+            'user.info.university_id'        => 'የምዝገባ ቁጥር',
+            'user.info.registration_no'      => 'የምዝገባ ቁጥር',
             'user.upcoming' => 'Upcoming',
             'user.upcoming_overrides' => 'የሚቀጥሉ',
             'user.upcoming_schedule_pipeline' => 'Upcoming Schedule Pipeline',
@@ -4027,6 +4030,87 @@ class Amharic extends Lang
             'notifications.total' => 'ድምር',
             'notifications.sent' => 'ተልኳል',
             'notifications.failed' => 'አልተሳካም',
+
+            // ── የተጠቃሚ ማኔጂያ ቃርቁም (ProfileTab) ──────────────────────
+            // ክፍሎች
+            'user.section.identity'          => 'የዓይነት መለያ',
+            'user.section.roles'             => 'ድሮዎች',
+            'user.section.contact_address'   => 'የእውቂያ ክርክሮት እና አድራሻ',
+            'user.section.account_status'    => 'የመለያ ሁኔታ',
+            'user.section.senbet'            => 'የሰንበት ስኮል አባልነት',
+            'user.section.academic_info'     => 'የደርግ መረጃ',
+            'user.section.emergency_contact' => 'የሰዓቱ ያለ ክርክሮት',
+            'user.section.emergency_address' => 'የሰዓቱ ያለ ክርክሮት አድራሻ',
+            'user.section.participation'     => 'የሚሰጠ ወጥ ስለት',
+
+            // የዓይነት ፋሮዎች
+            'user.form.full_name'            => 'ሙሉ ስም',
+            'user.form.full_name_placeholder'=> 'ለምሳ: ዳኒኤል አክሉ',
+            'user.form.email'                => 'የኢሜይል አድራሻ',
+            'user.form.email_placeholder'    => 'user@example.com',
+            'user.form.father_name'          => 'የአባት ስም',
+            'user.form.father_name_placeholder' => 'የአባት ሙሉ ስም',
+            'user.form.grandfather_name'     => 'የአባት አባት ስም',
+            'user.form.grandfather_name_placeholder' => 'የአባት አባት ሙሉ ስም',
+            'user.form.christian_name'       => 'የክርስትና ስም',
+            'user.form.christian_name_placeholder' => 'የምዓይት / የክርስትና ስም',
+            'user.form.spiritual_father'     => 'የነጥብ አባት',
+            'user.form.spiritual_father_placeholder' => 'የነጥብ አባት ስም',
+            'user.form.registration_id'      => 'የምዝገባ መለያ ቁጥር',
+            'user.form.gender'               => 'ጾታ',
+            'user.form.male'                 => 'ወንድ',
+            'user.form.female'               => 'ሴት',
+
+            // የእውቂያ ክርክሮት እና አድራሻ
+            'user.form.phone_number'         => 'የስልክ ቁጥር',
+            'user.form.phone_placeholder'    => '9XXXXXXXX',
+            'user.form.sub_city'             => 'ክፍለ ከተማ',
+            'user.form.sub_city_placeholder' => 'ለምሳ: ቦሌ',
+            'user.form.woreda'               => 'ወረዳ',
+            'user.form.woreda_placeholder'   => 'ለምሳ: 03',
+            'user.form.house_number'         => 'የቤት ቁጥር',
+            'user.form.house_number_placeholder' => 'ለምሳ: 123',
+            'user.form.address'              => 'ተጨማሪ አድራሻ / መግለጫ',
+            'user.form.address_placeholder'  => 'ተጨማሪ አድራሻ መረጃ',
+
+            // የመለያ ሁኔታ
+            'user.form.account_active'       => 'መለዛዊ ንቃፈ',
+            'user.form.account_active_on'    => 'ተጠቃሚው መግቢያ እና ስርዓት ለመጠቀም ይችላል',
+            'user.form.account_active_off'   => 'ተጠቃሚው የመግቢያ እደጋ ተዘርግቷል',
+
+            // የሰንበት ስኮል አባልነት
+            'user.form.is_member'            => 'ይህ ተጠቃሚ የሰንበት ስኮል አባል ነው',
+            'user.form.date_of_birth'        => 'የልደት ቀን',
+            'user.form.senbet_class'         => 'የሰንበት ክፍል',
+            'user.form.education_level'      => 'የትምህርት ደረጃ',
+            'user.form.education_level_placeholder' => 'ለምሳ: ክፍል 10፣ ዲግሪ',
+            'user.form.senbet_class.child'   => 'ሕጻን',
+            'user.form.senbet_class.post_12' => 'ከ-12 ው በኋላ',
+            'user.form.senbet_class.grade'   => 'ክፍል :num',
+
+            // የሰዓቱ ያለ ክርክሮት
+            'user.form.emergency_name'       => 'የሰዓቱ ያለ ካላው ስም',
+            'user.form.emergency_name_placeholder' => 'የእውቂያ ካላው ሙሉ ስም',
+            'user.form.emergency_phone'      => 'የሰዓቱ ስልክ',
+            'user.form.emergency_phone_placeholder' => 'ለምሳ: +251911000000',
+            'user.form.emergency_sub_city'   => 'ክፍለ ከተማ',
+            'user.form.emergency_woreda'     => 'ወረዳ',
+            'user.form.emergency_house_number' => 'የቤት ቁጥር',
+            'user.form.emergency_address'    => 'ተጨማሪ አድራሻ / ማስታወሻ',
+            'user.form.emergency_address_placeholder' => 'ለሰዓቱ ያለ ካላው ተጨማሪ አድራሻ',
+
+            // የሚሰጠ ወጥ ስለት
+            'user.form.previous_participation'  => 'ቀደም ሲል በሰንበት የሚሰጥ ወጥ ስለት ነበረው',
+            'user.form.participation_document'  => 'የቀደም ስለት ሰነድ',
+            'user.form.participation_doc_hint'  => 'ፎቶ ወይም PDF፣ ከፍ 5 ሜጋባይት',
+            'user.form.document_uploaded'       => 'ሰነዱ ቀደም ሲል ተጭኗል',
+            'user.form.optional_student'        => 'ለተማሪ ክፍል ተጠቃሚዎች አስፈላጊ አይደለም',
+            'user.form.roles_required'          => '*ያስፈላጋል',
+
+            // የድርጋት ፍቶዎች
+            'user.form.save'                 => 'መዝግብ',
+            'user.form.update'               => 'አድስ',
+            'user.form.cancel'               => 'ሰርዝ',
         ];
     }
 }
