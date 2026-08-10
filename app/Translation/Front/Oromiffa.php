@@ -349,6 +349,87 @@ class Oromiffa extends Lang {
             'notifications.total' => 'Walii gala',
             'notifications.sent' => 'Ergame',
             'notifications.failed' => 'Hin milkoofne',
+
+            // ── Bulchiinsa Fayyadamaa Foorama (ProfileTab) ──────────────────
+            // Kutaalee
+            'user.section.identity'          => 'Eenyummaa',
+            'user.section.roles'             => 'Gahee',
+            'user.section.contact_address'   => 'Quunnamtii fi Teessoo',
+            'user.section.account_status'    => 'Haala Herrega',
+            'user.section.senbet'            => 'Miseensummaa Mana Barumsaa Senbet',
+            'user.section.academic_info'     => 'Odeeffannoo Barnootaa',
+            'user.section.emergency_contact' => 'Quunnamtii Hatattamaa',
+            'user.section.emergency_address' => 'Teessoo Quunnamtii Hatattamaa',
+            'user.section.participation'     => 'Seenaa Hirmaannaa',
+
+            // Labootii eenyummaa
+            'user.form.full_name'            => 'Maqaa Guutuu',
+            'user.form.full_name_placeholder'=> 'fkn. Daniel Aklilu',
+            'user.form.email'                => 'Teessoo Imeelii',
+            'user.form.email_placeholder'    => 'user@example.com',
+            'user.form.father_name'          => 'Maqaa Abbaa',
+            'user.form.father_name_placeholder' => 'Maqaa guutuu abbaa',
+            'user.form.grandfather_name'     => 'Maqaa Abbaa Abbaa',
+            'user.form.grandfather_name_placeholder' => 'Maqaa guutuu abbaa abbaa',
+            'user.form.christian_name'       => 'Maqaa Kristiyaanaa',
+            'user.form.christian_name_placeholder' => 'Maqaa cuuphaa / kristiyaanaa',
+            'user.form.spiritual_father'     => 'Abbaa Hafuuraa',
+            'user.form.spiritual_father_placeholder' => 'Maqaa abbaa hafuuraa',
+            'user.form.registration_id'      => 'Lakkoofsa Galmee',
+            'user.form.gender'               => 'Saala',
+            'user.form.male'                 => 'Dhiira',
+            'user.form.female'               => 'Dubartii',
+
+            // Quunnamtii fi teessoo
+            'user.form.phone_number'         => 'Lakkoofsa Bilbilaa',
+            'user.form.phone_placeholder'    => '9XXXXXXXX',
+            'user.form.sub_city'             => 'Magaala-Xiqqaa',
+            'user.form.sub_city_placeholder' => 'fkn. Bole',
+            'user.form.woreda'               => 'Aanaa',
+            'user.form.woreda_placeholder'   => 'fkn. 03',
+            'user.form.house_number'         => 'Lakkoofsa Mana',
+            'user.form.house_number_placeholder' => 'fkn. 123',
+            'user.form.address'              => 'Teessoo Dabalataa / Ibsa',
+            'user.form.address_placeholder'  => 'Teessoo addaa kamiyyuu',
+
+            // Haala herrega
+            'user.form.account_active'       => 'Herrega Hojjachaa Jira',
+            'user.form.account_active_on'    => 'Fayyadamaan seenuu fi sirna fayyadamuu ni danda\'a',
+            'user.form.account_active_off'   => 'Fayyadamaan seenuu irraa dhorkameera',
+
+            // Miseensummaa Senbet
+            'user.form.is_member'            => 'Fayyadamaan kun miseensa Mana Barumsaa Senbet',
+            'user.form.date_of_birth'        => 'Guyyaa Dhalootaa',
+            'user.form.senbet_class'         => 'Kutaa Senbet',
+            'user.form.education_level'      => 'Sadarkaa Barnootaa',
+            'user.form.education_level_placeholder' => 'fkn. Kutaa 10, Digirii',
+            'user.form.senbet_class.child'   => 'Daa\'ima',
+            'user.form.senbet_class.post_12' => 'Booda-12',
+            'user.form.senbet_class.grade'   => 'Kutaa :num',
+
+            // Quunnamtii hatattamaa
+            'user.form.emergency_name'       => 'Maqaa Quunnamtii Hatattamaa',
+            'user.form.emergency_name_placeholder' => 'Maqaa guutuu nama quunnamtii',
+            'user.form.emergency_phone'      => 'Bilbila Hatattamaa',
+            'user.form.emergency_phone_placeholder' => 'fkn. +251911000000',
+            'user.form.emergency_sub_city'   => 'Magaala-Xiqqaa',
+            'user.form.emergency_woreda'     => 'Aanaa',
+            'user.form.emergency_house_number' => 'Lakkoofsa Mana',
+            'user.form.emergency_address'    => 'Teessoo Dabalataa / Yaadannoo',
+            'user.form.emergency_address_placeholder' => 'Teessoo dabalataa nama quunnamtii hatattamaa',
+
+            // Seenaa hirmaannaa
+            'user.form.previous_participation'  => 'Dura Senbet irratti hirmaateera',
+            'user.form.participation_document'  => 'Sanaduu Hirmaannaa Duraanii',
+            'user.form.participation_doc_hint'  => 'Fakkii ykn PDF, hanga 5MB',
+            'user.form.document_uploaded'       => 'Sanadichi dursee fe\'ameera',
+            'user.form.optional_student'        => 'Herregoota barataa qofa kan ta\'aniif dirqama miti',
+            'user.form.roles_required'          => '*dirqama',
+
+            // Qaaqni hojii
+            'user.form.save'                 => 'Olkaa\'i',
+            'user.form.update'               => 'Haaromsi',
+            'user.form.cancel'               => 'Haquu',
         ];
     }
 }
