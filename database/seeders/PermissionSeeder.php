@@ -17,12 +17,24 @@ class PermissionSeeder extends Seeder {
         $count = 0;
 
         foreach (Module::all() as $module) {
+            // Default CRUD actions
             $actions = [Action::VIEW, Action::CREATE, Action::EDIT, Action::DELETE];
 
+            // Bot-specific actions
             if ($module === Module::BOT) {
                 $actions[] = Action::MANAGE;
                 $actions[] = Action::NOTIFY;
                 $actions[] = Action::EXPORT;
+            }
+
+            // Academic course-management actions
+            if ($module === Module::ACADEMIC_COURSES) {
+                $actions[] = Action::MANAGE; // manage teachers/assignments
+            }
+
+            // Academic class access (teacher gradebook, attendance)
+            if ($module === Module::ACADEMIC_CLASSES) {
+                $actions[] = Action::MANAGE; // enter marks, take attendance
             }
 
             foreach ($actions as $action) {

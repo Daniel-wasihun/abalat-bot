@@ -52,6 +52,10 @@ class RoleSeeder extends Seeder {
                     'attendance.edit',
                     'attendance.delete',
                     'attendance.report',
+                    // Full academic course management
+                    'academic_courses.*',
+                    // Can view all class grades/attendance
+                    'academic_classes.*',
                 ],
             ],
 
@@ -65,6 +69,13 @@ class RoleSeeder extends Seeder {
                     'dashboard.view',
                     'attendance.view',
                     'attendance.create',
+                    // Teachers can view their assigned courses
+                    'academic_courses.view',
+                    // Teachers can fully manage their own classes (marks, attendance)
+                    'academic_classes.view',
+                    'academic_classes.create',
+                    'academic_classes.edit',
+                    'academic_classes.manage',
                 ],
             ],
 
@@ -77,6 +88,8 @@ class RoleSeeder extends Seeder {
                 'permissions'     => [
                     'dashboard.view',
                     'attendance.view',
+                    // Students can view their own classes / grades
+                    'academic_classes.view',
                 ],
             ],
         ];
