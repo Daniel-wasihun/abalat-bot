@@ -249,6 +249,8 @@ const hasExpiringAccess = computed(
  <h2
  class="text-lg font-normal text-main-text leading-tight">
  {{ localize(user.name, currentLanguage) }}
+ {{ user.info?.father_name ? localize(user.info.father_name, currentLanguage) : "" }}
+ {{ user.info?.grandfather_name ? localize(user.info.grandfather_name, currentLanguage) : "" }}
  </h2>
  <span
  class="px-2 py-0.5 border border-brand-blue text-brand-blue text-[14px] font-normal capitalize tracking-wide rounded">

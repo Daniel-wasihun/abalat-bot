@@ -143,8 +143,15 @@ const onInput = (e: Event) => {
  }, 300);
 };
 
+const getFullName = (user: any) => {
+    let name = localize(user.raw_name || user.name) || "";
+    if (user.info?.father_name) name += " " + localize(user.info.father_name);
+    if (user.info?.grandfather_name) name += " " + localize(user.info.grandfather_name);
+    return name.trim();
+};
+
 const selectUser = (user: any) => {
- const name = localize(user.raw_name || user.name);
+ const name = getFullName(user);
  localQuery.value = name;
  emit("update:searchQuery", name);
  emit("update:modelValue", user.id);
@@ -292,7 +299,7 @@ const clearUser = () => {
  <span
  v-else
  class="text-sm font-bold text-brand-blue"
- >{{ localize(user.raw_name || user.name)?.charAt(0) || "U" }}</span
+ >{{ getFullName(user)?.charAt(0) || "U" }}</span
  >
  </div>
 
@@ -300,7 +307,7 @@ const clearUser = () => {
  <div class="flex flex-col flex-1 min-w-0">
  <span
  class="text-sm font-bold text-main-text leading-tight group-hover:text-brand-blue transition-colors truncate"
- >{{ localize(user.raw_name || user.name) }}</span
+ >{{ getFullName(user) }}</span
  >
  <div class="flex items-center gap-2 mt-1 min-w-0">
  <span
