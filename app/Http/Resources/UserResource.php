@@ -12,7 +12,6 @@ class UserResource extends ApiResource {
         /** @var \App\Models\User $user */
         $user = $this->resource;
 
-        // 1. Use preloaded relations to avoid N+1 queries
         $allAssignments = $user->relationLoaded('roles')
             ? $user->roles->whereNull('pivot.revoked_at')->sortByDesc(fn($r) => $r->pivot->start_date ?? $r->pivot->created_at)
             : $user->roles()->whereNull('revoked_at')->orderByPivot('start_date', 'desc')->orderByPivot('created_at', 'desc')->get();
@@ -27,7 +26,6 @@ class UserResource extends ApiResource {
 
         $primaryRole = $activeAssignments->first();
 
-        // 2. Optimized direct permissions (avoiding double queries)
         $allPermissions = $user->relationLoaded('directPermissions')
             ? $user->directPermissions->sortByDesc('pivot.created_at')
             : $user->directPermissions()->orderByPivot('created_at', 'desc')->get();
@@ -107,6 +105,12 @@ class UserResource extends ApiResource {
             })->values(),
             'permissions' => $this->getAllPermissions($activeAssignments, $allPermissions)->unique()->values()->toArray(),
             'info' => $this->formatUserInfo($this->info),
+            'roles' => $activeAssignments->map(fn($r) => [
+                'id'   => $r->id,
+                'slug' => $r->slug,
+                'name' => $r->name,
+            ])->values(),
+            'senbetMembership' => $user->relationLoaded('senbetMembership') ? $user->senbetMembership : null,
 
             'profile_picture' => $this->info && $this->info->profile_picture ? asset('storage/' . $this->info->profile_picture) : null,
             'avatar' => $this->info && $this->info->profile_picture ? asset('storage/' . $this->info->profile_picture) : null,
@@ -167,13 +171,9 @@ class UserResource extends ApiResource {
 
         $infoArray = $info->toArray();
 
-        // Strip +251 prefix from phone number for frontend display
-        if (isset($infoArray['phone_number']) && $infoArray['phone_number']) {
-            $phone = $infoArray['phone_number'];
-            // Remove +251 prefix if present
-            if (str_starts_with($phone, '+251')) {
-                $infoArray['phone_number'] = substr($phone, 4); // Remove '+251'
-            }
+        // Strip +251 country prefix for frontend display
+        if (!empty($infoArray['phone_number']) && str_starts_with($infoArray['phone_number'], '+251')) {
+            $infoArray['phone_number'] = substr($infoArray['phone_number'], 4);
         }
 
         return $infoArray;
