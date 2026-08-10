@@ -74,6 +74,8 @@ class Amharic extends Lang
             'nav.course_materials' => 'የኮርስ ቁሳቁሶች',
             'nav.course_outlines' => 'የኮርስ መዋቅሮች',
             'nav.courses' => 'ኮርሶች',
+            'nav.my_classes' => 'ክፍሎቼ',
+            'nav.class_hub' => 'የክፍል ማዕከል',
             'nav.departments' => 'ዲፓርትመንቶች',
             'nav.users' => 'ተጠቃሚዎች',
             'nav.user_management' => 'የተጠቃሚ አስተዳደር',

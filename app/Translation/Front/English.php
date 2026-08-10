@@ -72,6 +72,8 @@ class English extends Lang {
             'nav.course_materials' => 'Course Materials',
             'nav.course_outlines' => 'Syllabi & Outlines',
             'nav.courses' => 'Courses',
+            'nav.my_classes' => 'My Classes',
+            'nav.class_hub' => 'Class Hub',
             'nav.departments' => 'Departments',
             'nav.video_lectures' => 'Video Lectures',
             'nav.worksheets' => 'Practice Materials',
