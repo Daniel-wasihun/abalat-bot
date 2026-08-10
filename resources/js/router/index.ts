@@ -147,9 +147,34 @@ const routes: RouteRecordRaw[] = [
                         name: "bot-user-profile",
                         meta: { title: "nav.bot_users", permission: "bot.manage" },
                         component: () => import("@/views/bot/UserProfileView.vue"),
-                    }
+                    },
                 ],
             },
+            {
+                path: "academic",
+                meta: { title: "nav.academic" },
+                component: { render: () => h(resolveComponent("router-view")) },
+                children: [
+                    {
+                        path: "courses",
+                        name: "academic-courses",
+                        meta: { title: "nav.courses", permission: "academic_courses.view" },
+                        component: () => import("@/Views/Academic/CoursesView.vue"),
+                    },
+                    {
+                        path: "my-classes",
+                        name: "academic-my-classes",
+                        meta: { title: "nav.my_classes", permission: "academic_classes.view" },
+                        component: () => import("@/Views/Academic/MyClassesView.vue"),
+                    },
+                    {
+                        path: "my-classes/:id",
+                        name: "academic-class-hub",
+                        meta: { title: "nav.class_hub", permission: "academic_classes.view" },
+                        component: () => import("@/Views/Academic/ClassHubView.vue"),
+                    },
+                ],
+            }
         ],
     },
     // 404 Route
