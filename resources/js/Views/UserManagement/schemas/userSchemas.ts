@@ -12,9 +12,8 @@ const optionalLetters = z
 export const createProfileSchema = () =>
     z.object({
         name: z.string()
-            .min(7, "validation.min_length")
-            .regex(LETTERS_ONLY, "validation.letters_only")
-            .regex(/^\S+\s+\S+/, "validation.name_format"),
+            .min(2, "validation.min_length")
+            .regex(/^[A-Za-z]+$/, "validation.letters_only"),
 
         email: z.string().email("validation.email").nullable().optional().or(z.literal("")),
 

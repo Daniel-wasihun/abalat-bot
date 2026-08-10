@@ -414,7 +414,7 @@ class English extends Lang
                 'ulid' => 'The :attribute field must be a valid ULID.',
                 'uuid' => 'The :attribute field must be a valid UUID.',
                 'letters_only' => 'The :attribute must only contain letters and spaces.',
-                'name_format' => 'Please enter full name (First and Father name).',
+                'name_format' => 'Please enter first name only (no spaces allowed).',
                 'id_format' => ':attribute must start with :l_min-:l_max letters followed by :d_min-:d_max digits.',
                 'phone_format' => 'Invalid Ethiopian phone format (09... or 07...).',
                 'gender_format' => 'Please select Male or Female.',
@@ -428,7 +428,7 @@ class English extends Lang
                 'file_size_error_50mb' => 'The file size must not exceed 50MB.',
                 'attributes' => [
                     'profile_picture' => 'Profile picture',
-                    'name' => 'Full name',
+                    'name' => 'First name',
                     'email' => 'Email address',
                     'password' => 'Security password',
                     'role' => 'System role',
@@ -444,7 +444,7 @@ class English extends Lang
             ],
             'attributes' => [
                 'profile_picture' => 'Profile picture',
-                'name' => 'Full name',
+                'name' => 'First name',
                 'email' => 'Email address',
                 'password' => 'Security password',
                 'role' => 'System role',

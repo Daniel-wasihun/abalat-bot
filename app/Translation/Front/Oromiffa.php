@@ -363,14 +363,14 @@ class Oromiffa extends Lang {
             'user.section.participation'     => 'Seenaa Hirmaannaa',
 
             // Labootii eenyummaa
-            'user.form.full_name'            => 'Maqaa Guutuu',
+            'user.form.full_name'            => 'Maqaa',
             'user.form.full_name_placeholder'=> 'fkn. Daniel Aklilu',
             'user.form.email'                => 'Teessoo Imeelii',
             'user.form.email_placeholder'    => 'user@example.com',
             'user.form.father_name'          => 'Maqaa Abbaa',
-            'user.form.father_name_placeholder' => 'Maqaa guutuu abbaa',
+            'user.form.father_name_placeholder' => 'Maqaa abbaa',
             'user.form.grandfather_name'     => 'Maqaa Abbaa Abbaa',
-            'user.form.grandfather_name_placeholder' => 'Maqaa guutuu abbaa abbaa',
+            'user.form.grandfather_name_placeholder' => 'Maqaa abbaa abbaa',
             'user.form.christian_name'       => 'Maqaa Kristiyaanaa',
             'user.form.christian_name_placeholder' => 'Maqaa cuuphaa / kristiyaanaa',
             'user.form.spiritual_father'     => 'Abbaa Hafuuraa',
@@ -409,7 +409,7 @@ class Oromiffa extends Lang {
 
             // Quunnamtii hatattamaa
             'user.form.emergency_name'       => 'Maqaa Quunnamtii Hatattamaa',
-            'user.form.emergency_name_placeholder' => 'Maqaa guutuu nama quunnamtii',
+            'user.form.emergency_name_placeholder' => 'Maqaa nama quunnamtii',
             'user.form.emergency_phone'      => 'Bilbila Hatattamaa',
             'user.form.emergency_phone_placeholder' => 'fkn. +251911000000',
             'user.form.emergency_sub_city'   => 'Magaala-Xiqqaa',

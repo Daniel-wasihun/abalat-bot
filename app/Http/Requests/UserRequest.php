@@ -44,10 +44,9 @@ class UserRequest extends BaseRequest
         $creating = $this->isCreating();
 
         $rules = [
-            'name'     => [$creating ? 'required' : 'nullable', 'string', 'min:7', 'max:255',
+            'name'     => [$creating ? 'required' : 'nullable', 'string', 'min:2', 'max:255',
                 function ($attribute, $value, $fail) {
-                    if (!preg_match('/^[A-Za-z\s]+$/', $value))  $fail('validation.letters_only');
-                    elseif (!preg_match('/^\S+\s+\S+/', $value)) $fail('validation.name_format');
+                    if (!preg_match('/^[A-Za-z]+$/', $value))  $fail('validation.letters_only');
                 },
             ],
             'email'    => ['nullable', 'email', 'max:255', Rule::unique('users', 'email')->ignore($userId)],

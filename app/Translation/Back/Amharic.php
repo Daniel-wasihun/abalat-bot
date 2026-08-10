@@ -412,7 +412,7 @@ class Amharic extends Lang {
                 'ulid' => 'The :attribute field must be a valid ULID.',
                 'uuid' => 'The :attribute field must be a valid UUID.',
                 'letters_only' => ':attribute ፊደላትን እና ክፍተት (space) ብቻ መያዝ አለበት።',
-                'name_format' => 'እባክዎ ሙሉ ስም ያስገቡ (ስም እና የአባት ስም)።',
+                'name_format' => 'እባክዎ ስምዎን ብቻ ያስገቡ (ክፍተት ያለበት ስም አይፈቀድም)።',
                 'id_format' => ':attribute ከ :l_min-:l_max ፊደላት መጀመር እና ከ :d_min-:d_max ቁጥሮች መከተል አለበት።',
                 'phone_format' => 'ትክክለኛ የኢትዮጵያ ስልክ ቁጥር ያስገቡ (09... ወይም 07...)።',
                 'gender_format' => 'እባክዎ ወንድ ወይም ሴት ይምረጡ።',
@@ -425,7 +425,7 @@ class Amharic extends Lang {
                 'file_size_error_50mb' => 'The file size must not exceed 50MB.',
                 'attributes' => [
                     'profile_picture' => 'የመገለጫ ምስል',
-                    'name' => 'ሙሉ ስም',
+                    'name' => 'ስም',
                     'email' => 'የኢሜይል አድራሻ',
                     'password' => 'የደህንነት የይለፍ ቃል',
                     'role' => 'የስርዓት ሚና',
@@ -443,7 +443,7 @@ class Amharic extends Lang {
             ],
             'attributes' => [
                 'profile_picture' => 'የመገለጫ ምስል',
-                'name' => 'ሙሉ ስም',
+                'name' => 'ስም',
                 'email' => 'የኢሜይል አድራሻ',
                 'password' => 'የደህንነት የይለፍ ቃል',
                 'role' => 'የስርዓት ሚና',
