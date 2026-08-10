@@ -127,4 +127,64 @@ Route::middleware(['auth:api', 'active', \App\Http\Middleware\TrackUserDevice::c
             Route::post('/webhook', [\App\Http\Controllers\Api\SettingController::class, 'setupWebhook']);
         });
     });
+
+    // Academic Management (Admin & Teachers)
+    Route::prefix('academic')->group(function () {
+
+        // Course management — admin/super-admin only for writes
+        Route::prefix('courses')->group(function () {
+            // All authenticated users with academic_courses.view can list/show
+            Route::get('/', [\App\Http\Controllers\Api\Academic\CourseController::class, 'index'])
+                ->middleware('permission:academic_courses.view');
+            Route::get('/{id}', [\App\Http\Controllers\Api\Academic\CourseController::class, 'show'])
+                ->middleware('permission:academic_courses.view');
+
+            // Create/update/delete require academic_courses.create/edit/delete
+            Route::post('/', [\App\Http\Controllers\Api\Academic\CourseController::class, 'store'])
+                ->middleware('permission:academic_courses.create');
+            Route::put('/{id}', [\App\Http\Controllers\Api\Academic\CourseController::class, 'update'])
+                ->middleware('permission:academic_courses.edit');
+            Route::delete('/{id}', [\App\Http\Controllers\Api\Academic\CourseController::class, 'destroy'])
+                ->middleware('permission:academic_courses.delete');
+
+            // Assign teachers — requires manage permission
+            Route::post('/{id}/teachers', [\App\Http\Controllers\Api\Academic\EnrollmentController::class, 'assignTeachers'])
+                ->middleware('permission:academic_courses.manage');
+
+            // Student enrollments — admin-managed
+            Route::get('/{id}/students', [\App\Http\Controllers\Api\Academic\EnrollmentController::class, 'courseStudents'])
+                ->middleware('permission:academic_classes.view');
+            Route::post('/{id}/enroll', [\App\Http\Controllers\Api\Academic\EnrollmentController::class, 'enrollStudent'])
+                ->middleware('permission:academic_courses.manage');
+            Route::post('/{id}/unenroll', [\App\Http\Controllers\Api\Academic\EnrollmentController::class, 'unenrollStudent'])
+                ->middleware('permission:academic_courses.manage');
+
+            // Assessments & Gradebook — teachers with academic_classes.manage
+            Route::get('/{id}/assessments', [\App\Http\Controllers\Api\Academic\GradebookController::class, 'index'])
+                ->middleware('permission:academic_classes.view');
+            Route::post('/{id}/assessments', [\App\Http\Controllers\Api\Academic\GradebookController::class, 'store'])
+                ->middleware('permission:academic_classes.manage');
+            Route::delete('/{id}/assessments/{assessment_id}', [\App\Http\Controllers\Api\Academic\GradebookController::class, 'destroy'])
+                ->middleware('permission:academic_classes.manage');
+
+            Route::get('/{id}/marks', [\App\Http\Controllers\Api\Academic\GradebookController::class, 'getMarks'])
+                ->middleware('permission:academic_classes.view');
+            Route::post('/{id}/marks', [\App\Http\Controllers\Api\Academic\GradebookController::class, 'saveMarks'])
+                ->middleware('permission:academic_classes.manage');
+
+            // Attendance — teachers with academic_classes.manage
+            Route::get('/{id}/attendance/sessions', [\App\Http\Controllers\Api\Academic\AttendanceController::class, 'index'])
+                ->middleware('permission:academic_classes.view');
+            Route::post('/{id}/attendance/sessions', [\App\Http\Controllers\Api\Academic\AttendanceController::class, 'storeSession'])
+                ->middleware('permission:academic_classes.manage');
+            Route::get('/{id}/attendance/sessions/{session_id}', [\App\Http\Controllers\Api\Academic\AttendanceController::class, 'showSession'])
+                ->middleware('permission:academic_classes.view');
+            Route::post('/{id}/attendance/sessions/{session_id}/records', [\App\Http\Controllers\Api\Academic\AttendanceController::class, 'saveRecords'])
+                ->middleware('permission:academic_classes.manage');
+        });
+
+        // Teacher's dashboard — only those with academic_classes.view
+        Route::get('/my-classes', [\App\Http\Controllers\Api\Academic\CourseController::class, 'myClasses'])
+            ->middleware('permission:academic_classes.view');
+    });
 });
