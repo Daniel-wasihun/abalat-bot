@@ -180,9 +180,9 @@ const getRoleStyles = (role: any) => {
  <div class="flex items-center gap-2">
  <span
  class="text-sm md:text-base font-normal text-main-text group-hover:text-accent transition-colors truncate">
- {{ capitalize(localize(user.name, currentLanguage)) }}
- {{ user.info?.father_name ? capitalize(localize(user.info.father_name, currentLanguage)) : "" }}
- {{ user.info?.grandfather_name ? capitalize(localize(user.info.grandfather_name, currentLanguage)) : "" }}
+ {{ capitalize(localize(user.name, currentLanguage).split(' ')[0]) }}
+ {{ user.info?.father_name ? capitalize(localize(user.info.father_name, currentLanguage).split(' ')[0]) : "" }}
+ {{ user.info?.grandfather_name ? capitalize(localize(user.info.grandfather_name, currentLanguage).split(' ')[0]) : "" }}
  </span>
  <span
  v-if="user.id === currentUser?.id"

@@ -248,9 +248,9 @@ const hasExpiringAccess = computed(
  <div class="flex items-center gap-4">
  <h2
  class="text-lg font-normal text-main-text leading-tight">
- {{ localize(user.name, currentLanguage) }}
- {{ user.info?.father_name ? localize(user.info.father_name, currentLanguage) : "" }}
- {{ user.info?.grandfather_name ? localize(user.info.grandfather_name, currentLanguage) : "" }}
+ {{ localize(user.name, currentLanguage).split(' ')[0] }}
+ {{ user.info?.father_name ? localize(user.info.father_name, currentLanguage).split(' ')[0] : "" }}
+ {{ user.info?.grandfather_name ? localize(user.info.grandfather_name, currentLanguage).split(' ')[0] : "" }}
  </h2>
  <span
  class="px-2 py-0.5 border border-brand-blue text-brand-blue text-[14px] font-normal capitalize tracking-wide rounded">

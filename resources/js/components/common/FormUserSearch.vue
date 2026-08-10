@@ -144,9 +144,9 @@ const onInput = (e: Event) => {
 };
 
 const getFullName = (user: any) => {
-    let name = localize(user.raw_name || user.name) || "";
-    if (user.info?.father_name) name += " " + localize(user.info.father_name);
-    if (user.info?.grandfather_name) name += " " + localize(user.info.grandfather_name);
+    let name = (localize(user.raw_name || user.name) || "").split(" ")[0];
+    if (user.info?.father_name) name += " " + localize(user.info.father_name).split(" ")[0];
+    if (user.info?.grandfather_name) name += " " + localize(user.info.grandfather_name).split(" ")[0];
     return name.trim();
 };
 
