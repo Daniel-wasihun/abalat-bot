@@ -2,15 +2,6 @@
   <div class="flex flex-col flex-1 min-w-0">
     <main class="flex-grow p-4 md:p-6 lg:p-8 space-y-5 overflow-y-auto">
 
-      <!-- Page header -->
-      <PageTitle
-        :title="t('users.title')"
-        :subtitle="t('users.subtitle')"
-        :icon="UserGroupIcon"
-        icon-bg-class="bg-indigo-500/10"
-        icon-color-class="text-indigo-500"
-      />
-
       <!-- Search & Filter bar (LMS-matching TableToolbar) -->
       <TableToolbar
         v-model="search"

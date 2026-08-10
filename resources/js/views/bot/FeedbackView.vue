@@ -2,24 +2,6 @@
   <div class="flex flex-col flex-1 min-w-0">
     <main class="grow p-4 md:p-6 lg:p-8 space-y-5 overflow-y-auto">
 
-      <!-- Page header -->
-      <PageTitle
-        :title="t('feedback.title')"
-        :subtitle="t('feedback.subtitle')"
-        :icon="ChatBubbleLeftEllipsisIcon"
-        icon-bg-class="bg-amber-500/10"
-        icon-color-class="text-amber-500"
-      >
-        <template #actions>
-          <Button variant="ghost" size="sm" :icon="ArrowDownTrayIcon" @click="exportData('csv')">
-            {{ t('feedback.exportCsv') }}
-          </Button>
-          <Button variant="ghost" size="sm" :icon="DocumentIcon" @click="exportData('pdf')">
-            {{ t('feedback.exportPdf') }}
-          </Button>
-        </template>
-      </PageTitle>
-
       <!-- Table Toolbar (LMS-matching design) -->
       <TableToolbar
         v-model="feedbackStore.filters.search"

@@ -92,7 +92,7 @@ export const useNotificationStore = defineStore("notifications", () => {
         if (!authStore.user) return;
         loading.value = true;
         try {
-            const response = await apiClient.get("/notifications");
+            const response = await apiClient.get("/bot/notifications");
             const data = response.data.data || response.data;
             notifications.value = data.map(mapNotification);
         } catch (error) {
@@ -105,7 +105,7 @@ export const useNotificationStore = defineStore("notifications", () => {
     const fetchTrashedNotifications = async () => {
         if (!authStore.user) return;
         try {
-            const response = await apiClient.get("/notifications/trashed");
+            const response = await apiClient.get("/bot/notifications/trashed");
             const data = response.data.data || response.data;
             trashedNotifications.value = data.map(mapNotification);
         } catch (error) {
@@ -164,7 +164,7 @@ export const useNotificationStore = defineStore("notifications", () => {
         const notif = notifications.value.find((n) => n.id === id);
         if (notif && !notif.read) {
             try {
-                await apiClient.post(`/notifications/${id}/read`, {}, {
+                await apiClient.post(`/bot/notifications/${id}/read`, {}, {
                     skipSuccessToast: true,
                 } as any);
                 notif.read = true;
@@ -177,7 +177,7 @@ export const useNotificationStore = defineStore("notifications", () => {
     const markAllAsRead = async () => {
         if (unreadCount.value === 0) return;
         try {
-            await apiClient.post("/notifications/mark-all-read", {}, {
+            await apiClient.post("/bot/notifications/mark-all-read", {}, {
                 skipSuccessToast: true,
             } as any);
             notifications.value.forEach((n) => (n.read = true));
@@ -188,7 +188,7 @@ export const useNotificationStore = defineStore("notifications", () => {
 
     const trashNotification = async (id: string) => {
         try {
-            await apiClient.post(`/notifications/${id}/trash`);
+            await apiClient.post(`/bot/notifications/${id}/trash`);
             const notif = notifications.value.find((n) => n.id === id);
             if (notif) {
                 notif.is_trashed = true;
@@ -205,7 +205,7 @@ export const useNotificationStore = defineStore("notifications", () => {
 
     const restoreNotification = async (id: string) => {
         try {
-            await apiClient.post(`/notifications/${id}/restore`);
+            await apiClient.post(`/bot/notifications/${id}/restore`);
             const notif = trashedNotifications.value.find((n) => n.id === id);
             if (notif) {
                 notif.is_trashed = false;
@@ -225,7 +225,7 @@ export const useNotificationStore = defineStore("notifications", () => {
 
     const deletePermanently = async (id: string) => {
         try {
-            await apiClient.delete(`/notifications/${id}`);
+            await apiClient.delete(`/bot/notifications/${id}`);
             trashedNotifications.value = trashedNotifications.value.filter(
                 (n) => n.id !== id,
             );
@@ -239,7 +239,7 @@ export const useNotificationStore = defineStore("notifications", () => {
 
     const trashAll = async () => {
         try {
-            await apiClient.post("/notifications/trash-all");
+            await apiClient.post("/bot/notifications/trash-all");
             notifications.value.forEach((n) => {
                 n.is_trashed = true;
                 trashedNotifications.value.unshift(n);
@@ -253,7 +253,7 @@ export const useNotificationStore = defineStore("notifications", () => {
 
     const emptyTrash = async () => {
         try {
-            await apiClient.delete("/notifications/trash");
+            await apiClient.delete("/bot/notifications/trash");
             trashedNotifications.value = [];
         } catch (error) {
             console.error("Failed to empty trash:", error);
@@ -262,7 +262,7 @@ export const useNotificationStore = defineStore("notifications", () => {
 
     const clearAll = async () => {
         try {
-            await apiClient.delete("/notifications/all");
+            await apiClient.delete("/bot/notifications/all");
             notifications.value = [];
             trashedNotifications.value = [];
         } catch (error) {

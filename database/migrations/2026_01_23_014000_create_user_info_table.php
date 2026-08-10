@@ -15,7 +15,15 @@ return new class extends Migration {
             $table->string('registration_id')->unique();
             $table->enum('gender', ['male', 'female']);
             $table->string('phone_number')->nullable();
-            $table->date('date_of_birth')->nullable();
+            
+            $table->string('father_name')->nullable();
+            $table->string('grandfather_name')->nullable();
+            $table->string('christian_name')->nullable();
+            $table->string('spiritual_father_name')->nullable();
+            $table->string('sub_city')->nullable();
+            $table->string('woreda')->nullable();
+            $table->string('house_number')->nullable();
+
             $table->text('address')->nullable();
             $table->string('profile_picture')->nullable();
             $table->enum('status', ['active', 'suspended', 'restricted'])->default('active');

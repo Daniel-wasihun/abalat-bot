@@ -23,35 +23,27 @@ class SettingController extends Controller
     {
         $settings = $this->settingRepo->getAll();
 
-        // Ensure defaults if empty
-        return response()->json([
-            'bot_token' => $settings['bot_token'] ?? env('TELEGRAM_BOT_TOKEN', ''),
-            'webhook_url' => $settings['webhook_url'] ?? env('TELEGRAM_WEBHOOK_URL', ''),
-            'welcome_message' => $settings['welcome_message'] ?? '',
-            'feedback_categories' => $settings['feedback_categories'] ?? ['Bug', 'Suggestion', 'Complaint', 'Question', 'Other'],
-        ]);
+        return response()->json($settings);
     }
 
     public function update(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'bot_token' => 'nullable|string',
-            'webhook_url' => 'nullable|url',
-            'welcome_message' => 'nullable|string',
-            'feedback_categories' => 'nullable|array',
+            'settings' => 'required|array',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        foreach ($request->only(['bot_token', 'webhook_url', 'welcome_message', 'feedback_categories']) as $key => $val) {
-            if ($val !== null) {
-                $this->settingRepo->set($key, $val);
-            }
+        foreach ($request->input('settings', []) as $key => $val) {
+            $this->settingRepo->set($key, $val);
         }
 
-        return response()->json(['message' => 'Settings updated successfully']);
+        return response()->json([
+            'message' => 'Settings updated successfully',
+            'settings' => $this->settingRepo->getAll()
+        ]);
     }
 
     public function getWebhookStatus()
