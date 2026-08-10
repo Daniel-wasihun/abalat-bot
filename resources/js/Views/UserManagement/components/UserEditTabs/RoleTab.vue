@@ -29,14 +29,14 @@ import { localize } from "@/utils/format";
 
 const props = defineProps<{
  user: any;
- selectedRole: string;
+ selectedRoles: string[];
  roleStartDate: string;
  roleEndDate: string;
  errors: any;
 }>();
 
 const emit = defineEmits([
- "update:selectedRole",
+ "update:selectedRoles",
  "update:roleStartDate",
  "update:roleEndDate",
  "open-confirm",
@@ -47,7 +47,14 @@ const emit = defineEmits([
 
 const userStore = useUserStore();
 
-const onRoleSelect = (slug: string) => emit("update:selectedRole", slug);
+const onRoleSelect = (slug: string) => {
+    const currentRoles = [...props.selectedRoles];
+    if (currentRoles.includes(slug)) {
+        emit("update:selectedRoles", currentRoles.filter(r => r !== slug));
+    } else {
+        emit("update:selectedRoles", [...currentRoles, slug]);
+    }
+};
 const onStartDateChange = (val: any) => emit("update:roleStartDate", val);
 const onEndDateChange = (val: any) => emit("update:roleEndDate", val);
 
@@ -167,39 +174,39 @@ const closeDeleteModal = () => {
  </div>
 
  <div class="flex flex-wrap gap-1 pt-0">
- <button
- v-for="role in userStore.allRoles"
- :key="role.slug"
- @click="onRoleSelect(role.slug)"
- :class="[
- 'group/card relative px-3 py-1 rounded-full border transition-all text-left cursor-pointer flex items-center gap-2 min-h-[36px]',
- selectedRole === role.slug
- ? 'bg-brand-blue text-white border-brand-blue translate-y-[-1px]'
- : 'bg-main-bg border-card-border hover:border-accent/40 text-main-text/70',
- ]">
- <span
- :class="[
- 'text-sm font-medium tracking-tight transition-colors truncate',
- selectedRole === role.slug
- ? 'text-white'
- : 'text-main-text/60 group-hover/card:text-accent',
- ]">
- {{ localize(role.name) || role.slug }}
- </span>
+        <button
+            v-for="role in userStore.allRoles"
+            :key="role.slug"
+            @click="onRoleSelect(role.slug)"
+            :class="[
+                'group/card relative px-3 py-1 rounded-full border transition-all text-left cursor-pointer flex items-center gap-2 min-h-[36px]',
+                selectedRoles.includes(role.slug)
+                    ? 'bg-brand-blue text-white border-brand-blue translate-y-[-1px]'
+                    : 'bg-main-bg border-card-border hover:border-accent/40 text-main-text/70',
+            ]">
+            <span
+                :class="[
+                    'text-sm font-medium tracking-tight transition-colors truncate',
+                    selectedRoles.includes(role.slug)
+                        ? 'text-white'
+                        : 'text-main-text/60 group-hover/card:text-accent',
+                ]">
+                {{ localize(role.name) || role.slug }}
+            </span>
+
+            <div
+                v-if="selectedRoles.includes(role.slug)"
+                class="w-4 h-4 rounded-full bg-white/20 flex items-center justify-center">
+                <Check class="w-3 h-3 text-white" />
+            </div>
+        </button>
+    </div>
+ </div>
 
  <div
- v-if="selectedRole === role.slug"
- class="w-4 h-4 rounded-full bg-white/20 flex items-center justify-center">
- <Check class="w-3 h-3 text-white" />
- </div>
- </button>
- </div>
- </div>
-
- <div
- v-if="errors.role"
+ v-if="errors.roles"
  class="text-[13px] text-rose-500 font-medium px-1 text-left">
- {{ errors.role }}
+ {{ errors.roles }}
  </div>
 
  <!-- Validity Configuration Console -->

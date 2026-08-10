@@ -27,30 +27,30 @@ const languageStore = useLanguageStore();
 
 // Unified Logic
 const {
- profileForm,
- profilePicturePreview,
- selectedRole,
- roleStartDate,
- roleEndDate,
- selectedPermissions,
- permStartDate,
- permEndDate,
- activeTab,
- showConfirmModal,
- loading,
- scheduleForm,
- errors,
- syncState,
- handleFileChange,
- handleRemoveAvatar,
- openConfirm,
- submitAction,
- startEditSchedule,
- updateSchedule,
- cancelSchedule,
- togglePermission,
- clearFieldError,
- confirmationData,
+    profileForm,
+    profilePicturePreview,
+    selectedRoles,
+    roleStartDate,
+    roleEndDate,
+    selectedPermissions,
+    permStartDate,
+    permEndDate,
+    activeTab,
+    showConfirmModal,
+    loading,
+    scheduleForm,
+    errors,
+    syncState,
+    handleFileChange,
+    handleRemoveAvatar,
+    openConfirm,
+    submitAction,
+    startEditSchedule,
+    updateSchedule,
+    cancelSchedule,
+    togglePermission,
+    clearFieldError,
+    confirmationData,
 } = useUserEditLogic(props, emit, $tr);
 
 // Permission-based Tab Visibility
@@ -136,7 +136,7 @@ watch(
  <RoleTab
  v-else-if="activeTab === 'role'"
  :user="user"
- v-model:selectedRole="selectedRole"
+ v-model:selectedRoles="selectedRoles"
  v-model:roleStartDate="roleStartDate"
  v-model:roleEndDate="roleEndDate"
  :errors="errors"
