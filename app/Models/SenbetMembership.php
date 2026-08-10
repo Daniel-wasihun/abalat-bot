@@ -36,6 +36,23 @@ class SenbetMembership extends Model
         'previous_participation' => 'boolean',
     ];
 
+    protected static function booted()
+    {
+        static::saved(function ($membership) {
+            if ($membership->senbet_class) {
+                // Find all active courses for this class
+                $courses = Course::where('senbet_class', $membership->senbet_class)
+                                ->where('is_active', true)
+                                ->pluck('id');
+                
+                if ($courses->isNotEmpty()) {
+                    // Sync without detaching to automatically enroll the student
+                    $membership->user->enrolledCourses()->syncWithoutDetaching($courses);
+                }
+            }
+        });
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

@@ -52,9 +52,21 @@ class User extends Authenticatable implements OAuthenticatableContract
         return $this->hasMany(UserSession::class);
     }
 
-    public function senbetMembership(): HasOne
+    public function senbetMembership(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
         return $this->hasOne(SenbetMembership::class);
+    }
+
+    public function teachingCourses()
+    {
+        return $this->belongsToMany(Course::class, 'course_teacher', 'teacher_id', 'course_id');
+    }
+
+    public function enrolledCourses()
+    {
+        return $this->belongsToMany(Course::class, 'course_enrollments', 'student_id', 'course_id')
+                    ->withPivot('status')
+                    ->withTimestamps();
     }
 
     public function suspiciousActivities(): HasMany
