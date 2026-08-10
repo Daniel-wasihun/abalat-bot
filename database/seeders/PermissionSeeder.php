@@ -46,7 +46,6 @@ class PermissionSeeder extends Seeder {
                     }
                     $permission->is_system_level = true;
                     $permission->is_active = true;
-                    $permission->name = null;
                     $permission->save();
                 } else {
                     Permission::create([
