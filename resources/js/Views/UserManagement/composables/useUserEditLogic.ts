@@ -21,17 +21,34 @@ export function useUserEditLogic(props: { user: any }, emit: any, $tr: any) {
         registration_id: "",
         phone_number: "",
         gender: "",
-        date_of_birth: "",
-        address: "",
-        is_active: true,
         role: "",
+        roles: [],
+        father_name: "",
+        grandfather_name: "",
+        christian_name: "",
+        spiritual_father_name: "",
+        sub_city: "",
+        woreda: "",
+        house_number: "",
+        is_member: false,
+        senbet_date_of_birth: "",
+        education_level: "",
+        emergency_name: "",
+        emergency_phone: "",
+        emergency_sub_city: "",
+        emergency_woreda: "",
+        emergency_house_number: "",
+        emergency_address: "",
+        senbet_class: "",
+        previous_participation: false,
+        previous_participation_document: null as File | null,
     });
 
     const profilePictureFile = ref<File | null>(null);
     const profilePicturePreview = ref<string | null>(null);
     const removeProfilePicture = ref(false);
 
-    const selectedRole = ref("");
+    const selectedRoles = ref<string[]>([]);
     const roleStartDate = ref("");
     const roleEndDate = ref("");
 
@@ -63,8 +80,28 @@ export function useUserEditLogic(props: { user: any }, emit: any, $tr: any) {
                 address: "",
                 is_active: true,
                 role: "",
+                roles: [],
+                father_name: "",
+                grandfather_name: "",
+                christian_name: "",
+                spiritual_father_name: "",
+                sub_city: "",
+                woreda: "",
+                house_number: "",
+                is_member: false,
+                senbet_date_of_birth: "",
+                education_level: "",
+                emergency_name: "",
+                emergency_phone: "",
+                emergency_sub_city: "",
+                emergency_woreda: "",
+                emergency_house_number: "",
+                emergency_address: "",
+                senbet_class: "",
+                previous_participation: false,
+                previous_participation_document: null,
             };
-            selectedRole.value = "";
+            selectedRoles.value = [];
             selectedPermissions.value = [];
             profilePicturePreview.value = null;
             return;
@@ -76,16 +113,35 @@ export function useUserEditLogic(props: { user: any }, emit: any, $tr: any) {
             registration_id: user.info?.registration_id || "",
             phone_number: user.info?.phone_number || "",
             gender: (user.info?.gender || "").toLowerCase(),
-            date_of_birth: user.info?.date_of_birth || "",
             address: user.info?.address || "",
+            father_name: user.info?.father_name || "",
+            grandfather_name: user.info?.grandfather_name || "",
+            christian_name: user.info?.christian_name || "",
+            spiritual_father_name: user.info?.spiritual_father_name || "",
+            sub_city: user.info?.sub_city || "",
+            woreda: user.info?.woreda || "",
+            house_number: user.info?.house_number || "",
             is_active: user.is_active ?? true,
-            role: "",
+            role: "", // keep for fallback if any component strictly needs it, though we use roles now
+            roles: user.roles?.map((r: any) => r.slug) || [],
+            is_member: !!user.senbetMembership,
+            senbet_date_of_birth: user.senbetMembership?.date_of_birth || "",
+            education_level: user.senbetMembership?.education_level || "",
+            emergency_name: user.senbetMembership?.emergency_name || "",
+            emergency_phone: user.senbetMembership?.emergency_phone || "",
+            emergency_sub_city: user.senbetMembership?.emergency_sub_city || "",
+            emergency_woreda: user.senbetMembership?.emergency_woreda || "",
+            emergency_house_number: user.senbetMembership?.emergency_house_number || "",
+            emergency_address: user.senbetMembership?.emergency_address || "",
+            senbet_class: user.senbetMembership?.senbet_class || "",
+            previous_participation: !!user.senbetMembership?.previous_participation,
+            previous_participation_document: null, // Don't load file objects from string path
         };
 
         assignedPermissions.value = (user.permissions || []).map((p: any) =>
             typeof p === "string" ? p : p.slug,
         );
-        selectedRole.value = user.role?.slug || "";
+        selectedRoles.value = profileForm.value.roles;
         selectedPermissions.value = [...assignedPermissions.value];
         profilePicturePreview.value = user.profile_picture || null;
 
@@ -114,9 +170,9 @@ export function useUserEditLogic(props: { user: any }, emit: any, $tr: any) {
     // ─── Submit flow ──────────────────────────────────────────────────────────
 
     const openConfirm = (type: "profile" | "role" | "permissions") => {
-        if (type === "profile" && !validate(createProfileSchema(withParams), profileForm.value)) return;
+        if (type === "profile" && !validate(createProfileSchema(), profileForm.value)) return;
         if (type === "role" && !validate(roleSchema, {
-            role: selectedRole.value,
+            roles: selectedRoles.value,
             startDate: roleStartDate.value,
             endDate: roleEndDate.value,
         })) return;
@@ -137,30 +193,71 @@ export function useUserEditLogic(props: { user: any }, emit: any, $tr: any) {
         try {
             if (confirmType.value === "profile") {
                 const formData = new FormData();
-                Object.entries(profileForm.value).forEach(([k, v]) => {
-                    if (k === "is_active") {
-                        formData.append(k, v ? "1" : "0");
-                    } else if (v !== null && v !== undefined && v !== "") {
-                        formData.append(k, String(v));
+                const form = profileForm.value;
+
+                // --- Core user fields ---
+                const stringFields = [
+                    "name", "email", "registration_id", "phone_number", "gender",
+                    "address", "father_name", "grandfather_name", "christian_name",
+                    "spiritual_father_name", "sub_city", "woreda", "house_number",
+                ];
+                stringFields.forEach((k) => {
+                    if (form[k] !== null && form[k] !== undefined) {
+                        formData.append(k, String(form[k]));
                     }
                 });
-                if (profilePictureFile.value)
+
+                // --- Boolean fields ---
+                formData.append("is_active", form.is_active ? "1" : "0");
+                formData.append("is_member", form.is_member ? "1" : "0");
+                formData.append("previous_participation", form.previous_participation ? "1" : "0");
+
+                // --- Roles (array) ---
+                const roles: string[] = Array.isArray(form.roles) ? form.roles : [];
+                roles.forEach((r) => formData.append("roles[]", r));
+
+                // --- Senbet membership fields (only if is_member) ---
+                if (form.is_member) {
+                    const memberFields = [
+                        "senbet_date_of_birth", "education_level", "senbet_class",
+                        "emergency_name", "emergency_phone",
+                        "emergency_sub_city", "emergency_woreda", "emergency_house_number",
+                        "emergency_address",
+                    ];
+                    memberFields.forEach((k) => {
+                        if (form[k] !== null && form[k] !== undefined && form[k] !== "") {
+                            formData.append(k, String(form[k]));
+                        }
+                    });
+
+                    // Participation document (File object)
+                    if (form.previous_participation && form.previous_participation_document instanceof File) {
+                        formData.append("previous_participation_document", form.previous_participation_document);
+                    }
+                }
+
+                // --- Profile picture ---
+                if (profilePictureFile.value) {
                     formData.append("profile_picture", profilePictureFile.value);
-                if (removeProfilePicture.value)
+                }
+                if (removeProfilePicture.value) {
                     formData.append("remove_profile_picture", "1");
+                }
 
                 if (props.user) {
                     await userStore.updateUser(props.user.id, formData);
                 } else {
-                    if (profileForm.value.role)
-                        formData.append("role", profileForm.value.role);
                     await userStore.createUser(formData);
                     emit("close");
                 }
             } else if (confirmType.value === "role") {
-                await userStore.assignRole(
+            const currentRoles = (props.user?.roles || []).map((r: any) => typeof r === 'string' ? r : r.slug);
+            const isRemoving = false; // Logic needs adaptation if multiple
+            const isAdding = selectedRoles.value.length > 0;
+            const hasChange = isAdding || isRemoving;
+            await userStore.assignRole(
                     props.user.id,
-                    selectedRole.value,
+                    selectedRoles.value,
                     roleStartDate.value || undefined,
                     roleEndDate.value || undefined,
                 );
@@ -272,10 +369,10 @@ export function useUserEditLogic(props: { user: any }, emit: any, $tr: any) {
             res.description = $tr("user.review_role_assignment") || "You are about to modify this user's role.";
             res.icon = Briefcase;
 
-            const role = userStore.allRoles.find((r) => r.slug === selectedRole.value);
+            const roles = userStore.allRoles.filter((r) => selectedRoles.value.includes(r.slug));
             res.summary.push({
-                label: $tr("field.target_role") || "Role",
-                value: role ? localize(role.name, languageStore.currentLanguage) : selectedRole.value,
+                label: $tr("field.target_role") || "Roles",
+                value: roles.length > 0 ? roles.map(r => localize(r.name, languageStore.currentLanguage)).join(', ') : selectedRoles.value.join(', '),
             });
             if (roleStartDate.value) res.summary.push({ label: $tr("field.effective_from") || "From", value: roleStartDate.value });
             if (roleEndDate.value)   res.summary.push({ label: $tr("field.effective_until") || "Until", value: roleEndDate.value });
@@ -301,7 +398,7 @@ export function useUserEditLogic(props: { user: any }, emit: any, $tr: any) {
     return {
         profileForm,
         profilePicturePreview,
-        selectedRole,
+        selectedRoles,
         roleStartDate,
         roleEndDate,
         selectedPermissions,

@@ -1,54 +1,45 @@
 import { z } from "zod";
 
-export const NAME_MIN = 7;
-export const ID_MIN_LETTERS = 2;
-export const ID_MAX_LETTERS = 5;
-export const ID_MIN_DIGITS = 5;
-export const ID_MAX_DIGITS = 8;
+const LETTERS_ONLY = /^[A-Za-z\s]+$/;
+const PHONE_REGEX  = /^[79]\d{8}$/;
+const ID_REGEX     = /^DB\d{4,}$/;
+const SENBET_CLASSES = ["child", "post_12", ...Array.from({ length: 12 }, (_, i) => String(i + 1))];
 
-export const createProfileSchema = (withParams: any) =>
+const optionalLetters = z
+    .string().nullable().optional().or(z.literal(""))
+    .refine((v) => !v || LETTERS_ONLY.test(v), { message: "validation.letters_only" });
+
+export const createProfileSchema = () =>
     z.object({
-        name: z
-            .string()
-            .min(1, "validation.required")
-            .min(NAME_MIN, "validation.min_length")
-            .regex(/^[A-Za-z\s]+$/, "validation.letters_only")
-            .regex(/^\S+\s+\S+.*$/, "validation.name_format"),
-        email: z
-            .string()
-            .min(1, "validation.required")
-            .email("validation.email"),
-        registration_id: z
-            .string()
-            .min(1, "validation.required")
-            .regex(
-                /^[A-Za-z]{2,5}\d{5,8}$/,
-                withParams("validation.id_format", {
-                    l_min: ID_MIN_LETTERS,
-                    l_max: ID_MAX_LETTERS,
-                    d_min: ID_MIN_DIGITS,
-                    d_max: ID_MAX_DIGITS,
-                }),
-            ),
-        phone_number: z
-            .string()
-            .nullable()
-            .optional()
-            .or(z.literal(""))
-            .refine((val) => !val || /^[79]\d{8}$/.test(val), {
-                message: "validation.phone_format",
-            }),
-        gender: z
-            .string()
-            .min(1, "validation.required")
-            .refine((val) => ["male", "female"].includes(val.toLowerCase()), {
-                message: "validation.gender_format",
-            }),
-        role: z.string().min(1, "validation.required"),
+        name: z.string()
+            .min(7, "validation.min_length")
+            .regex(LETTERS_ONLY, "validation.letters_only")
+            .regex(/^\S+\s+\S+/, "validation.name_format"),
+
+        email: z.string().email("validation.email").nullable().optional().or(z.literal("")),
+
+        registration_id: z.string().nullable().optional().or(z.literal(""))
+            .refine((v) => !v || ID_REGEX.test(v), { message: "validation.id_format" }),
+
+        father_name:      z.string().min(1, "validation.required").regex(LETTERS_ONLY, "validation.letters_only"),
+        grandfather_name: z.string().min(1, "validation.required").regex(LETTERS_ONLY, "validation.letters_only"),
+        christian_name:        optionalLetters,
+        spiritual_father_name: optionalLetters,
+
+        phone_number: z.string().min(1, "validation.required").regex(PHONE_REGEX, "validation.phone_format"),
+        address:      z.string().min(1, "validation.required"),
+
+        gender: z.string().min(1, "validation.required")
+            .refine((v) => ["male", "female"].includes(v), { message: "validation.gender_format" }),
+
+        senbet_class: z.string().nullable().optional().or(z.literal(""))
+            .refine((v) => !v || SENBET_CLASSES.includes(v), { message: "Invalid Senbet class" }),
+
+        roles: z.array(z.string()).min(1, "validation.required"),
     });
 
 export const roleSchema = z.object({
-    role: z.string().min(1, "validation.required"),
+    roles:     z.array(z.string()).min(1, "validation.required"),
     startDate: z.string().optional(),
-    endDate: z.string().optional(),
+    endDate:   z.string().optional(),
 });
