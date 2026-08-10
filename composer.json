@@ -16,7 +16,8 @@
         "laravel/reverb": "^1.0",
         "laravel/tinker": "^2.10.1",
         "nutgram/laravel": "^1.7",
-        "nutgram/nutgram": "^4.44"
+        "nutgram/nutgram": "^4.44",
+        "tecnickcom/tcpdf": "^6.11"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
@@ -47,6 +48,10 @@
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
             "@php artisan key:generate",
             "@php artisan migrate --force",
+            "@php artisan db:seed --force",
+            "@php artisan passport:keys --force",
+            "@php artisan passport:client --personal --name=\"Senbet Personal Access Client\" --no-interaction",
+            "@php artisan storage:link",
             "npm install",
             "npm run build"
         ],
