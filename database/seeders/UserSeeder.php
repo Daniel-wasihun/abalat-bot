@@ -53,10 +53,16 @@ class UserSeeder extends Seeder {
             UserInfo::updateOrCreate(
                 ['user_id' => $user->id],
                 [
-                    'registration_id' => 'SB' . $digits,
+                    'registration_id' => UserInfo::generateNextRegistrationId(),
                     'gender' => collect(['male', 'female'])->random(),
                     'phone_number' => '+251' . collect(['7', '9'])->random() . str_pad(rand(0, 99999999), 8, '0', STR_PAD_LEFT),
-                    'date_of_birth' => Carbon::now()->subYears(rand(18, 50))->format('Y-m-d'),
+                    'father_name' => 'Father ' . $name,
+                    'grandfather_name' => 'Grandfather ' . $name,
+                    'christian_name' => 'Christian ' . $name,
+                    'spiritual_father_name' => 'Aba ' . $name,
+                    'sub_city' => 'Bole',
+                    'woreda' => '03',
+                    'house_number' => '123',
                     'address' => 'Addis Ababa, Ethiopia',
                 ]
             );
