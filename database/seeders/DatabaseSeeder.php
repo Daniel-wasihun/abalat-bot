@@ -15,6 +15,9 @@ class DatabaseSeeder extends Seeder
             PermissionSeeder::class,
             RoleSeeder::class,
             UserSeeder::class,
+            TeacherSeeder::class,
+            CourseSeeder::class,
+            StudentSeeder::class,  // must run after CourseSeeder so offerings exist
         ]);
     }
 }
