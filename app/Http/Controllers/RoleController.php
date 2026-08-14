@@ -45,9 +45,9 @@ class RoleController extends Controller implements HasMiddleware {
             ->where('slug', '!=', 'super-admin')
             ->when($request->search, function ($query, $search) {
                 $query->where(function ($q) use ($search) {
-                    $q->where('name->en', 'like', "%{$search}%")
-                        ->orWhere('name->am', 'like', "%{$search}%")
-                        ->orWhere('slug', 'like', "%{$search}%");
+                    $q->whereRaw("(\"name\"::jsonb)->>'en' ilike ?", ["%{$search}%"])
+                        ->orWhereRaw("(\"name\"::jsonb)->>'am' ilike ?", ["%{$search}%"])
+                        ->orWhere('slug', 'ilike', "%{$search}%");
                 });
             });
 

@@ -275,7 +275,14 @@ class AuthController extends Controller implements HasMiddleware {
             }]);
         }
 
-        return Response::_200(UserResource::success($user));
+        // Expose a flag so the frontend can detect that the user teaches even if
+        // their primary role slug is not "teacher" (e.g. they also have student role).
+        $hasTeacherAssignment = ($user instanceof User) && $user->teacherAssignments()->exists();
+
+        $resource = UserResource::success($user);
+        $resource = $resource->additional(['has_teacher_assignment' => $hasTeacherAssignment]);
+
+        return Response::_200($resource);
     }
 
     /**

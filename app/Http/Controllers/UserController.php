@@ -82,8 +82,8 @@ class UserController extends Controller implements HasMiddleware {
 
         return $query->when($request->search, function ($query, $search) {
             $query->where(function ($q) use ($search) {
-                $q->where('name->en', 'ilike', "%{$search}%")
-                    ->orWhere('name->am', 'ilike', "%{$search}%")
+                $q->whereRaw("(\"name\"::jsonb)->>'en' ilike ?", ["%{$search}%"])
+                    ->orWhereRaw("(\"name\"::jsonb)->>'am' ilike ?", ["%{$search}%"])
                     ->orWhere('email', 'ilike', "%{$search}%")
                     ->orWhereHas('info', function ($qi) use ($search) {
                         $qi->where('registration_id', 'ilike', "%{$search}%");

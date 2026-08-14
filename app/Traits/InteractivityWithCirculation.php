@@ -65,7 +65,7 @@ trait InteractivityWithCirculation {
             ->leftJoin('users as b_u', 'borrows.borrower_id', '=', 'b_u.id')
             ->leftJoin('spot_readings', "{$table}.spot_reading_id", '=', 'spot_readings.id')
             ->leftJoin('users as s_u', 'spot_readings.user_id', '=', 's_u.id')
-            ->orderByRaw("COALESCE(b_u.name->>'{$locale}', b_u.name->>'en', s_u.name->>'{$locale}', s_u.name->>'en') {$sortOrder}")
+            ->orderByRaw("COALESCE((b_u.name::jsonb)->>'{$locale}', (b_u.name::jsonb)->>'en', (s_u.name::jsonb)->>'{$locale}', (s_u.name::jsonb)->>'en') {$sortOrder}")
             ->select("{$table}.*");
     }
 

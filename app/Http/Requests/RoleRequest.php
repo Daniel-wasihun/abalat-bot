@@ -57,7 +57,20 @@ class RoleRequest extends BaseRequest {
                 'string',
                 'min:4',
                 'max:20',
-                Rule::unique('roles', 'name->' . app()->getLocale())->ignore($roleId),
+                function ($attribute, $value, $fail) use ($roleId) {
+                    $locale = app()->getLocale();
+                    $query = \Illuminate\Support\Facades\DB::table('roles')
+                        ->whereRaw("(\"name\"::jsonb)->>'$locale' = ?", [$value])
+                        ->whereNull('deleted_at');
+                    
+                    if ($roleId) {
+                        $query->where('id', '!=', $roleId);
+                    }
+                    
+                    if ($query->exists()) {
+                        $fail(trans('validation.unique', ['attribute' => 'name']));
+                    }
+                },
             ],
             'description' => ['nullable', 'string', 'max:500'],
             'hierarchy_level' => [$isPost ? 'required' : 'sometimes', 'integer', 'min:1', 'max:99'],

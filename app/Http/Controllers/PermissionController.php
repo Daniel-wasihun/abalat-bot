@@ -45,11 +45,11 @@ class PermissionController extends Controller implements HasMiddleware {
 
         $permissions = Permission::when($request->search, function ($query, $search) {
             $query->where(function ($q) use ($search) {
-                $q->where('name->en', 'like', "%{$search}%")
-                    ->orWhere('name->am', 'like', "%{$search}%")
-                    ->orWhere('slug', 'like', "%{$search}%")
-                    ->orWhere('description->en', 'like', "%{$search}%")
-                    ->orWhere('description->am', 'like', "%{$search}%");
+                $q->whereRaw("(\"name\"::jsonb)->>'en' ilike ?", ["%{$search}%"])
+                    ->orWhereRaw("(\"name\"::jsonb)->>'am' ilike ?", ["%{$search}%"])
+                    ->orWhere('slug', 'ilike', "%{$search}%")
+                    ->orWhereRaw("(\"description\"::jsonb)->>'en' ilike ?", ["%{$search}%"])
+                    ->orWhereRaw("(\"description\"::jsonb)->>'am' ilike ?", ["%{$search}%"]);
             });
         })
             ->when($request->module, function ($query, $module) {
