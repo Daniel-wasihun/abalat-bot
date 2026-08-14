@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+
 class SenbetMembership extends Model
 {
     use HasFactory, SoftDeletes;
@@ -39,16 +40,29 @@ class SenbetMembership extends Model
     protected static function booted()
     {
         static::saved(function ($membership) {
-            if ($membership->senbet_class) {
-                // Find all active courses for this class
-                $courses = Course::where('senbet_class', $membership->senbet_class)
-                                ->where('is_active', true)
-                                ->pluck('id');
-                
-                if ($courses->isNotEmpty()) {
-                    // Sync without detaching to automatically enroll the student
-                    $membership->user->enrolledCourses()->syncWithoutDetaching($courses);
-                }
+            if (! $membership->senbet_class) return;
+
+            // Find all active course offerings for this class
+            $offerings = CourseOffering::where('senbet_class', $membership->senbet_class)
+                ->where('is_active', true)
+                ->get();
+
+            foreach ($offerings as $offering) {
+                // Enroll in the offering
+                $membership->user->enrolledInOfferings()->syncWithoutDetaching([
+                    $offering->id => ['status' => 'active', 'course_id' => $offering->course_id],
+                ]);
+
+                // Create a blank StudentResult placeholder
+                StudentResult::firstOrCreate(
+                    [
+                        'student_id'          => $membership->user_id,
+                        'course_offering_id'  => $offering->id,
+                    ],
+                    [
+                        'recorded_by' => null,
+                    ]
+                );
             }
         });
     }

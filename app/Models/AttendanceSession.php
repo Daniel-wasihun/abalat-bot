@@ -10,12 +10,12 @@ class AttendanceSession extends Model
     use HasFactory;
 
     protected $fillable = [
-        'course_id', 'teacher_id', 'date', 'topic'
+        'course_offering_id', 'teacher_id', 'date', 'topic'
     ];
 
-    public function course()
+    public function courseOffering()
     {
-        return $this->belongsTo(Course::class);
+        return $this->belongsTo(CourseOffering::class);
     }
 
     public function teacher()

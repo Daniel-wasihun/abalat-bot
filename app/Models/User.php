@@ -69,6 +69,36 @@ class User extends Authenticatable implements OAuthenticatableContract
                     ->withTimestamps();
     }
 
+    /**
+     * Offering-scoped enrollment (new system).
+     * A student is enrolled in specific CourseOfferings (class × year × semester).
+     */
+    public function enrolledInOfferings()
+    {
+        return $this->belongsToMany(CourseOffering::class, 'course_enrollments', 'student_id', 'course_offering_id')
+                    ->withPivot('status', 'course_id')
+                    ->withTimestamps();
+    }
+
+    public function teacherAssignments(): HasMany
+    {
+        return $this->hasMany(TeacherAssignment::class, 'teacher_id');
+    }
+
+    /**
+     * Course offerings this teacher is assigned to.
+     */
+    public function assignedOfferings()
+    {
+        return $this->belongsToMany(CourseOffering::class, 'teacher_assignments', 'teacher_id', 'course_offering_id')
+                    ->withTimestamps();
+    }
+
+    public function studentResults(): HasMany
+    {
+        return $this->hasMany(StudentResult::class, 'student_id');
+    }
+
     public function suspiciousActivities(): HasMany
     {
         return $this->hasMany(SuspiciousActivity::class);
