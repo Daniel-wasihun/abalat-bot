@@ -162,16 +162,31 @@ const routes: RouteRecordRaw[] = [
                         component: () => import("@/Views/Academic/CoursesView.vue"),
                     },
                     {
-                        path: "my-classes",
-                        name: "academic-my-classes",
-                        meta: { title: "nav.my_classes", permission: "academic_classes.view" },
+                        path: "my-courses",
+                        name: "academic-my-courses",
+                        meta: { title: "nav.my_courses", permission: "academic_classes.view" },
                         component: () => import("@/Views/Academic/MyClassesView.vue"),
                     },
                     {
-                        path: "my-classes/:id",
+                        // Legacy redirect: old my-classes → my-courses
+                        path: "my-classes",
+                        redirect: { name: "academic-my-courses" },
+                    },
+                    {
+                        // Offering-scoped ClassHub (primary route for teachers)
+                        path: "offerings/:id",
                         name: "academic-class-hub",
                         meta: { title: "nav.class_hub", permission: "academic_classes.view" },
                         component: () => import("@/Views/Academic/ClassHubView.vue"),
+                    },
+                    {
+                        // Legacy redirect: old my-classes/:id → offerings/:id
+                        path: "my-classes/:id",
+                        name: "academic-class-hub-legacy",
+                        redirect: (to) => ({
+                            name: "academic-class-hub",
+                            params: { id: to.params.id },
+                        }),
                     },
                 ],
             }

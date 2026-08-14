@@ -66,6 +66,28 @@ export const useAuthStore = defineStore("auth", () => {
         return level >= 40;
     });
 
+    const isTeacher = computed(() => {
+        const u = user.value;
+        if (!u) return false;
+        // Check primary role slug
+        const slug = (u.role?.slug || "").toLowerCase();
+        if (slug === "teacher") return true;
+        // Also check all roles array (user may have multiple roles)
+        const roles: any[] = u.roles || [];
+        if (roles.some((r: any) => (r.slug || "").toLowerCase() === "teacher")) return true;
+        // Fallback: user has teacher assignments flagged by backend
+        return !!u.has_teacher_assignment;
+    });
+
+    const isStudent = computed(() => {
+        const u = user.value;
+        if (!u) return false;
+        const slug = (u.role?.slug || "").toLowerCase();
+        if (slug === "student") return true;
+        const roles: any[] = u.roles || [];
+        return roles.some((r: any) => (r.slug || "").toLowerCase() === "student");
+    });
+
     const setAuth = (newToken: string, userData: any, sessionId?: string) => {
         token.value = newToken;
         Cookies.set("access_token", newToken, { expires: 30, sameSite: "Lax", path: "/" });
@@ -142,6 +164,13 @@ export const useAuthStore = defineStore("auth", () => {
             try {
                 const response = await apiClient.get("/me");
                 const userData = response.data.user;
+
+                // Merge top-level flags (like has_teacher_assignment) into the user object
+                // so computed properties like isTeacher can access them.
+                if (response.data.has_teacher_assignment !== undefined) {
+                    userData.has_teacher_assignment = response.data.has_teacher_assignment;
+                }
+
                 user.value = userData;
 
                 // Update current session ID if available
@@ -281,6 +310,8 @@ export const useAuthStore = defineStore("auth", () => {
         hasPermission,
         canManageAllLibraries,
         isStaff,
+        isTeacher,
+        isStudent,
         login,
         fetchUser,
         logout,

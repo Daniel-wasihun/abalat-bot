@@ -278,11 +278,13 @@ const menuGroups = computed<MenuGroup[]>(() => [
     ],
   },
   {
-    // Academic Management — only visible to users with at least one academic permission
+    // Academic Management — visible to users with academic permissions, teachers, and students
     name: "nav.academic",
     condition: () =>
       perms.academicCourses.canView.value ||
-      perms.academicClasses.canView.value,
+      perms.academicClasses.canView.value ||
+      authStore.isTeacher ||
+      authStore.isStudent,
     items: [
       {
         // Course admin — create/edit/delete/assign teachers — admin+ only
@@ -292,13 +294,15 @@ const menuGroups = computed<MenuGroup[]>(() => [
         condition: () => perms.academicCourses.canView.value,
       },
       {
-        // My Classes — teachers, students, and admin
-        name: "nav.my_classes",
+        // My Courses — teachers, students, and admin
+        name: "nav.my_courses",
         icon: BookOpen,
-        to: "/dashboard/academic/my-classes",
+        to: "/dashboard/academic/my-courses",
         condition: () =>
           perms.academicCourses.canView.value ||
-          perms.academicClasses.canView.value,
+          perms.academicClasses.canView.value ||
+          authStore.isTeacher ||
+          authStore.isStudent,
       },
     ],
   },
