@@ -19,7 +19,7 @@ A comprehensive school management system featuring a Laravel backend, Vue.js fro
 Ensure the following are installed on your machine:
 
 | Requirement | Version |
-|---|---|
+| --- | --- |
 | PHP | 8.2 or higher |
 | Composer | Latest |
 | Node.js & npm | 18+ recommended |
@@ -66,6 +66,7 @@ DB_PASSWORD=your_postgres_password
 
 > **Tip for Linux users using peer auth (no password):**
 > If your PostgreSQL user matches your system user, you can use:
+>
 > ```env
 > DB_HOST=/var/run/postgresql
 > DB_PASSWORD=
@@ -121,7 +122,7 @@ This will create all tables, seed permissions, roles, and default test users.
 **Default login accounts after seeding:**
 
 | Email | Password | Role |
-|---|---|---|
+| --- | --- | --- |
 | `superadmin@lms.com` | `password123` | Super Admin |
 | `admin@lms.com` | `password123` | Administrator |
 | `teacher@lms.com` | `password123` | Teacher |
@@ -190,7 +191,7 @@ Starts the Laravel server, Vite dev server, Reverb WebSocket, queue listener, an
 composer dev
 ```
 
-Access the dashboard at: **http://localhost:8000**
+Access the dashboard at: **<http://localhost:8000>**
 
 ### Production Mode
 
@@ -209,10 +210,13 @@ composer prod-start
 **Cause:** Laravel Passport OAuth clients don't exist in the database (e.g., after a fresh migration).
 
 **Fix:**
+
 ```bash
 php artisan passport:install
 ```
+
 Then update `PASSPORT_PERSONAL_ACCESS_CLIENT_ID` and `PASSPORT_PERSONAL_ACCESS_CLIENT_SECRET` in your `.env`, then run:
+
 ```bash
 php artisan config:clear
 ```
@@ -224,6 +228,7 @@ php artisan config:clear
 **Cause:** Passport is not configured, or the client IDs in `.env` don't match the database.
 
 **Fix:**
+
 ```bash
 php artisan passport:install
 # Update .env with new client credentials, then:
@@ -238,6 +243,7 @@ php artisan cache:clear
 **Cause:** Composer autoload cache is stale.
 
 **Fix:**
+
 ```bash
 composer dump-autoload
 ```
@@ -249,6 +255,7 @@ composer dump-autoload
 **Cause:** You ran `php artisan migrate` on an already-seeded database.
 
 **Fix:**
+
 ```bash
 # Drops all data and recreates from scratch:
 php artisan migrate:fresh --seed
@@ -263,6 +270,7 @@ php artisan migrate
 **Cause:** The `SESSION_DRIVER` is incorrect.
 
 **Fix:** Make sure your `.env` has:
+
 ```env
 SESSION_DRIVER=file
 SESSION_LIFETIME=120
@@ -275,6 +283,7 @@ SESSION_LIFETIME=120
 **Cause:** The Telegram token is wrong or the Telegram API is temporarily unreachable. The bot automatically restarts.
 
 **Fix:**
+
 1. Verify your `TELEGRAM_TOKEN` in `.env` is correct.
 2. For local development, the error is harmless — the bot retries every 5 seconds automatically.
 
@@ -285,6 +294,7 @@ SESSION_LIFETIME=120
 **Cause:** The storage symlink is missing.
 
 **Fix:**
+
 ```bash
 php artisan storage:link
 ```
@@ -318,7 +328,7 @@ php artisan route:clear
 ## Environment Variable Reference
 
 | Variable | Description | Example |
-|---|---|---|
+| --- | --- | --- |
 | `APP_KEY` | Laravel app encryption key (auto-generated) | `base64:...` |
 | `APP_URL` | Public URL of your app | `http://localhost:8000` |
 | `DB_CONNECTION` | Database driver | `pgsql` |
@@ -338,3 +348,5 @@ php artisan route:clear
 ## License
 
 This project is licensed under the [MIT License](https://opensource.org/licenses/MIT).
+
+php artisan passport:client --personal --name="Senbet Personal Access Client"
