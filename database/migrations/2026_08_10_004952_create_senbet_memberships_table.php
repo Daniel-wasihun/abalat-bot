@@ -24,6 +24,7 @@ return new class extends Migration
             $table->text('emergency_address')->nullable();
             $table->date('registration_date')->nullable();
             $table->string('senbet_class')->nullable();
+            $table->string('section', 50)->nullable();
             $table->boolean('previous_participation')->default(false);
             $table->string('previous_participation_document')->nullable();
             $table->timestamps();

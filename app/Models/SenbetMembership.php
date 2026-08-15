@@ -27,6 +27,7 @@ class SenbetMembership extends Model
         'emergency_address',
         'registration_date',
         'senbet_class',
+        'section',
         'previous_participation',
         'previous_participation_document',
     ];

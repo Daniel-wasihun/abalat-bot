@@ -70,7 +70,8 @@ class UserRequest extends BaseRequest
             // Senbet Membership (always optional at field level; conditionally required via withValidator)
             'is_member'         => ['nullable', 'boolean'],
             'senbet_date_of_birth' => ['nullable', 'date', 'before:-15 years'],
-            'senbet_class'      => ['nullable', 'string', 'in:child,post_12,1,2,3,4,5,6,7,8,9,10,11,12'],
+            'senbet_class'      => ['nullable', 'string', 'exists:senbet_classes,code'],
+            'section'           => ['nullable', 'string', 'max:50'],
             'education_level'   => ['nullable', 'string'],
             'emergency_name'    => ['nullable', 'string'],
             'emergency_phone'   => ['nullable', 'string'],

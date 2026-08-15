@@ -40,6 +40,7 @@ export function useUserEditLogic(props: { user: any }, emit: any, $tr: any) {
         emergency_house_number: "",
         emergency_address: "",
         senbet_class: "",
+        section: "",
         previous_participation: false,
         previous_participation_document: null as File | null,
     });
@@ -134,6 +135,7 @@ export function useUserEditLogic(props: { user: any }, emit: any, $tr: any) {
             emergency_house_number: user.senbetMembership?.emergency_house_number || "",
             emergency_address: user.senbetMembership?.emergency_address || "",
             senbet_class: user.senbetMembership?.senbet_class || "",
+            section: user.senbetMembership?.section || "",
             previous_participation: !!user.senbetMembership?.previous_participation,
             previous_participation_document: null, // Don't load file objects from string path
         };

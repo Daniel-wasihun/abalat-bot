@@ -238,6 +238,7 @@ class UserController extends Controller implements HasMiddleware {
                     'emergency_address' => $data['emergency_address'] ?? null,
                     'registration_date' => now(),
                     'senbet_class' => $data['senbet_class'] ?? null,
+                    'section' => $data['section'] ?? null,
                     'previous_participation' => filter_var($data['previous_participation'] ?? false, FILTER_VALIDATE_BOOLEAN),
                 ];
 
@@ -379,7 +380,8 @@ class UserController extends Controller implements HasMiddleware {
                         'emergency_woreda' => 'emergency_woreda',
                         'emergency_house_number' => 'emergency_house_number',
                         'emergency_address' => 'emergency_address',
-                        'senbet_class' => 'senbet_class'
+                        'senbet_class' => 'senbet_class',
+                        'section' => 'section'
                     ];
 
                     foreach ($membershipFields as $reqField => $dbField) {

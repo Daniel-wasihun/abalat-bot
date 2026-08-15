@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, getCurrentInstance } from "vue";
+import { computed, ref, onMounted, getCurrentInstance, watch } from "vue";
 import {
     UserCircle2, Camera, Trash2, Save, Calendar,
     Check, User, Phone, Mail, UserSquare2,
@@ -15,6 +15,7 @@ import { useUserStore } from "@/stores/userStore";
 import { useLanguageStore } from "@/stores/languageStore";
 import { storeToRefs } from "pinia";
 import { localize } from "@/utils/format";
+import apiClient from "@/api/apiClient";
 
 const props = defineProps<{
     user: any;
@@ -47,14 +48,50 @@ const genderOptions = computed(() => [
     { value: "female", label: $tr("user.form.female") || "Female" },
 ]);
 
-const classOptions = computed(() => [
-    { value: "child",   label: $tr("user.form.senbet_class.child")   || "Child" },
-    ...Array.from({ length: 12 }, (_, i) => ({
-        value: String(i + 1),
-        label: ($tr("user.form.senbet_class.grade") || "Grade :num").replace(":num", String(i + 1)),
-    })),
-    { value: "post_12", label: $tr("user.form.senbet_class.post_12") || "Post-12" },
-]);
+// Load classes from configuration API
+const configClasses = ref<Array<{code: string; name: string; number_of_sections: number}>>([]);
+onMounted(async () => {
+    try {
+        const { data } = await apiClient.get('/academic/config/classes');
+        configClasses.value = (data.classes || []).map((c: any) => ({ code: c.code, name: c.name, number_of_sections: c.number_of_sections || 1 }));
+    } catch {
+        // Fall back to defaults
+        configClasses.value = [
+            { code: 'child', name: 'Child', number_of_sections: 1 },
+            ...Array.from({ length: 12 }, (_, i) => ({ code: String(i + 1), name: `Grade ${i + 1}`, number_of_sections: 1 })),
+            { code: 'post_12', name: 'Post-12', number_of_sections: 1 },
+        ];
+    }
+});
+
+const classOptions = computed(() =>
+    configClasses.value.map(c => ({ value: c.code, label: c.name }))
+);
+
+const sectionOptions = computed(() => {
+    if (!props.profileForm?.senbet_class) return [];
+    const cls = configClasses.value.find(c => c.code === props.profileForm.senbet_class);
+    if (!cls || !cls.number_of_sections) return [];
+    
+    // Generate sections: 1 -> '1', 2 -> '1', '2', etc.
+    return Array.from({ length: cls.number_of_sections }, (_, i) => {
+        const sec = String(i + 1);
+        return { value: sec, label: `Section ${sec}` };
+    });
+});
+
+watch(() => props.profileForm?.senbet_class, (newClass) => {
+    if (newClass && sectionOptions.value.length === 1) {
+        // Auto-select if only 1 section exists
+        props.profileForm.section = sectionOptions.value[0].value;
+    } else if (props.profileForm?.section) {
+        // Clear selected section if it doesn't exist in the new class's options
+        const isValidSection = sectionOptions.value.some(opt => opt.value === props.profileForm.section);
+        if (!isValidSection) {
+            props.profileForm.section = '';
+        }
+    }
+});
 
 const isStudentOnly = computed(() => {
     const roles: string[] = Array.isArray(props.profileForm?.roles) ? props.profileForm.roles : [];
@@ -294,6 +331,13 @@ const isStudentOnly = computed(() => {
                             :label="$tr('user.form.senbet_class') || 'Senbet Class'"
                             :options="classOptions"
                             :error="errors.senbet_class" @change="clearFieldError('senbet_class')" />
+
+                        <FormSelect
+                            v-model="profileForm.section"
+                            :label="$tr('user.form.section') || 'Section'"
+                            :options="sectionOptions"
+                            :disabled="sectionOptions.length === 0"
+                            :error="errors.section" @change="clearFieldError('section')" />
 
                         <FormField
                             v-model="profileForm.education_level"
