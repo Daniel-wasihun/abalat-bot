@@ -131,6 +131,26 @@ Route::middleware(['auth:api', 'active', \App\Http\Middleware\TrackUserDevice::c
     // Academic Management (Admin & Teachers)
     Route::prefix('academic')->group(function () {
 
+        // ── General Attendance ───────────────────────────────────────────────
+        Route::prefix('general-attendance')->group(function () {
+            Route::get('/classes', [\App\Http\Controllers\Api\Academic\GeneralAttendanceController::class, 'getClasses']);
+            Route::post('/session', [\App\Http\Controllers\Api\Academic\GeneralAttendanceController::class, 'getOrCreateSession']);
+            Route::post('/session/{sessionId}/records', [\App\Http\Controllers\Api\Academic\GeneralAttendanceController::class, 'saveRecords']);
+        });
+
+        // ── Configuration (Admin) ─────────────────────────────────────────────
+        Route::prefix('config')->group(function () {
+            Route::get('/classes', [\App\Http\Controllers\Api\Academic\ConfigurationController::class, 'getClasses']);
+            Route::post('/classes', [\App\Http\Controllers\Api\Academic\ConfigurationController::class, 'storeClass']);
+            Route::put('/classes/{id}', [\App\Http\Controllers\Api\Academic\ConfigurationController::class, 'updateClass']);
+            Route::delete('/classes/{id}', [\App\Http\Controllers\Api\Academic\ConfigurationController::class, 'destroyClass']);
+
+            Route::get('/assessments', [\App\Http\Controllers\Api\Academic\ConfigurationController::class, 'getAssessments']);
+            Route::post('/assessments', [\App\Http\Controllers\Api\Academic\ConfigurationController::class, 'storeAssessment']);
+            Route::put('/assessments/{id}', [\App\Http\Controllers\Api\Academic\ConfigurationController::class, 'updateAssessment']);
+            Route::delete('/assessments/{id}', [\App\Http\Controllers\Api\Academic\ConfigurationController::class, 'destroyAssessment']);
+        });
+
         // ── Course Management (Admin) ─────────────────────────────────────────
         Route::prefix('courses')->group(function () {
             Route::get('/', [\App\Http\Controllers\Api\Academic\CourseController::class, 'index'])

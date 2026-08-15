@@ -3,6 +3,10 @@ import { ref, computed, watch } from "vue";
 import Cookies from "js-cookie";
 import apiClient from "@/api/apiClient";
 
+// Bump this number whenever new translation keys are added.
+// It forces all clients to discard their cached translations and re-fetch.
+const TRANSLATION_VERSION = 4;
+
 export interface LanguageOption {
     key: string;
     name: string;
@@ -18,9 +22,17 @@ export const useLanguageStore = defineStore(
         const translationCache = ref<Record<string, Record<string, string>>>(
             {},
         );
+        const translationVersion = ref<number>(0);
         const isInitialized = ref(true);
         const currentLanguage = ref<string>(Cookies.get("lang") || "en");
         const activeTitleKey = ref<string>("app.name");
+
+        // If the stored version is outdated, wipe the cache so fresh translations are fetched.
+        if (translationVersion.value !== TRANSLATION_VERSION) {
+            translationCache.value = {};
+            translations.value = {};
+            translationVersion.value = TRANSLATION_VERSION;
+        }
 
         // Synchronize page language and direction attributes with the selected language
         watch(
@@ -231,6 +243,7 @@ export const useLanguageStore = defineStore(
             getCurrentLang,
             translations,
             translationCache,
+            translationVersion,
             isLoading,
             isInitialized,
             setLanguage,
@@ -243,7 +256,7 @@ export const useLanguageStore = defineStore(
     },
     {
         persist: {
-            pick: ["currentLanguage", "availableLanguages", "translations"],
+            paths: ["currentLanguage", "availableLanguages", "translations", "translationCache", "translationVersion"],
         },
     },
 );
