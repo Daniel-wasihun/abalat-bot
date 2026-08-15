@@ -18,6 +18,8 @@ class DatabaseSeeder extends Seeder
             TeacherSeeder::class,
             CourseSeeder::class,
             StudentSeeder::class,  // must run after CourseSeeder so offerings exist
+            SenbetClassSeeder::class,
+            AssessmentTypeSeeder::class,
         ]);
     }
 }

@@ -15,9 +15,7 @@ class StudentResult extends Model
     protected $fillable = [
         'student_id',
         'course_offering_id',
-        'quiz_ca_score',
-        'midterm_score',
-        'final_exam_score',
+        'scores',
         'total_score',
         'letter_grade',
         'remarks',
@@ -26,9 +24,7 @@ class StudentResult extends Model
     ];
 
     protected $casts = [
-        'quiz_ca_score'    => 'float',
-        'midterm_score'    => 'float',
-        'final_exam_score' => 'float',
+        'scores'           => 'array',
         'total_score'      => 'float',
         'is_finalized'     => 'boolean',
     ];
@@ -40,11 +36,7 @@ class StudentResult extends Model
         static::saving(function (StudentResult $result) {
             // Auto-calculate total and letter grade before every save
             $grading = app(GradingService::class);
-            $result->total_score  = $grading->calculateTotal(
-                $result->quiz_ca_score,
-                $result->midterm_score,
-                $result->final_exam_score
-            );
+            $result->total_score  = $grading->calculateTotal($result->scores);
             $result->letter_grade = $grading->calculateLetterGrade($result->total_score);
         });
 

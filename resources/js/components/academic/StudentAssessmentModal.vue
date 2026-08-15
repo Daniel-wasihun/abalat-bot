@@ -57,13 +57,13 @@
                     :max="comp.max"
                     step="0.5"
                     :disabled="isFinalized"
-                    v-model.number="localForm[comp.key]"
+                    v-model.number="localForm.scores[comp.key]"
                     @input="recompute"
                     class="w-full px-4 py-2.5 text-sm border border-gray-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                    :class="{ 'border-red-300 focus:ring-red-500': localForm[comp.key] != null && localForm[comp.key] > comp.max }"
+                    :class="{ 'border-red-300 focus:ring-red-500': localForm.scores[comp.key] != null && localForm.scores[comp.key] > comp.max }"
                     :placeholder="`Enter score (0–${comp.max})`"
                   />
-                  <span v-if="localForm[comp.key] != null && localForm[comp.key] > comp.max"
+                  <span v-if="localForm.scores[comp.key] != null && localForm.scores[comp.key] > comp.max"
                     class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-red-500">
                     Max {{ comp.max }}
                   </span>
@@ -197,11 +197,11 @@ const historyLoading = ref(false);
 const history       = ref<any[]>([]);
 
 const localForm = reactive<Record<string, any>>({
-  quiz_ca_score:    props.result?.quiz_ca_score    ?? null,
-  midterm_score:    props.result?.midterm_score    ?? null,
-  final_exam_score: props.result?.final_exam_score ?? null,
-  remarks:          props.result?.remarks          ?? '',
-  change_reason:    '',
+  scores: Object.fromEntries(
+    props.componentInfo.map(c => [c.key, props.result?.scores?.[c.key] ?? null])
+  ),
+  remarks:       props.result?.remarks ?? '',
+  change_reason: '',
 });
 
 const hasExistingResult = computed(() => !!props.result?.id);
@@ -209,7 +209,8 @@ const hasExistingResult = computed(() => !!props.result?.id);
 // ─── Computed grade preview ────────────────────────────────────────────────────
 
 const computedTotal = computed<number | null>(() => {
-  const vals = props.componentInfo.map(c => localForm[c.key]).filter(v => v !== null && v !== undefined && !isNaN(v));
+  const scores = localForm.scores as Record<string, any>;
+  const vals = props.componentInfo.map(c => scores[c.key]).filter(v => v !== null && v !== undefined && !isNaN(v));
   if (!vals.length) return null;
   const sum = vals.reduce((a: number, b: any) => a + parseFloat(b), 0);
   return Math.min(parseFloat(sum.toFixed(2)), 100);
@@ -226,7 +227,7 @@ const computedGrade = computed<string | null>(() => {
 });
 
 const hasValidationErrors = computed(() =>
-  props.componentInfo.some(c => localForm[c.key] != null && localForm[c.key] > c.max)
+  props.componentInfo.some(c => localForm.scores[c.key] != null && localForm.scores[c.key] > c.max)
 );
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -281,13 +282,11 @@ const saveResult = async () => {
   saving.value = true;
   try {
     const res = await apiClient.put(
-      `/api/academic/offerings/${props.offeringId}/results/${props.student.id}`,
+      `/academic/offerings/${props.offeringId}/results/${props.student.id}`,
       {
-        quiz_ca_score:    localForm.quiz_ca_score,
-        midterm_score:    localForm.midterm_score,
-        final_exam_score: localForm.final_exam_score,
-        remarks:          localForm.remarks || null,
-        change_reason:    localForm.change_reason || null,
+        scores:        localForm.scores,
+        remarks:       localForm.remarks || null,
+        change_reason: localForm.change_reason || null,
       }
     );
     emit('saved', res.data.data?.result ?? res.data.result);
@@ -305,7 +304,7 @@ const loadHistory = async () => {
   historyLoading.value = true;
   try {
     const res = await apiClient.get(
-      `/api/academic/offerings/${props.offeringId}/results/${props.student.id}/history`
+      `/academic/offerings/${props.offeringId}/results/${props.student.id}/history`
     );
     history.value = res.data;
   } catch (err) {

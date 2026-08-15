@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Academic;
 use App\Http\Controllers\Controller;
 use App\Models\CourseOffering;
 use App\Models\StudentResult;
+use App\Models\AssessmentType;
 use App\Services\Academic\GradingService;
 use App\Http\Requests\Academic\StudentResultRequest;
 use App\Http\Resources\Academic\StudentResultResource;
@@ -35,10 +36,12 @@ class StudentResultController extends Controller
             ])
             ->get();
 
+        $assessmentTypes = AssessmentType::where('is_active', true)->orderBy('order')->get();
+
         return response()->json([
-            'offering'       => new CourseOfferingResource($offering->load('course:id,name,code')),
-            'component_info' => $this->grading->componentInfo(),
-            'results'        => StudentResultResource::collection($results),
+            'offering'         => new CourseOfferingResource($offering->load('course:id,name,code')),
+            'assessment_types' => $assessmentTypes,
+            'results'          => StudentResultResource::collection($results),
         ]);
     }
 
