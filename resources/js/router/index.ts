@@ -168,6 +168,18 @@ const routes: RouteRecordRaw[] = [
                         component: () => import("@/Views/Academic/MyClassesView.vue"),
                     },
                     {
+                        path: "general-attendance",
+                        name: "academic-general-attendance",
+                        meta: { title: "nav.general_attendance", permission: "academic_classes.view" },
+                        component: () => import("@/Views/Academic/GeneralAttendanceView.vue"),
+                    },
+                    {
+                        path: "config",
+                        name: "academic-config",
+                        meta: { title: "Configuration", permission: "academic_courses.manage" },
+                        component: () => import("@/Views/Academic/ConfigView.vue"),
+                    },
+                    {
                         // Legacy redirect: old my-classes → my-courses
                         path: "my-classes",
                         redirect: { name: "academic-my-courses" },

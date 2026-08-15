@@ -29,6 +29,8 @@ import {
   Key,
   GraduationCap,
   BookOpen,
+  Calendar,
+  Settings2,
 } from "lucide-vue-next";
 import { useAuthStore } from "@/stores/authStore";
 import { useLanguageStore } from "@/stores/languageStore";
@@ -303,6 +305,20 @@ const menuGroups = computed<MenuGroup[]>(() => [
           perms.academicClasses.canView.value ||
           authStore.isTeacher ||
           authStore.isStudent,
+      },
+      {
+        // General Attendance — admin or homeroom teachers
+        name: "nav.general_attendance",
+        icon: Calendar,
+        to: "/dashboard/academic/general-attendance",
+        condition: () => perms.academicCourses.canView.value || authStore.isTeacher,
+      },
+      {
+        // Academic Configuration — admin only
+        name: "Configuration",
+        icon: Settings2,
+        to: "/dashboard/academic/config",
+        condition: () => perms.academicCourses.canManage.value,
       },
     ],
   },

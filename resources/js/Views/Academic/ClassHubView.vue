@@ -507,10 +507,15 @@ const fetchOffering = async () => {
   loading.value = true;
   try {
     const r = await apiClient.get(`/academic/offerings/${offeringId}/results`);
-    offering.value      = r.data.offering;
-    componentInfo.value = r.data.component_info ?? [];
-    results.value       = r.data.results ?? [];
-    isFinalized.value   = results.value.some((res: any) => res.is_finalized);
+    offering.value    = r.data.offering;
+    // Map dynamic assessment_types to componentInfo shape
+    componentInfo.value = (r.data.assessment_types ?? []).map((a: any) => ({
+      key:   a.code,
+      label: a.name,
+      max:   parseFloat(a.max_score),
+    }));
+    results.value     = r.data.results ?? [];
+    isFinalized.value = results.value.some((res: any) => res.is_finalized);
   } catch (err) {
     console.error('Failed to load offering data', err);
   } finally {
@@ -527,11 +532,12 @@ const fetchStudents = async () => {
 
     students.value.forEach((s: any) => {
       const result = getResult(s.id);
-      draftMarks[s.id] = {
-        quiz_ca_score:    result?.quiz_ca_score    ?? null,
-        midterm_score:    result?.midterm_score    ?? null,
-        final_exam_score: result?.final_exam_score ?? null,
-      };
+      // Build draft from dynamic scores JSON
+      const scores: Record<string, number | null> = {};
+      componentInfo.value.forEach(comp => {
+        scores[comp.key] = result?.scores?.[comp.key] ?? null;
+      });
+      draftMarks[s.id] = scores;
       draftRemarks[s.id] = result?.remarks ?? '';
       recomputeLocal(s.id);
       // Default all to present
@@ -582,10 +588,8 @@ const saveAllMarks = async () => {
   try {
     const requests = students.value.map(s =>
       apiClient.put(`/academic/offerings/${offeringId}/results/${s.id}`, {
-        quiz_ca_score:    draftMarks[s.id].quiz_ca_score,
-        midterm_score:    draftMarks[s.id].midterm_score,
-        final_exam_score: draftMarks[s.id].final_exam_score,
-        remarks:          draftRemarks[s.id] || null,
+        scores:  draftMarks[s.id],
+        remarks: draftRemarks[s.id] || null,
       })
     );
     await Promise.all(requests);
