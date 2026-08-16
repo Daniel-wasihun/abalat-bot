@@ -4,6 +4,7 @@ import {
   CheckCircle2,
   XCircle,
   Trash2,
+  Contact,
 } from "lucide-vue-next";
 import { onMounted, computed, getCurrentInstance, ref, watch } from "vue";
 import { useUserStore } from "@/stores/userStore";
@@ -21,6 +22,7 @@ const TableSelection = defineAsyncComponent(() => import("@/components/common/Ta
 const UserTable = defineAsyncComponent(() => import("./components/UserTable.vue"));
 const UserModal = defineAsyncComponent(() => import("./components/UserModal.vue"));
 const UserViewModal = defineAsyncComponent(() => import("./components/UserViewModal.vue"));
+const IdCardGeneratorModal = defineAsyncComponent(() => import("./components/IdCardGeneratorModal.vue"));
 const BulkActionConfirmModal = defineAsyncComponent(() => import("@/components/common/BulkActionConfirmModal.vue"));
 const ConfirmDialog = defineAsyncComponent(() => import("@/components/common/ConfirmDialog.vue"));
 
@@ -70,6 +72,19 @@ const {
   deleteAction: (id: string | number) => userStore.deleteUser(id as number),
   refreshAction: userStore.fetchUsers,
 });
+
+const showIdCardModal = ref(false);
+const idCardUsers = ref<any[]>([]);
+
+function openGenerateId(user: any) {
+  idCardUsers.value = [user];
+  showIdCardModal.value = true;
+}
+
+function handleBulkGenerate() {
+  idCardUsers.value = userStore.users.filter(u => selectedIds.value.includes(u.id));
+  showIdCardModal.value = true;
+}
 
 // Simplified bulk action handlers for UserStore
 const showBulkModal = ref(false);
@@ -143,6 +158,15 @@ const handlePerPageChange = (val: number) => {
           <div class="flex items-center gap-2">
             <Button
               v-if="canEdit"
+              variant="soft-primary"
+              size="sm"
+              :icon="Contact"
+              @click="handleBulkGenerate"
+            >
+              {{ $tr("user.generate_ids", "Generate IDs") }}
+            </Button>
+            <Button
+              v-if="canEdit"
               variant="soft-success"
               size="sm"
               :icon="CheckCircle2"
@@ -179,6 +203,7 @@ const handlePerPageChange = (val: number) => {
             :can-delete="canDelete"
             @view="openView"
             @edit="openEdit"
+            @generate-id="openGenerateId"
             @delete="openDelete"
             @sort="handleSort"
           >
@@ -241,6 +266,12 @@ const handlePerPageChange = (val: number) => {
       :loading="deleting"
       @close="showBulkModal = false"
       @confirm="handleBulkAction"
+    />
+
+    <IdCardGeneratorModal
+      :show="showIdCardModal"
+      :users="idCardUsers"
+      @close="showIdCardModal = false"
     />
   </div>
 </template>

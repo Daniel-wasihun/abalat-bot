@@ -9,6 +9,7 @@ import {
  Building2,
  Library,
  Minus,
+ Contact,
 } from "lucide-vue-next";
 import { useUserStore } from "@/stores/userStore";
 import { useAuthStore } from "@/stores/authStore";
@@ -33,6 +34,7 @@ const emit = defineEmits([
  "edit",
  "delete",
  "sort",
+ "generate-id",
 ]);
 
 const userStore = useUserStore();
@@ -77,6 +79,16 @@ const getUserActions = (user: any, canEdit: boolean, canDelete: boolean) => {
  colorClass: "text-brand-blue",
  onClick: (u: any) => emit("view", u),
  });
+
+ // ID Card Action
+ if (canEdit && canModify) {
+   actions.push({
+     label: $tr("user.generate_id") || "Generate ID",
+     icon: Contact,
+     colorClass: "text-indigo-600",
+     onClick: (u: any) => emit("generate-id", u),
+   });
+ }
 
  if (canEdit && canModify) {
  actions.push({
