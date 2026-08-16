@@ -31,17 +31,17 @@ class UserInfo extends Model
     ];
 
     /**
-     * Generate the next unique registration ID (e.g. DBSS000001 → DBSS000002).
+     * Generate the next unique registration ID (e.g. DBSS-000001 → DBSS-000002).
      */
     public static function generateNextRegistrationId(): string
     {
-        $last = self::where('registration_id', 'like', 'DBSS%')
+        $last = self::where('registration_id', 'like', 'DBSS-%')
             ->orderByDesc('registration_id')
             ->value('registration_id');
 
         $next = $last ? (int) preg_replace('/\D/', '', $last) + 1 : 1;
 
-        return 'DBSS' . str_pad($next, 6, '0', STR_PAD_LEFT);
+        return 'DBSS-' . str_pad($next, 6, '0', STR_PAD_LEFT);
     }
 
     public function user()

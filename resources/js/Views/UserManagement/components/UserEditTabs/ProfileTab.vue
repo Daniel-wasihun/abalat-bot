@@ -178,7 +178,7 @@ const isStudentOnly = computed(() => {
                         v-if="props.user"
                         v-model="profileForm.registration_id"
                         :label="$tr('user.form.registration_id') || 'Registration ID'"
-                        placeholder="DBSS000001"
+                        placeholder="DBSS-000001"
                         disabled :icon="UserSquare2" :error="errors.registration_id" />
 
                     <FormRadioGroup

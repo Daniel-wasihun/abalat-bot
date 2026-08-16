@@ -85,8 +85,8 @@ class UserRequest extends BaseRequest
 
         // Registration ID
         $rules['registration_id'] = $creating
-            ? ['nullable', 'string', 'unique:user_info,registration_id', 'regex:/^DBSS\d{6,}$/']
-            : ['sometimes', 'nullable', 'string', "unique:user_info,registration_id,{$userId},user_id", 'regex:/^DBSS\d{6,}$/'];
+            ? ['nullable', 'string', 'unique:user_info,registration_id', 'regex:/^DBSS-\d{6,}$/']
+            : ['sometimes', 'nullable', 'string', "unique:user_info,registration_id,{$userId},user_id", 'regex:/^DBSS-\d{6,}$/'];
 
         // Role assignment
         if ($creating) {
