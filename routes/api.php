@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('languages', [LanguageController::class, 'list']);
 Route::get('front-language', [LanguageController::class, 'frontLanguage']);
 Route::get('translations/{lang}', [LanguageController::class, 'translations']);
+Route::get('id-card-settings', [\App\Http\Controllers\Api\SettingController::class, 'getIdCardSettings']);
 
 // Auth (public)
 Route::post('/login', [AuthController::class, 'login'])->name('login')->middleware('throttle:auth');
@@ -123,6 +124,8 @@ Route::middleware(['auth:api', 'active', \App\Http\Middleware\TrackUserDevice::c
         Route::prefix('settings')->group(function () {
             Route::get('/', [\App\Http\Controllers\Api\SettingController::class, 'index']);
             Route::put('/', [\App\Http\Controllers\Api\SettingController::class, 'update']);
+            Route::get('/id-card', [\App\Http\Controllers\Api\SettingController::class, 'getIdCardSettings']);
+            Route::post('/id-card/logo', [\App\Http\Controllers\Api\SettingController::class, 'uploadLogo']);
             Route::get('/webhook', [\App\Http\Controllers\Api\SettingController::class, 'getWebhookStatus']);
             Route::post('/webhook', [\App\Http\Controllers\Api\SettingController::class, 'setupWebhook']);
         });

@@ -185,6 +185,115 @@
       </div>
     </div>
 
+    <!-- ID Card Config Tab -->
+    <div v-if="activeTab === 'idcard'" class="space-y-6 animate-in fade-in duration-500">
+      <div v-if="loadingIdCard" class="flex items-center justify-center py-20">
+        <Loader2 class="w-6 h-6 animate-spin text-brand-blue" />
+      </div>
+      <div v-else class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+        <!-- School Titles Card -->
+        <div class="bg-card-bg border border-card-border/60 rounded-2xl overflow-hidden">
+          <div class="px-6 py-4 border-b border-card-border/40 flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-brand-blue/10 flex items-center justify-center">
+              <CreditCard class="w-4 h-4 text-brand-blue" />
+            </div>
+            <div>
+              <h3 class="text-sm font-semibold text-main-text">{{ $tr('id_card.config.school_titles', 'School Titles') }}</h3>
+              <p class="text-xs text-main-text/50 mt-0.5">{{ $tr('id_card.config.subtitle', 'Text shown at the top of each printed ID card') }}</p>
+            </div>
+          </div>
+          <div class="p-6 space-y-5">
+            <!-- Logo Upload -->
+            <div>
+              <label class="block text-xs font-semibold text-main-text/60 uppercase tracking-widest mb-2">{{ $tr('id_card.config.logo', 'School Logo') }}</label>
+              <div class="flex items-center gap-4">
+                <div class="w-16 h-16 rounded-xl border-2 border-dashed border-card-border/60 bg-main-bg flex items-center justify-center overflow-hidden shrink-0">
+                  <img v-if="currentLogoUrl" :src="currentLogoUrl" class="w-full h-full object-contain p-1" alt="School logo" />
+                  <CreditCard v-else class="w-6 h-6 text-main-text/20" />
+                </div>
+                <div class="flex-1 min-w-0">
+                  <label class="flex items-center gap-2 cursor-pointer h-10 px-4 rounded-xl border border-dashed border-brand-blue/40 bg-brand-blue/5 hover:bg-brand-blue/10 text-brand-blue text-sm font-semibold transition-colors">
+                    <input type="file" accept="image/*" class="hidden" @change="handleLogoUpload" :disabled="uploadingLogo" />
+                    <Loader2 v-if="uploadingLogo" class="w-4 h-4 animate-spin" />
+                    <span v-else>{{ $tr('id_card.config.upload_logo', 'Upload Logo') }}</span>
+                  </label>
+                  <p class="text-xs text-main-text/40 mt-1.5">PNG, JPG, SVG · max 2 MB</p>
+                </div>
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-main-text/60 uppercase tracking-widest mb-1.5">{{ $tr('id_card.config.title_am', 'Title (Amharic)') }}</label>
+              <input v-model="idCardForm['id_card.title_am']" type="text" class="w-full px-4 h-11 rounded-xl border text-sm bg-input-bg text-main-text border-input-border focus:ring-2 focus:ring-brand-blue/30 outline-none transition-all" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-main-text/60 uppercase tracking-widest mb-1.5">{{ $tr('id_card.config.title_en', 'Title (English)') }}</label>
+              <input v-model="idCardForm['id_card.title_en']" type="text" class="w-full px-4 h-11 rounded-xl border text-sm bg-input-bg text-main-text border-input-border focus:ring-2 focus:ring-brand-blue/30 outline-none transition-all" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-main-text/60 uppercase tracking-widest mb-1.5">{{ $tr('id_card.config.title_or', 'Title (Oromiffa)') }}</label>
+              <input v-model="idCardForm['id_card.title_or']" type="text" class="w-full px-4 h-11 rounded-xl border text-sm bg-input-bg text-main-text border-input-border focus:ring-2 focus:ring-brand-blue/30 outline-none transition-all" />
+            </div>
+          </div>
+        </div>
+
+
+        <!-- Right column -->
+        <div class="flex flex-col gap-6">
+          <!-- Authority Labels Card -->
+          <div class="bg-card-bg border border-card-border/60 rounded-2xl overflow-hidden">
+            <div class="px-6 py-4 border-b border-card-border/40 flex items-center gap-3">
+              <div class="w-9 h-9 rounded-xl bg-emerald-500/10 flex items-center justify-center">
+                <Save class="w-4 h-4 text-emerald-500" />
+              </div>
+              <h3 class="text-sm font-semibold text-main-text">{{ $tr('id_card.config.authority', 'Issuing Authority Labels') }}</h3>
+            </div>
+            <div class="p-6 space-y-4">
+              <div>
+                <label class="block text-xs font-semibold text-main-text/60 uppercase tracking-widest mb-1.5">{{ $tr('id_card.config.authority_am') }}</label>
+                <input v-model="idCardForm['id_card.authority_am']" type="text" class="w-full px-4 h-11 rounded-xl border text-sm bg-input-bg text-main-text border-input-border focus:ring-2 focus:ring-brand-blue/30 outline-none transition-all" />
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-main-text/60 uppercase tracking-widest mb-1.5">{{ $tr('id_card.config.authority_en') }}</label>
+                <input v-model="idCardForm['id_card.authority_en']" type="text" class="w-full px-4 h-11 rounded-xl border text-sm bg-input-bg text-main-text border-input-border focus:ring-2 focus:ring-brand-blue/30 outline-none transition-all" />
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-main-text/60 uppercase tracking-widest mb-1.5">{{ $tr('id_card.config.authority_or') }}</label>
+                <input v-model="idCardForm['id_card.authority_or']" type="text" class="w-full px-4 h-11 rounded-xl border text-sm bg-input-bg text-main-text border-input-border focus:ring-2 focus:ring-brand-blue/30 outline-none transition-all" />
+              </div>
+            </div>
+          </div>
+
+          <!-- ID Settings Card -->
+          <div class="bg-card-bg border border-card-border/60 rounded-2xl overflow-hidden">
+            <div class="px-6 py-4 border-b border-card-border/40">
+              <h3 class="text-sm font-semibold text-main-text">{{ $tr('id_card.config.id_settings', 'ID Settings') }}</h3>
+            </div>
+            <div class="p-6 grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-semibold text-main-text/60 uppercase tracking-widest mb-1.5">{{ $tr('id_card.config.id_prefix', 'ID Prefix') }}</label>
+                <input v-model="idCardForm['id_card.id_prefix']" type="text" placeholder="DBSS" class="w-full px-4 h-11 rounded-xl border text-sm font-mono bg-input-bg text-main-text border-input-border focus:ring-2 focus:ring-brand-blue/30 outline-none transition-all" />
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-main-text/60 uppercase tracking-widest mb-1.5">{{ $tr('id_card.config.validity_years', 'Validity (Years)') }}</label>
+                <input v-model.number="idCardForm['id_card.validity_years']" type="number" min="1" max="10" class="w-full px-4 h-11 rounded-xl border text-sm bg-input-bg text-main-text border-input-border focus:ring-2 focus:ring-brand-blue/30 outline-none transition-all" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Save Button -->
+      <div class="flex justify-end">
+        <button @click="saveIdCardSettings" :disabled="savingIdCard"
+          class="flex items-center gap-2 h-11 px-6 rounded-xl text-sm font-bold bg-brand-blue text-white hover:bg-brand-blue/90 transition-all disabled:opacity-50 shadow-lg shadow-brand-blue/20">
+          <Loader2 v-if="savingIdCard" class="w-4 h-4 animate-spin" />
+          <Save v-else class="w-4 h-4" />
+          {{ $tr('id_card.config.save', 'Save ID Card Settings') }}
+        </button>
+      </div>
+    </div>
+
     <!-- Class Modal -->
     <Teleport to="body">
       <div v-if="classModalOpen" class="fixed inset-0 z-[9999] flex items-center justify-center p-4">
@@ -303,7 +412,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, getCurrentInstance } from 'vue';
-import { GraduationCap, FileText, Plus, Pencil, Trash2, Loader2, Save, X } from 'lucide-vue-next';
+import { GraduationCap, FileText, Plus, Pencil, Trash2, Loader2, Save, X, CreditCard } from 'lucide-vue-next';
 import apiClient from '@/api/apiClient';
 import { useToastStore } from '@/stores/toast';
 import TableToolbar from '@/components/common/TableToolbar.vue';
@@ -318,8 +427,9 @@ const $tr = proxy.$tr;
 const toast = useToastStore();
 
 const tabs = computed(() => [
-  { key: 'classes',     label: $tr('academic.config.classes_tab'),          icon: GraduationCap  },
-  { key: 'assessments', label: $tr('academic.config.assessments_tab'),  icon: FileText  },
+  { key: 'classes',     label: $tr('academic.config.classes_tab'),     icon: GraduationCap },
+  { key: 'assessments', label: $tr('academic.config.assessments_tab'), icon: FileText },
+  { key: 'idcard',      label: $tr('id_card.config.tab', 'ID Card'),   icon: CreditCard },
 ]);
 const activeTab = ref('classes');
 
@@ -529,5 +639,66 @@ async function deleteAssessment(a: any) {
   }
 }
 
-onMounted(() => { loadClasses(); loadAssessments(); });
+// --- ID Card Settings ---
+const loadingIdCard  = ref(false);
+const savingIdCard   = ref(false);
+const uploadingLogo  = ref(false);
+const currentLogoUrl = ref<string | null>(null);
+
+const idCardForm = ref<Record<string, any>>({
+  'id_card.title_am':       'የደቂቀ ብርሃን ሰንበት ትምህርት ቤት መታወቂያ',
+  'id_card.title_en':       'Dekike Birhan Senbet School ID Card',
+  'id_card.title_or':       'Waraqaa Eenyummaa Mana Barumsaa Dekike Birhan Senbet',
+  'id_card.authority_am':   'ሰጪው አካል',
+  'id_card.authority_en':   'Issuing Authority',
+  'id_card.authority_or':   'Qaama Kennaa',
+  'id_card.id_prefix':      'DBSS',
+  'id_card.validity_years': 2,
+});
+
+async function loadIdCardSettings() {
+  loadingIdCard.value = true;
+  try {
+    const { data } = await apiClient.get('/bot/settings/id-card');
+    Object.entries(data).forEach(([k, v]) => {
+      if (k !== 'id_card.logo') idCardForm.value[k] = v;
+    });
+    if (data['id_card.logo']) currentLogoUrl.value = data['id_card.logo'];
+  } catch { /* use defaults */ } finally {
+    loadingIdCard.value = false;
+  }
+}
+
+async function handleLogoUpload(event: Event) {
+  const file = (event.target as HTMLInputElement).files?.[0];
+  if (!file) return;
+  uploadingLogo.value = true;
+  try {
+    const form = new FormData();
+    form.append('logo', file);
+    const { data } = await apiClient.post('/bot/settings/id-card/logo', form, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    currentLogoUrl.value = data.logo;
+    toast.success('Logo uploaded successfully');
+  } catch {
+    toast.error('Failed to upload logo');
+  } finally {
+    uploadingLogo.value = false;
+  }
+}
+
+async function saveIdCardSettings() {
+  savingIdCard.value = true;
+  try {
+    await apiClient.put('/bot/settings', { settings: idCardForm.value });
+    toast.success($tr('id_card.config.saved', 'ID Card settings saved'));
+  } catch {
+    toast.error($tr('id_card.config.save_failed', 'Failed to save'));
+  } finally {
+    savingIdCard.value = false;
+  }
+}
+
+onMounted(() => { loadClasses(); loadAssessments(); loadIdCardSettings(); });
 </script>

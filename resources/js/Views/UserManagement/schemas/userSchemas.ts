@@ -2,7 +2,7 @@ import { z } from "zod";
 
 const LETTERS_ONLY = /^[A-Za-z\s]+$/;
 const PHONE_REGEX  = /^[79]\d{8}$/;
-const ID_REGEX     = /^DB\d{4,}$/;
+const ID_REGEX     = /^DBSS-\d{6,}$/;
 const SENBET_CLASSES = ["child", "post_12", ...Array.from({ length: 12 }, (_, i) => String(i + 1))];
 
 const optionalLetters = z

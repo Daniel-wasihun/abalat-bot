@@ -904,7 +904,7 @@ class English extends Lang {
             'message.ownership_edit_warning' => 'You can only edit resources you uploaded. Contact an administrator if changes are needed.',
             'message.ownership_delete_warning' => 'You can only delete resources you uploaded. Only the original uploader or an administrator can remove this file.',
             'validation.gender_format' => 'Please select Male or Female.',
-            'validation.id_format' => ':attribute must start with :l_min-:l_max letters followed by :d_min-:d_max digits.',
+            'validation.id_format' => 'Registration ID must be in the format DBSS-XXXXXX',
             'validation.in' => 'The selected :attribute is invalid.',
             'validation.integer' => 'The :attribute must be an integer.',
             'validation.invalid_file_type_assignments' => 'Invalid file type for assignments. Please upload a PDF or Word document.',
@@ -1328,13 +1328,33 @@ class English extends Lang {
             'user.future_access_pipeline' => 'Future Overrides Pipeline',
             'user.future_overrides_pipeline' => 'Future Overrides Pipeline',
             'user.gender' => 'Gender',
+            'user.age'    => 'Age',
             'user.generate_id_card' => 'Generate ID Card',
             'user.generate_ids' => 'Generate IDs',
+            'user.generate_id' => 'Generate ID',
             'user.id_card_label' => 'Student Identification Card',
-            'user.chairman_name' => 'Chairman Name',
+            'user.chairman_name' => 'Chairman Name & Signature',
             'user.emergency_contact' => 'Emergency Contact',
-            'user.senbet_school_id' => 'Dekike Birhan Senbet School',
+            'user.senbet_school_id' => 'Dekike Birhan Senbet School ID Card',
             'user.chairman_signature' => 'Chairman Signature',
+            // ID Card Configuration
+            'id_card.config.title'          => 'ID Card Configuration',
+            'id_card.config.subtitle'       => 'Manage static text that appears on all printed ID cards',
+            'id_card.config.tab'            => 'ID Card',
+            'id_card.config.school_titles'  => 'School Titles',
+            'id_card.config.title_am'       => 'Title (Amharic)',
+            'id_card.config.title_en'       => 'Title (English)',
+            'id_card.config.title_or'       => 'Title (Oromiffa)',
+            'id_card.config.authority'      => 'Issuing Authority Labels',
+            'id_card.config.authority_am'   => 'Authority Label (Amharic)',
+            'id_card.config.authority_en'   => 'Authority Label (English)',
+            'id_card.config.authority_or'   => 'Authority Label (Oromiffa)',
+            'id_card.config.id_settings'    => 'ID Settings',
+            'id_card.config.id_prefix'      => 'ID Number Prefix',
+            'id_card.config.validity_years' => 'Card Validity (Years)',
+            'id_card.config.save'           => 'Save ID Card Settings',
+            'id_card.config.saved'          => 'ID Card settings saved successfully',
+            'id_card.config.save_failed'    => 'Failed to save ID Card settings',
             'user.issue_date' => 'Issue Date',
             'user.expiry_date' => 'Expiry Date',
             'user.id_card_valid' => 'Valid Until',
@@ -4152,7 +4172,7 @@ class English extends Lang {
             'user.section.participation'     => 'Participation History',
 
             // Identity fields
-            'user.form.full_name'            => 'First Name',
+            'user.form.full_name'            => 'Full Name',
             'user.form.full_name_placeholder'=> 'e.g. Daniel',
             'user.form.email'                => 'Email Address',
             'user.form.email_placeholder'    => 'user@example.com',
@@ -4223,6 +4243,7 @@ class English extends Lang {
             'user.form.cancel'               => 'Cancel',
 
         
+            'academic.class' => 'Class',
             'academic.config.title' => 'Academic Configuration',
             'academic.config.subtitle' => 'Manage school classes and assessment type definitions.',
             'academic.config.classes_tab' => 'Classes',
@@ -4317,6 +4338,15 @@ class English extends Lang {
             'attendance.general.col_gender'      => 'Gender',
             'attendance.general.col_status'      => 'Status',
             'attendance.general.col_notes'       => 'Notes (Optional)',
+
+            // ID Card labels
+            'id_card.reg_no' => 'Reg. No',
+            'id_card.id_no' => 'ID No',
+            'id_card.emergency_contact' => 'Emerg. Contact',
+            'id_card.issued' => 'Issued',
+            'id_card.expiry' => 'Expiry',
+            'id_card.auth_title' => 'Issuing Authority',
+            'user.nationality' => 'Nationality',
 
         ];
     }

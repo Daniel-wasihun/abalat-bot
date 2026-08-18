@@ -46,6 +46,53 @@ class SettingController extends Controller
         ]);
     }
 
+    public function getIdCardSettings()
+    {
+        $all = $this->settingRepo->getAll();
+        $defaults = [
+            'id_card.title_am'       => 'የደቂቀ ብርሃን ሰንበት ትምህርት ቤት መታወቂያ',
+            'id_card.title_en'       => 'Dekike Birhan Senbet School ID Card',
+            'id_card.title_or'       => 'Waraqaa Eenyummaa Mana Barumsaa Dekike Birhan Senbet',
+            'id_card.authority_am'   => 'ሰጪው አካል',
+            'id_card.authority_en'   => 'Issuing Authority',
+            'id_card.authority_or'   => 'Qaama Kennaa',
+            'id_card.id_prefix'      => 'DBSS',
+            'id_card.validity_years' => 2,
+            'id_card.logo'           => null,
+        ];
+        $result = [];
+        foreach ($defaults as $key => $default) {
+            $val = $all[$key] ?? $default;
+            // Convert stored relative path to full URL for logo
+            if ($key === 'id_card.logo' && $val) {
+                $val = asset('storage/' . $val);
+            }
+            $result[$key] = $val;
+        }
+        return response()->json($result);
+    }
+
+    public function uploadLogo(Request $request)
+    {
+        $request->validate([
+            'logo' => 'required|image|mimes:png,jpg,jpeg,svg,webp|max:2048',
+        ]);
+
+        // Delete old logo if exists
+        $existing = $this->settingRepo->get('id_card.logo');
+        if ($existing) {
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($existing);
+        }
+
+        $path = $request->file('logo')->store('id_card', 'public');
+        $this->settingRepo->set('id_card.logo', $path);
+
+        return response()->json([
+            'message' => 'Logo uploaded successfully',
+            'logo'    => asset('storage/' . $path),
+        ]);
+    }
+
     public function getWebhookStatus()
     {
         try {

@@ -114,6 +114,8 @@ class UserResource extends ApiResource {
 
             'profile_picture' => $this->info && $this->info->profile_picture ? asset('storage/' . $this->info->profile_picture) : null,
             'avatar' => $this->info && $this->info->profile_picture ? asset('storage/' . $this->info->profile_picture) : null,
+            'gender'       => $this->info?->gender ?? null,
+            'birth_date'   => $this->info?->birth_date ?? null,
             'hierarchy_level' => $activeAssignments->max('hierarchy_level') ?? 0,
             'sessions' => $user->relationLoaded('sessions')
                 ? $user->sessions->where('is_active', true)->map(function ($s) use ($user) {
