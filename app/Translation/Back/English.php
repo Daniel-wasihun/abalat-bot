@@ -734,7 +734,7 @@ class English extends Lang
             'user.account_type' => 'Account Type',
             'user.gender' => 'Gender',
             'user.department' => 'Department',
-            'user.phone_number' => 'Phone Number',
+            'user.phone_number' => 'Phone No',
             'user.date_of_birth' => 'Date of Birth',
             'user.address' => 'Physical Address',
             'user.profile' => 'Profile',

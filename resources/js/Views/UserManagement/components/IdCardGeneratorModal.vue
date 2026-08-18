@@ -204,8 +204,8 @@ function buildCardHtml(card: CardData): string {
         ${r(lbl.grade, card.grade_level || '---')}
       </div>
       <div class="split-row" style="gap:0;">
-        ${r(lbl.phone, card.phone || '---', true, 'flex:1.2;')}
-        ${r(lbl.nat, natValue, false, 'flex:0.8;')}
+        ${r(lbl.phone, card.phone || '---', true, 'flex:1.1;')}
+        ${r(lbl.nat, natValue, false, 'flex:0.9;')}
       </div>
       ${r(lbl.address, card.address || '---')}
       <div class="row emerg-row">
@@ -263,7 +263,7 @@ body { background:#fff; font-family:'Segoe UI',Arial,sans-serif; -webkit-print-c
 .val  { color:#000; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; flex:1; min-width:0; }
 .mono { font-family:monospace; }
 .emerg-row .val { white-space:normal; line-height:1.2; }
-.watermark-logo { position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); width:40mm; height:40mm; object-fit:contain; opacity:0.18; z-index:-1; }
+.watermark-logo { position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); width:40mm; height:40mm; object-fit:contain; opacity:0.25; z-index:-1; }
 
 @media print { @page { size:A4 portrait; margin:0; } body { margin:0; } }
 `;
@@ -392,5 +392,5 @@ body { background:#fff; font-family:'Segoe UI',Arial,sans-serif; -webkit-print-c
 :deep(.val)  { color:#000; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; flex:1; min-width:0; }
 :deep(.mono) { font-family:monospace; }
 :deep(.emerg-row .val) { white-space:normal; line-height:1.2; }
-:deep(.watermark-logo) { position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); width:40mm; height:40mm; object-fit:contain; opacity:0.18; z-index:-1; }
+:deep(.watermark-logo) { position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); width:40mm; height:40mm; object-fit:contain; opacity:0.25; z-index:-1; }
 </style>

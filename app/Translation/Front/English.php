@@ -4348,7 +4348,7 @@ class English extends Lang {
             'id_card.issued' => 'Issued',
             'id_card.expiry' => 'Expiry',
             'id_card.auth_title' => 'Issuing Authority',
-            'user.nationality' => 'Nationality',
+            'user.nationality' => 'Nat.',
 
         ];
     }
