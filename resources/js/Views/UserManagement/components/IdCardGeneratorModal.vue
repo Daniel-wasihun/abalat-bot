@@ -156,12 +156,8 @@ function buildCardHtml(card: CardData): string {
 
     const lbl = getLabels();
     const l   = lang.value;
-    const titlePrimary   = l === 'am' ? idCardSettings.value['id_card.title_am']
-                         : l === 'or' ? idCardSettings.value['id_card.title_or']
-                         :              idCardSettings.value['id_card.title_en'];
-    const titleSecondary = l === 'am' ? idCardSettings.value['id_card.title_en']
-                         : l === 'or' ? idCardSettings.value['id_card.title_en']
-                         :              idCardSettings.value['id_card.title_am'];
+    const titlePrimary   = idCardSettings.value['id_card.title_am'];
+    const titleSecondary = idCardSettings.value['id_card.title_en'];
     const authority = (l === 'am' ? idCardSettings.value['id_card.authority_am']
                     : l === 'or' ? idCardSettings.value['id_card.authority_or']
                     :              idCardSettings.value['id_card.authority_en']) || '---';
