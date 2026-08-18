@@ -4299,6 +4299,8 @@ class Amharic extends Lang
             // ID Card labels
             'id_card.reg_no' => 'የምዝገባ ቁ.',
             'id_card.id_no' => 'የ.ቁ',
+            'id_card.chr_name' => 'ክ/ስም',
+            'id_card.phone_no' => 'ስልክ ቁ.',
             'id_card.emergency_contact' => 'የአደጋ ተጠሪ',
             'id_card.issued' => 'የተሰጠ',
             'id_card.expiry' => 'ያልቃል',

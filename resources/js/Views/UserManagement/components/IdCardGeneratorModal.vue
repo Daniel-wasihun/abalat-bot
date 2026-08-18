@@ -130,9 +130,9 @@ function getLabels() {
         regNo:     $tr('id_card.reg_no', 'Reg. No'),
         idNo:      $tr('id_card.id_no', 'ID No'),
         fullName:  $tr('user.form.full_name', 'Full Name'),
-        chrName:   $tr('user.form.christian_name', 'Chr. Name'),
+        chrName:   $tr('id_card.chr_name', 'Chr. Name'),
         grade:     $tr('academic.class', 'Grade'),
-        phone:     $tr('user.form.phone_number', 'Phone'),
+        phone:     $tr('id_card.phone_no', 'Phone No'),
         gender:    $tr('user.form.gender', 'Gender'),
         age:       $tr('user.age', 'Age'),
         emerg:     $tr('id_card.emergency_contact', 'Emerg. Contact'),
@@ -204,8 +204,8 @@ function buildCardHtml(card: CardData): string {
         ${r(lbl.grade, card.grade_level || '---')}
       </div>
       <div class="split-row" style="gap:1mm;">
-        ${r(lbl.phone, card.phone || '---', true, 'flex:1.4;')}
-        ${r(lbl.nat, natValue, false, 'flex:0.6;')}
+        ${r(lbl.phone, card.phone || '---', true, 'flex:1.3;')}
+        ${r(lbl.nat, natValue, false, 'flex:0.7;')}
       </div>
       ${r(lbl.address, card.address || '---')}
       <div class="row emerg-row">
