@@ -4342,7 +4342,7 @@ class English extends Lang {
             // ID Card labels
             'id_card.reg_no' => 'Reg. No',
             'id_card.id_no' => 'ID No',
-            'id_card.chr_name' => 'Chr. Name',
+            'id_card.chr_name' => 'Christian Name',
             'id_card.phone_no' => 'Phone No',
             'id_card.emergency_contact' => 'Emerg. Contact',
             'id_card.issued' => 'Issued',

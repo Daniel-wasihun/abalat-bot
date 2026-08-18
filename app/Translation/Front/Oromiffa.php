@@ -630,7 +630,7 @@ class Oromiffa extends Lang {
             // ID Card labels
             'id_card.reg_no' => 'Lak.Galm.',
             'id_card.id_no' => 'Lak.',
-            'id_card.chr_name' => 'Maq.Kir.',
+            'id_card.chr_name' => 'Maqaa Kiristiyaanaa',
             'id_card.phone_no' => 'Lak.Bil.',
             'id_card.emergency_contact' => 'Q. Hatattamaa',
             'id_card.issued' => 'Kenname',
