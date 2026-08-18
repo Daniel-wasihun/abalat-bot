@@ -167,8 +167,8 @@ function buildCardHtml(card: CardData): string {
                     :              idCardSettings.value['id_card.authority_en']) || '---';
     const natValue = card.nationality || (l === 'am' ? 'ኢትዮጵያዊ' : l === 'or' ? 'Itoophiyaa' : 'Ethiopian');
 
-    const r = (lbl: string, val: string, mono = false) =>
-        `<div class="row"><span class="lbl">${lbl}</span><span class="val${mono ? ' mono' : ''}">${val}</span></div>`;
+    const r = (lbl: string, val: string, mono = false, extraStyle = '') =>
+        `<div class="row" ${extraStyle ? `style="${extraStyle}"` : ''}><span class="lbl">${lbl}</span><span class="val${mono ? ' mono' : ''}">${val}</span></div>`;
 
     return `
 <div class="card">
@@ -203,9 +203,9 @@ function buildCardHtml(card: CardData): string {
         ${r(lbl.age,    card.age    || '---')}
         ${r(lbl.grade, card.grade_level || '---')}
       </div>
-      <div class="split-row">
-        ${r(lbl.phone, card.phone || '---', true)}
-        ${r(lbl.nat, natValue)}
+      <div class="split-row" style="gap:1mm;">
+        ${r(lbl.phone, card.phone || '---', true, 'flex:1.4;')}
+        ${r(lbl.nat, natValue, false, 'flex:0.6;')}
       </div>
       ${r(lbl.address, card.address || '---')}
       <div class="row emerg-row">
