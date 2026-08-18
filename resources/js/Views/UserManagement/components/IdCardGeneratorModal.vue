@@ -236,9 +236,9 @@ function buildCardHtml(card: CardData): string {
         <span class="lbl">${lbl.emerg}</span>
         <span class="val">${card.emergency_name}${card.emergency_phone ? ' · ' + card.emergency_phone : ''}</span>
       </div>
-      <div class="split-row">
-        ${r(lbl.issued, fmtDate(card.issue_date, l), true)}
-        ${r(lbl.expiry, fmtDate(card.expiry_date, l), true)}
+      <div class="split-row date-row">
+        ${r(lbl.issued, fmtDate(card.issue_date, l))}
+        ${r(lbl.expiry, fmtDate(card.expiry_date, l))}
       </div>
     </div>
   </div>
@@ -287,6 +287,9 @@ body { background:#fff; font-family:'Segoe UI',Arial,sans-serif; -webkit-print-c
 .val  { color:#000; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; flex:1; min-width:0; }
 .mono { font-family:monospace; }
 .emerg-row .val { white-space:normal; line-height:1.2; }
+.date-row .row  { font-size:5.5pt; }
+.date-row .lbl  { white-space:nowrap; flex-shrink:0; }
+.date-row .val  { white-space:nowrap; overflow:visible; text-align:left; font-weight:700; }
 .watermark-logo { position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); width:40mm; height:40mm; object-fit:contain; opacity:0.25; z-index:-1; }
 
 @media print { @page { size:A4 portrait; margin:0; } body { margin:0; } }
@@ -416,5 +419,8 @@ body { background:#fff; font-family:'Segoe UI',Arial,sans-serif; -webkit-print-c
 :deep(.val)  { color:#000; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; flex:1; min-width:0; }
 :deep(.mono) { font-family:monospace; }
 :deep(.emerg-row .val) { white-space:normal; line-height:1.2; }
+:deep(.date-row .row)  { font-size:5.5pt; }
+:deep(.date-row .lbl)  { white-space:nowrap; flex-shrink:0; }
+:deep(.date-row .val)  { white-space:nowrap; overflow:visible; text-align:left; font-weight:700; }
 :deep(.watermark-logo) { position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); width:40mm; height:40mm; object-fit:contain; opacity:0.25; z-index:-1; }
 </style>
