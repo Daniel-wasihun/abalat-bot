@@ -145,8 +145,8 @@ function fmtDate(s: string, l = 'en'): string {
         if (l === 'am') {
             const eth = toEthiopianDate(s);
             if (!eth) return '---';
-            const months = ['',' \u1218\u1235\u12a8\u1228\u121d',' \u1325\u1245\u121d\u1275',' \u1205\u12f3\u122d',' \u1273\u1205\u1323\u1225',' \u1325\u122d',' \u12e8\u12ab\u1272\u1275',' \u1218\u130b\u1262\u1275',' \u121a\u12eb\u12dd\u12eb',' \u130d\u1295\u1266\u1275',' \u1230\u1294',' \u1200\u121d\u1209',' \u1290\u1200\u1230',' \u1333\u130f\u121c'];
-            return `${eth.day}${months[eth.month]} ${eth.year}`;
+            const months = ['','መስከረም','ጥቅምት','ኅዳር','ታኅሣሥ','ጥር','የካቲት','መጋቢት','ሚያዝያ','ግንቦት','ሰኔ','ሐምሌ','ነሐሴ','ጳጉሜ'];
+            return `${eth.day} ${months[eth.month]} ${eth.year}`;
         }
         return new Date(s).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
     } catch { return s; }
