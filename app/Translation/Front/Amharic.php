@@ -4302,8 +4302,8 @@ class Amharic extends Lang
             'id_card.chr_name' => 'የክርስትና ስም',
             'id_card.phone_no' => 'ስልክ ቁ.',
             'id_card.emergency_contact' => 'የአደጋ ተጠሪ',
-            'id_card.issued' => 'የተሰጠ',
-            'id_card.expiry' => 'ያልቃል',
+            'id_card.issued' => 'የተሰጠው ፡',
+            'id_card.expiry' => 'የሚያበቃው',
             'id_card.auth_title' => 'ሰጪው አካል',
             'user.nationality' => 'ዜግነት',
 

@@ -118,10 +118,38 @@ watch(() => props.show, async (v) => {
 const nextCard = () => { if (currentIndex.value < cardDataList.value.length - 1) currentIndex.value++; };
 const prevCard = () => { if (currentIndex.value > 0) currentIndex.value--; };
 
-function fmtDate(s: string): string {
+/* ── Ethiopian calendar conversion ── */
+
+function toEthiopianDate(dateStr: string): { year: number; month: number; day: number } | null {
+    if (!dateStr) return null;
+    try {
+        const d = new Date(dateStr);
+        const gYear = d.getFullYear(), gMonth = d.getMonth() + 1, gDay = d.getDate();
+        const a = Math.floor((14 - gMonth) / 12);
+        const y = gYear + 4800 - a;
+        const m = gMonth + 12 * a - 3;
+        const jdn = gDay + Math.floor((153 * m + 2) / 5) + 365 * y + Math.floor(y / 4) - Math.floor(y / 100) + Math.floor(y / 400) - 32045;
+        const r = (jdn - 1723856) % 1461;
+        const n = r % 365 + 365 * Math.floor(r / 1460);
+        return {
+            year:  4 * Math.floor((jdn - 1723856) / 1461) + Math.floor(r / 365) - Math.floor(r / 1460),
+            month: Math.floor(n / 30) + 1,
+            day:   n % 30 + 1,
+        };
+    } catch { return null; }
+}
+
+function fmtDate(s: string, l = 'en'): string {
     if (!s) return '---';
-    try { return new Date(s).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' }); }
-    catch { return s; }
+    try {
+        if (l === 'am') {
+            const eth = toEthiopianDate(s);
+            if (!eth) return '---';
+            const months = ['',' \u1218\u1235\u12a8\u1228\u121d',' \u1325\u1245\u121d\u1275',' \u1205\u12f3\u122d',' \u1273\u1205\u1323\u1225',' \u1325\u122d',' \u12e8\u12ab\u1272\u1275',' \u1218\u130b\u1262\u1275',' \u121a\u12eb\u12dd\u12eb',' \u130d\u1295\u1266\u1275',' \u1230\u1294',' \u1200\u121d\u1209',' \u1290\u1200\u1230',' \u1333\u130f\u121c'];
+            return `${eth.day}${months[eth.month]} ${eth.year}`;
+        }
+        return new Date(s).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+    } catch { return s; }
 }
 
 /* ── Per-language labels (single language) ──────────── */
@@ -209,8 +237,8 @@ function buildCardHtml(card: CardData): string {
         <span class="val">${card.emergency_name}${card.emergency_phone ? ' · ' + card.emergency_phone : ''}</span>
       </div>
       <div class="split-row">
-        ${r(lbl.issued, fmtDate(card.issue_date), true)}
-        ${r(lbl.expiry, fmtDate(card.expiry_date), true)}
+        ${r(lbl.issued, fmtDate(card.issue_date, l), true)}
+        ${r(lbl.expiry, fmtDate(card.expiry_date, l), true)}
       </div>
     </div>
   </div>
