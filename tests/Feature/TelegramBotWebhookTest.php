@@ -40,14 +40,12 @@ class TelegramBotWebhookTest extends TestCase
                     'id' => 987654321,
                     'is_bot' => false,
                     'first_name' => 'John',
-                    'last_name' => 'Doe',
                     'username' => 'johndoe',
                     'language_code' => 'en',
                 ],
                 'chat' => [
                     'id' => 987654321,
                     'first_name' => 'John',
-                    'last_name' => 'Doe',
                     'username' => 'johndoe',
                     'type' => 'private',
                 ],
@@ -80,7 +78,6 @@ class TelegramBotWebhookTest extends TestCase
                     'id' => 987654321,
                     'is_bot' => false,
                     'first_name' => 'John',
-                    'last_name' => 'Doe',
                     'username' => 'johndoe',
                 ],
                 'message' => [
@@ -130,7 +127,6 @@ class TelegramBotWebhookTest extends TestCase
                     'id' => 987654321,
                     'is_bot' => false,
                     'first_name' => 'John',
-                    'last_name' => 'Doe',
                     'username' => 'johndoe',
                 ],
                 'chat' => [

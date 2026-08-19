@@ -12,24 +12,6 @@ trait CreatesSuperAdmin {
     protected $superAdmin;
 
     protected function createSuperAdmin(): void {
-        // Ensure a department exists with proper hierarchy
-        $campus = \App\Models\Campus::firstOrCreate(['slug' => 'main-campus'], ['name' => ['en' => 'Main Campus']]);
-        $college = \App\Models\College::firstOrCreate(['slug' => 'engineering-college'], [
-            'name' => ['en' => 'College of Engineering'],
-            'campus_id' => $campus->id
-        ]);
-        $school = \App\Models\School::firstOrCreate(['slug' => 'tech-school'], [
-            'name' => ['en' => 'School of Technology'],
-            'college_id' => $college->id
-        ]);
-        $dept = Department::firstOrCreate(['slug' => 'default-department'], [
-            'id' => 1,
-            'name' => ['en' => 'Default Department'],
-            'school_id' => $school->id,
-            'short_code' => 'DD',
-            'total_year' => 4
-        ]);
-
         // Create super-admin role
         $adminRole = Role::firstOrCreate(
             ['slug' => 'super-admin'],
@@ -48,9 +30,6 @@ trait CreatesSuperAdmin {
             ['module' => \App\Constants\Module::ROLES, 'action' => \App\Constants\Action::VIEW],
             ['module' => \App\Constants\Module::ROLES, 'action' => \App\Constants\Action::EDIT],
             ['module' => \App\Constants\Module::ROLES, 'action' => \App\Constants\Action::DELETE],
-            ['module' => \App\Constants\Module::BOOKS, 'action' => \App\Constants\Action::VIEW],
-            ['module' => \App\Constants\Module::BOOKS, 'action' => \App\Constants\Action::CREATE],
-            ['module' => \App\Constants\Module::BOOKS, 'action' => \App\Constants\Action::EDIT],
         ];
 
         foreach ($permissions as $p) {
@@ -91,11 +70,9 @@ trait CreatesSuperAdmin {
         \App\Models\UserInfo::firstOrCreate(
             ['user_id' => $this->superAdmin->id],
             [
-                'user_university_id' => 'LMS10000000',
-                'user_type' => 'staff',
+                'registration_id' => \App\Models\UserInfo::generateNextRegistrationId(),
                 'gender' => 'male',
                 'phone_number' => '+251911111111',
-                'department_id' => $dept->id
             ]
         );
 
