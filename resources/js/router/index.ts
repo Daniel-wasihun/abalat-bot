@@ -111,6 +111,12 @@ const routes: RouteRecordRaw[] = [
                         },
                         children: userManagementRoutes,
                     },
+                    {
+                        path: "payments",
+                        name: "SystemPayments",
+                        component: () => import("@/Views/Payments/PaymentsView.vue"),
+                        meta: { title: "Payments", module: "system", action: "view" },
+                    },
                 ],
             },
             {
@@ -176,7 +182,7 @@ const routes: RouteRecordRaw[] = [
                     {
                         path: "config",
                         name: "academic-config",
-                        meta: { title: "Configuration", permission: "academic_courses.manage" },
+                        meta: { title: "common.config", permission: "academic_courses.manage" },
                         component: () => import("@/Views/Academic/ConfigView.vue"),
                     },
                     {
