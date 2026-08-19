@@ -23,6 +23,7 @@ import {
   Monitor,
   LogOut,
   ChevronRight,
+  CreditCard,
   Loader2,
   PanelLeftClose,
   Bot,
@@ -213,7 +214,7 @@ const menuGroups = computed<MenuGroup[]>(() => [
     name: "nav.main",
     items: [
       {
-        name: "dashboard",
+        name: "nav.dashboard",
         icon: LayoutDashboard,
         to: "/dashboard",
         condition: () => perms.dashboard.canView.value,
@@ -277,6 +278,12 @@ const menuGroups = computed<MenuGroup[]>(() => [
           },
         ],
       },
+      {
+        name: "nav.payments",
+        icon: CreditCard,
+        to: "/dashboard/system/payments",
+        condition: () => perms.users.canView.value,
+      },
     ],
   },
   {
@@ -315,7 +322,7 @@ const menuGroups = computed<MenuGroup[]>(() => [
       },
       {
         // Academic Configuration — admin only
-        name: "Configuration",
+        name: "common.config",
         icon: Settings2,
         to: "/dashboard/academic/config",
         condition: () => perms.academicCourses.canManage.value,
@@ -432,7 +439,7 @@ const handleItemClick = () => {
         class="space-y-3">
         <p
           v-if="!isCollapsed"
-          class="px-2.5 text-xs tracking-widest text-main-text/50 uppercase animate-in fade-in duration-300">
+          class="px-2.5 text-xs tracking-widest text-main-text/50 capitalize animate-in fade-in duration-300">
           {{ $tr(group.name) }}
         </p>
         <div class="space-y-1 font-normal">
