@@ -156,11 +156,21 @@ const eventOptions = [
 
 const modelOptions = [
   { value: '', label: 'All Resources' },
-  { value: 'GeneralAttendanceRecord', label: 'Attendance' },
+  { value: 'User', label: 'User Profile' },
+  { value: 'Role', label: 'Role & Permissions' },
+  { value: 'GeneralAttendanceRecord', label: 'General Attendance' },
+  { value: 'GeneralAttendanceSession', label: 'General Attendance Session' },
   { value: 'AttendanceRecord', label: 'Course Attendance' },
+  { value: 'AttendanceSession', label: 'Course Attendance Session' },
+  { value: 'StudentMark', label: 'Student Mark' },
+  { value: 'StudentResult', label: 'Student Final Result' },
   { value: 'Payment', label: 'Payment' },
-  { value: 'User', label: 'User' },
-  { value: 'Role', label: 'Role' },
+  { value: 'PaymentTransaction', label: 'Payment Transaction' },
+  { value: 'SenbetClass', label: 'Class Configuration' },
+  { value: 'Course', label: 'Course Configuration' },
+  { value: 'CourseOffering', label: 'Course Offering' },
+  { value: 'AssessmentType', label: 'Assessment Configuration' },
+  { value: 'Setting', label: 'System Settings' },
 ];
 
 const fetchLogs = async (page = 1) => {

@@ -6,12 +6,12 @@ use App\Traits\HasSlug;
 use App\Traits\Localizable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-
 use Illuminate\Database\Eloquent\SoftDeletes;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class Role extends Model {
+class Role extends Model implements Auditable {
 
-    use HasSlug, Localizable, SoftDeletes, \App\Traits\HasSorting;
+    use HasSlug, Localizable, SoftDeletes, \App\Traits\HasSorting, \OwenIt\Auditing\Auditable;
 
     protected $fillable = [
         'name',

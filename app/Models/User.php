@@ -14,10 +14,21 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\Contracts\OAuthenticatable as OAuthenticatableContract;
 use Laravel\Passport\HasApiTokens;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class User extends Authenticatable implements OAuthenticatableContract
+class User extends Authenticatable implements OAuthenticatableContract, Auditable
 {
-    use HasApiTokens, HasFactory, Notifiable, HasCustomPermissions, SoftDeletes, Localizable, HasSorting;
+    use HasApiTokens, HasFactory, Notifiable, HasCustomPermissions, SoftDeletes, Localizable, HasSorting, \OwenIt\Auditing\Auditable;
+
+    /**
+     * Exclude sensitive fields from audit logs.
+     */
+    protected array $auditExclude = [
+        'password',
+        'remember_token',
+        'two_factor_secret',
+        'two_factor_recovery_codes',
+    ];
 
     protected $fillable = ['name', 'email', 'password', 'is_active'];
 
