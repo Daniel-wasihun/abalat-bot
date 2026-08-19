@@ -12,6 +12,7 @@ class Module
     public const BOT = 'bot';
     public const ACADEMIC_COURSES = 'academic_courses';
     public const ACADEMIC_CLASSES = 'academic_classes';
+    public const PAYMENTS = 'payments';
 
     /**
      * Get all module values.
@@ -27,6 +28,7 @@ class Module
             self::BOT,
             self::ACADEMIC_COURSES,
             self::ACADEMIC_CLASSES,
+            self::PAYMENTS,
         ];
     }
 

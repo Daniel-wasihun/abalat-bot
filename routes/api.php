@@ -128,8 +128,18 @@ Route::middleware(['auth:api', 'active', \App\Http\Middleware\TrackUserDevice::c
             Route::post('/id-card/logo', [\App\Http\Controllers\Api\SettingController::class, 'uploadLogo']);
             Route::get('/webhook', [\App\Http\Controllers\Api\SettingController::class, 'getWebhookStatus']);
             Route::post('/webhook', [\App\Http\Controllers\Api\SettingController::class, 'setupWebhook']);
+            Route::get('/payments', [\App\Http\Controllers\Api\SettingController::class, 'getPaymentSettings']);
         });
     });
+
+    // Payments
+    Route::get('/payments/statistics', [\App\Http\Controllers\PaymentController::class, 'statistics']);
+    Route::get('/payments/preview-bulk', [\App\Http\Controllers\PaymentController::class, 'previewBulk']);
+    Route::get('/payments/history/{user}', [\App\Http\Controllers\PaymentController::class, 'history']);
+    Route::get('/payments/{payment}', [\App\Http\Controllers\PaymentController::class, 'show']);
+    Route::get('/payments', [\App\Http\Controllers\PaymentController::class, 'index']);
+    Route::post('/payments/bulk', [\App\Http\Controllers\PaymentController::class, 'storeBulk']);
+    Route::post('/payments', [\App\Http\Controllers\PaymentController::class, 'store']);
 
     // Academic Management (Admin & Teachers)
     Route::prefix('academic')->group(function () {
@@ -140,6 +150,7 @@ Route::middleware(['auth:api', 'active', \App\Http\Middleware\TrackUserDevice::c
             Route::post('/session', [\App\Http\Controllers\Api\Academic\GeneralAttendanceController::class, 'getOrCreateSession']);
             Route::post('/session/{sessionId}/records', [\App\Http\Controllers\Api\Academic\GeneralAttendanceController::class, 'saveRecords']);
         });
+
 
         // ── Configuration (Admin) ─────────────────────────────────────────────
         Route::prefix('config')->group(function () {
