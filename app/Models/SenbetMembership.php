@@ -19,6 +19,7 @@ class SenbetMembership extends Model
         'user_id',
         'date_of_birth',
         'education_level',
+        'work_status',
         'emergency_name',
         'emergency_phone',
         'emergency_sub_city',

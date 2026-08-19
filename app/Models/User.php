@@ -104,6 +104,11 @@ class User extends Authenticatable implements OAuthenticatableContract
         return $this->hasMany(SuspiciousActivity::class);
     }
 
+    public function payments(): HasMany
+    {
+        return $this->hasMany(Payment::class);
+    }
+
     // ─── Role Helpers ─────────────────────────────────────────────────────────
 
     public function isSystemAdmin(): bool
