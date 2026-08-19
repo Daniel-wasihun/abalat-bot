@@ -335,7 +335,7 @@ body { background:#fff; font-family:'Segoe UI',Arial,sans-serif; -webkit-print-c
         <div class="flex min-h-0 overflow-hidden" style="height:580px;">
             <!-- Left: edit form -->
             <div class="w-80 shrink-0 border-r border-card-border/40 overflow-y-auto p-5 bg-main-bg/40 custom-scrollbar">
-                <p class="text-[11px] uppercase tracking-widest font-semibold text-main-text/40 mb-4">{{ $tr('user.edit_id_info', 'Edit ID Information') }}</p>
+                <p class="text-[11px] capitalize tracking-widest font-semibold text-main-text/40 mb-4">{{ $tr('user.edit_id_info', 'Edit ID Information') }}</p>
                 <div class="space-y-3" v-if="cardDataList.length > 0">
                     <FormField v-model="cardDataList[currentIndex].name"           :label="$tr('user.form.full_name', 'Full Name')" />
                     <FormField v-model="cardDataList[currentIndex].registration_id" :label="$tr('user.form.registration_id', 'Registration ID')" />
@@ -349,14 +349,14 @@ body { background:#fff; font-family:'Segoe UI',Arial,sans-serif; -webkit-print-c
                     <FormField v-model="cardDataList[currentIndex].issue_date"     type="date" :label="$tr('user.issue_date', 'Issue Date')" />
                     <FormField v-model="cardDataList[currentIndex].expiry_date"    type="date" :label="$tr('user.expiry_date', 'Expiry Date')" />
                     <div class="pt-3 border-t border-card-border/40">
-                        <p class="text-[11px] uppercase tracking-widest font-semibold text-main-text/40 mb-3">{{ $tr('user.emergency_contact', 'Emergency Contact') }}</p>
+                        <p class="text-[11px] capitalize tracking-widest font-semibold text-main-text/40 mb-3">{{ $tr('user.emergency_contact', 'Emergency Contact') }}</p>
                         <div class="space-y-3">
                             <FormField v-model="cardDataList[currentIndex].emergency_name"  :label="$tr('user.form.emergency_name', 'Contact Name')" />
                             <FormField v-model="cardDataList[currentIndex].emergency_phone" :label="$tr('user.form.emergency_phone', 'Contact Phone')" />
                         </div>
                     </div>
                     <div class="pt-3 border-t border-card-border/40">
-                        <p class="text-[11px] uppercase tracking-widest font-semibold text-main-text/40 mb-3">{{ $tr('user.issuer', 'Issuer') }}</p>
+                        <p class="text-[11px] capitalize tracking-widest font-semibold text-main-text/40 mb-3">{{ $tr('user.issuer', 'Issuer') }}</p>
                         <FormField v-model="cardDataList[currentIndex].chairman_name" :label="$tr('user.issuer_name', 'Issuer Name & Signature')" />
                     </div>
                 </div>

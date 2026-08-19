@@ -248,9 +248,7 @@ const hasExpiringAccess = computed(
  <div class="flex items-center gap-4">
  <h2
  class="text-lg font-normal text-main-text leading-tight">
- {{ localize(user.name, currentLanguage).split(' ')[0] }}
- {{ user.info?.father_name ? localize(user.info.father_name, currentLanguage).split(' ')[0] : "" }}
- {{ user.info?.grandfather_name ? localize(user.info.grandfather_name, currentLanguage).split(' ')[0] : "" }}
+ {{ localize(user.name, currentLanguage) }}
  </h2>
  <span
  class="px-2 py-0.5 border border-brand-blue text-brand-blue text-[14px] font-normal capitalize tracking-wide rounded">
@@ -355,8 +353,7 @@ const hasExpiringAccess = computed(
  <div class="grid grid-cols-2 gap-4">
  <div
  v-for="(val, label) in {
- 'user.date_of_birth':
- user.info?.date_of_birth,
+ 'user.date_of_birth': user.info?.date_of_birth ? formatDate(user.info.date_of_birth, currentLanguage) : '-',
  'user.joined_date': formatDate(
  user.created_at,
  currentLanguage,
@@ -463,7 +460,7 @@ const hasExpiringAccess = computed(
  }}:
  {{
  formatDate(
- role.start_date,
+ role.start_date || user.created_at,
  currentLanguage,
  )
  }}</span
@@ -582,7 +579,7 @@ const hasExpiringAccess = computed(
  }}:
  {{
  formatDate(
- perm.start_date,
+ perm.start_date || user.created_at,
  currentLanguage,
  )
  }}</span
@@ -733,7 +730,7 @@ const hasExpiringAccess = computed(
  $tr(
  getItemTheme(
  activeExpiringRole,
- "sunset",
+ 'sunset',
  ).intentLabel,
  )
  }}
@@ -848,7 +845,7 @@ const hasExpiringAccess = computed(
  $tr(
  getItemTheme(
  over,
- "sunset",
+ 'sunset',
  ).intentLabel,
  )
  }}
@@ -974,7 +971,7 @@ const hasExpiringAccess = computed(
  class="w-3.5 h-3.5 opacity-40" />
  <span>{{
  formatDate(
- item.start_date,
+ item.start_date || user.created_at,
  currentLanguage,
  )
  }}</span>
