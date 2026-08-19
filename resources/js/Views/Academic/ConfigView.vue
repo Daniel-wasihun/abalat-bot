@@ -45,7 +45,7 @@
             :show-filters="false"
             :has-active-filters="false"
             :create-label="$tr('academic.config.add_class')"
-            :can-create="true"
+            :can-create="canManageCourses"
             :loading="loadingClasses"
             @create="openClassModal(null)"
           />
@@ -100,7 +100,7 @@
               <TableColumn header="" align="right">
                 <template #default="{ row: item }">
                   <div class="flex justify-end p-1">
-                    <ActionDropdown :actions="getClassActions(item)" :item="item" />
+                    <ActionDropdown v-if="canManageCourses" :actions="getClassActions(item)" :item="item" />
                   </div>
                 </template>
               </TableColumn>
@@ -126,7 +126,7 @@
             :show-filters="false"
             :has-active-filters="false"
             :create-label="$tr('academic.config.add_assessment')"
-            :can-create="true"
+            :can-create="canManageCourses"
             :loading="loadingAssessments"
             @create="openAssessmentModal(null)"
           />
@@ -181,7 +181,7 @@
               <TableColumn header="" align="right">
                 <template #default="{ row: item }">
                   <div class="flex justify-end p-1">
-                    <ActionDropdown :actions="getAssessmentActions(item)" :item="item" />
+                    <ActionDropdown v-if="canManageCourses" :actions="getAssessmentActions(item)" :item="item" />
                   </div>
                 </template>
               </TableColumn>
@@ -508,6 +508,8 @@ import { ref, computed, onMounted, getCurrentInstance } from 'vue';
 import { GraduationCap, FileText, Plus, Pencil, Trash2, Loader2, Save, X, CreditCard } from 'lucide-vue-next';
 import apiClient from '@/api/apiClient';
 import { useToastStore } from '@/stores/toast';
+import { usePermissions } from '@/composables/usePermissions';
+import { Modules } from '@/constants/permissions';
 import TableToolbar from '@/components/common/TableToolbar.vue';
 import DataTable from '@/components/common/DataTable.vue';
 import TableColumn from '@/components/common/TableColumn.vue';
@@ -518,6 +520,7 @@ const { proxy } = getCurrentInstance() as any;
 const $tr = proxy.$tr;
 
 const toast = useToastStore();
+const { canView: canViewCourses, canManage: canManageCourses } = usePermissions(Modules.ACADEMIC_COURSES);
 
 const tabs = computed(() => [
   { key: 'classes',     label: $tr('academic.config.classes_tab'),     icon: GraduationCap },
