@@ -44,6 +44,12 @@ Route::middleware(['auth:api', 'active', \App\Http\Middleware\TrackUserDevice::c
     Route::post('/sessions/{id}/logout', [AuthController::class, 'logoutSession']);
     Route::post('/sessions/logout-other', [AuthController::class, 'logoutAllOtherSessions']);
 
+    // ── Audit Logs ──────────────────────────────────────────────────────────
+    Route::middleware('permission:super_admin')->prefix('audit-logs')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Api\AuditLogController::class, 'index']);
+        Route::post('/{id}/rollback', [\App\Http\Controllers\Api\AuditLogController::class, 'rollback']);
+    });
+
     // System Management (Roles, Permissions, Users)
     Route::prefix('system')->group(function () {
         Route::get('/roles', [RoleController::class, 'index']);
@@ -133,36 +139,54 @@ Route::middleware(['auth:api', 'active', \App\Http\Middleware\TrackUserDevice::c
     });
 
     // Payments
-    Route::get('/payments/statistics', [\App\Http\Controllers\PaymentController::class, 'statistics']);
-    Route::get('/payments/preview-bulk', [\App\Http\Controllers\PaymentController::class, 'previewBulk']);
-    Route::get('/payments/history/{user}', [\App\Http\Controllers\PaymentController::class, 'history']);
-    Route::get('/payments/{payment}', [\App\Http\Controllers\PaymentController::class, 'show']);
-    Route::get('/payments', [\App\Http\Controllers\PaymentController::class, 'index']);
-    Route::post('/payments/bulk', [\App\Http\Controllers\PaymentController::class, 'storeBulk']);
-    Route::post('/payments', [\App\Http\Controllers\PaymentController::class, 'store']);
+    Route::get('/payments/statistics', [\App\Http\Controllers\PaymentController::class, 'statistics'])
+        ->middleware('permission:academic_courses.view');
+    Route::get('/payments/preview-bulk', [\App\Http\Controllers\PaymentController::class, 'previewBulk'])
+        ->middleware('permission:academic_courses.view');
+    Route::get('/payments/history/{user}', [\App\Http\Controllers\PaymentController::class, 'history'])
+        ->middleware('permission:academic_courses.view');
+    Route::get('/payments/{payment}', [\App\Http\Controllers\PaymentController::class, 'show'])
+        ->middleware('permission:academic_courses.view');
+    Route::get('/payments', [\App\Http\Controllers\PaymentController::class, 'index'])
+        ->middleware('permission:academic_courses.view');
+    Route::post('/payments/bulk', [\App\Http\Controllers\PaymentController::class, 'storeBulk'])
+        ->middleware('permission:academic_courses.manage');
+    Route::post('/payments', [\App\Http\Controllers\PaymentController::class, 'store'])
+        ->middleware('permission:academic_courses.manage');
 
     // Academic Management (Admin & Teachers)
     Route::prefix('academic')->group(function () {
 
         // ── General Attendance ───────────────────────────────────────────────
         Route::prefix('general-attendance')->group(function () {
-            Route::get('/classes', [\App\Http\Controllers\Api\Academic\GeneralAttendanceController::class, 'getClasses']);
-            Route::post('/session', [\App\Http\Controllers\Api\Academic\GeneralAttendanceController::class, 'getOrCreateSession']);
-            Route::post('/session/{sessionId}/records', [\App\Http\Controllers\Api\Academic\GeneralAttendanceController::class, 'saveRecords']);
+            Route::get('/classes', [\App\Http\Controllers\Api\Academic\GeneralAttendanceController::class, 'getClasses'])
+                ->middleware('permission:academic_classes.view');
+            Route::post('/session', [\App\Http\Controllers\Api\Academic\GeneralAttendanceController::class, 'getOrCreateSession'])
+                ->middleware('permission:academic_classes.manage');
+            Route::post('/session/{sessionId}/records', [\App\Http\Controllers\Api\Academic\GeneralAttendanceController::class, 'saveRecords'])
+                ->middleware('permission:academic_classes.manage');
         });
 
 
         // ── Configuration (Admin) ─────────────────────────────────────────────
         Route::prefix('config')->group(function () {
-            Route::get('/classes', [\App\Http\Controllers\Api\Academic\ConfigurationController::class, 'getClasses']);
-            Route::post('/classes', [\App\Http\Controllers\Api\Academic\ConfigurationController::class, 'storeClass']);
-            Route::put('/classes/{id}', [\App\Http\Controllers\Api\Academic\ConfigurationController::class, 'updateClass']);
-            Route::delete('/classes/{id}', [\App\Http\Controllers\Api\Academic\ConfigurationController::class, 'destroyClass']);
+            Route::get('/classes', [\App\Http\Controllers\Api\Academic\ConfigurationController::class, 'getClasses'])
+                ->middleware('permission:academic_courses.view');
+            Route::post('/classes', [\App\Http\Controllers\Api\Academic\ConfigurationController::class, 'storeClass'])
+                ->middleware('permission:academic_courses.manage');
+            Route::put('/classes/{id}', [\App\Http\Controllers\Api\Academic\ConfigurationController::class, 'updateClass'])
+                ->middleware('permission:academic_courses.manage');
+            Route::delete('/classes/{id}', [\App\Http\Controllers\Api\Academic\ConfigurationController::class, 'destroyClass'])
+                ->middleware('permission:academic_courses.manage');
 
-            Route::get('/assessments', [\App\Http\Controllers\Api\Academic\ConfigurationController::class, 'getAssessments']);
-            Route::post('/assessments', [\App\Http\Controllers\Api\Academic\ConfigurationController::class, 'storeAssessment']);
-            Route::put('/assessments/{id}', [\App\Http\Controllers\Api\Academic\ConfigurationController::class, 'updateAssessment']);
-            Route::delete('/assessments/{id}', [\App\Http\Controllers\Api\Academic\ConfigurationController::class, 'destroyAssessment']);
+            Route::get('/assessments', [\App\Http\Controllers\Api\Academic\ConfigurationController::class, 'getAssessments'])
+                ->middleware('permission:academic_courses.view');
+            Route::post('/assessments', [\App\Http\Controllers\Api\Academic\ConfigurationController::class, 'storeAssessment'])
+                ->middleware('permission:academic_courses.manage');
+            Route::put('/assessments/{id}', [\App\Http\Controllers\Api\Academic\ConfigurationController::class, 'updateAssessment'])
+                ->middleware('permission:academic_courses.manage');
+            Route::delete('/assessments/{id}', [\App\Http\Controllers\Api\Academic\ConfigurationController::class, 'destroyAssessment'])
+                ->middleware('permission:academic_courses.manage');
         });
 
         // ── Course Management (Admin) ─────────────────────────────────────────
