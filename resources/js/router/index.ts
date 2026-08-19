@@ -117,6 +117,12 @@ const routes: RouteRecordRaw[] = [
                         component: () => import("@/Views/Payments/PaymentsView.vue"),
                         meta: { title: "Payments", module: "system", action: "view" },
                     },
+                    {
+                        path: "audit-logs",
+                        name: "SystemAuditLogs",
+                        component: () => import("@/Views/System/AuditLogsView.vue"),
+                        meta: { title: "Audit Logs", permission: "super_admin" },
+                    },
                 ],
             },
             {
@@ -286,6 +292,19 @@ router.afterEach((to) => {
     const languageStore = useLanguageStore();
     const titleKey = (to.meta.title as string) || "app.name";
     languageStore.setTitle(titleKey);
+});
+
+// Handle ChunkLoadErrors gracefully
+// This typically happens when Vite rebuilds the frontend and old JS chunks are no longer available on the server
+router.onError((error, to) => {
+    if (
+        error.message.includes("Failed to fetch dynamically imported module") ||
+        error.message.includes("Importing a module script failed") ||
+        error.name === "ChunkLoadError"
+    ) {
+        // Hard reload the page to fetch the new index.html and fresh chunks
+        window.location.href = to.fullPath;
+    }
 });
 
 export default router;
