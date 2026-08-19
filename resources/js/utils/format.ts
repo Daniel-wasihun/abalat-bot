@@ -31,12 +31,22 @@ export function formatDate(
     lang: string = "en",
 ): string {
     if (!date) return "N/A";
-    const locale = lang === "am" ? "am-ET" : "en-US";
-    return new Date(date).toLocaleDateString(locale, {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-    });
+    try {
+        if (lang === "am") {
+            return new Intl.DateTimeFormat('am-ET-u-ca-ethiopic', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            }).format(new Date(date));
+        }
+        return new Intl.DateTimeFormat('en-US', {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+        }).format(new Date(date));
+    } catch (e) {
+        return new Date(date).toLocaleDateString(lang === "am" ? "am-ET" : "en-US");
+    }
 }
 
 export function formatTime(
