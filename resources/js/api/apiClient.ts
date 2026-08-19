@@ -193,4 +193,106 @@ apiClient.interceptors.response.use(
     },
 );
 
+/**
+ * Professional SWR (Stale-While-Revalidate) Cache Layer
+ * Caches only specific static GET requests (e.g., courses, classes, config) for 1 hour
+ * Refreshes in the background if signed in.
+ */
+const CACHED_ENDPOINTS = [
+    '/courses',
+    '/classes',
+    '/settings',
+    '/config',
+];
+
+const shouldCache = (url?: string) => {
+    if (!url) return false;
+    return CACHED_ENDPOINTS.some(endpoint => url.includes(endpoint));
+};
+
+const originalGet = apiClient.get;
+apiClient.get = async function (url: string, config?: any) {
+    if (!shouldCache(url) || config?.headers?.['X-No-Cache']) {
+        return originalGet.call(this, url, config);
+    }
+
+    const cacheKey = `api_cache_${url}_${JSON.stringify(config?.params || {})}`;
+    const cached = localStorage.getItem(cacheKey);
+    const token = Cookies.get("access_token");
+
+    let parsedCache: any = null;
+    let isExpired = true;
+
+    if (cached) {
+        try {
+            parsedCache = JSON.parse(cached);
+            const age = Date.now() - parsedCache.timestamp;
+            isExpired = age > 3600000; // 1 hour cache time
+
+            if (!isExpired) {
+                // Background refresh if user is signed in
+                if (token && !config?.skipBackgroundRefresh) {
+                    originalGet.call(this, url, { ...config, skipBackgroundRefresh: true })
+                        .then(res => {
+                            if (res.status === 200) {
+                                localStorage.setItem(cacheKey, JSON.stringify({ data: res.data, timestamp: Date.now() }));
+                                window.dispatchEvent(new CustomEvent('cache-refreshed', { detail: { url } }));
+                            }
+                        })
+                        .catch(() => {});
+                }
+                
+                return Promise.resolve({
+                    data: parsedCache.data,
+                    status: 200,
+                    statusText: "OK",
+                    headers: {},
+                    config: config as any,
+                    request: {}
+                });
+            }
+        } catch (e) {
+            // Ignore parse errors, fall through to network
+        }
+    }
+
+    // Perform network request
+    try {
+        const response = await originalGet.call(this, url, config);
+        if (response.status === 200) {
+            try {
+                localStorage.setItem(cacheKey, JSON.stringify({ data: response.data, timestamp: Date.now() }));
+            } catch (e) {}
+        }
+        return response;
+    } catch (error) {
+        // If network fails but we have expired cache, return the expired cache gracefully
+        if (parsedCache) {
+            return Promise.resolve({
+                data: parsedCache.data,
+                status: 200,
+                statusText: "OK (Stale)",
+                headers: {},
+                config: config as any,
+                request: {}
+            });
+        }
+        throw error;
+    }
+} as any;
+
+// Global invalidator for mutations to keep cache fresh
+apiClient.interceptors.response.use((response) => {
+    const isMutation = ["post", "put", "patch", "delete"].includes(response.config.method || "");
+    if (isMutation) {
+        // Clear all cached API responses on mutation for safety
+        const keys = Object.keys(localStorage);
+        keys.forEach(k => {
+            if (k.startsWith('api_cache_')) localStorage.removeItem(k);
+        });
+    }
+    return response;
+});
+
 export default apiClient;
+
