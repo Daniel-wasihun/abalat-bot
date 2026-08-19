@@ -563,6 +563,7 @@ class Amharic extends Lang {
             'module.spot_readings' => 'የቤተ-መጻሕፍት አጠቃቀም',
             'module.shelves' => 'መደርደሪያዎች',
             'module.security' => 'ደህንነት',
+            'module.payments' => 'ክፍያዎች',
             'module.repository_research' => 'የምርምር ሥራዎች',
             'module.repository_journal_articles' => 'የጆርናል ጽሁፎች',
             'module.repository_theses' => 'ተሲስ እና ዲሰርቴሽን',

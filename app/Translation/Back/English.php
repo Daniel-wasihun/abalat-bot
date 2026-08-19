@@ -560,6 +560,7 @@ class English extends Lang
             'module.spot_readings' => 'Spot Reading',
             'module.shelves' => 'Shelves',
             'module.security' => 'Security',
+            'module.payments' => 'Payments',
             'module.repository_research' => 'Research Papers',
             'module.repository_journal_articles' => 'Journal Articles',
             'module.repository_theses' => 'Theses & Dissertations',
