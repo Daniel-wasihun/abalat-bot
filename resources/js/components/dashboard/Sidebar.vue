@@ -32,6 +32,7 @@ import {
   BookOpen,
   Calendar,
   Settings2,
+  Activity,
 } from "lucide-vue-next";
 import { useAuthStore } from "@/stores/authStore";
 import { useLanguageStore } from "@/stores/languageStore";
@@ -283,6 +284,12 @@ const menuGroups = computed<MenuGroup[]>(() => [
         icon: CreditCard,
         to: "/dashboard/system/payments",
         condition: () => perms.users.canView.value,
+      },
+      {
+        name: "Audit Logs",
+        icon: Activity,
+        to: "/dashboard/system/audit-logs",
+        condition: () => isSuperAdmin.value,
       },
     ],
   },
