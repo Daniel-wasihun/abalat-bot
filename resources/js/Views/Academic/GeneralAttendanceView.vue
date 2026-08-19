@@ -66,7 +66,7 @@
         </div>
       </div>
 
-      <button @click="saveAttendance" :disabled="saving || loading || !selectedClass"
+      <button v-if="canManageAttendance" @click="saveAttendance" :disabled="saving || loading || !selectedClass"
         class="inline-flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white bg-brand-blue hover:bg-brand-blue/90 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg shadow-sm transition-colors">
         <Loader2 v-if="saving" class="w-4 h-4 animate-spin" />
         <Save v-else class="w-4 h-4" />
@@ -119,33 +119,33 @@
         <TableColumn field="status" :header="$tr('attendance.general.col_status')" align="left">
           <template #default="{ row: item }">
             <div class="flex items-center gap-1.5">
-              <label class="inline-flex items-center cursor-pointer">
-                <input type="radio" :name="'att_'+item.id" value="present" v-model="item.status" class="sr-only peer" />
-                <div class="px-3 py-1.5 text-xs font-semibold rounded-lg cursor-pointer
+              <label class="inline-flex items-center" :class="canManageAttendance ? 'cursor-pointer' : 'cursor-not-allowed opacity-60'">
+                <input type="radio" :name="'att_'+item.id" value="present" v-model="item.status" :disabled="!canManageAttendance" class="sr-only peer" />
+                <div class="px-3 py-1.5 text-xs font-semibold rounded-lg
                   bg-gray-100 text-gray-500 border border-gray-200
                   peer-checked:bg-emerald-600 peer-checked:text-white peer-checked:border-emerald-600
                   hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-300
-                  transition-all duration-150">
+                  transition-all duration-150" :class="canManageAttendance ? 'cursor-pointer' : 'cursor-not-allowed'">
                   ✓ {{ $tr('attendance.general.present') }}
                 </div>
               </label>
-              <label class="inline-flex items-center cursor-pointer">
-                <input type="radio" :name="'att_'+item.id" value="permission" v-model="item.status" class="sr-only peer" />
-                <div class="px-3 py-1.5 text-xs font-semibold rounded-lg cursor-pointer
+              <label class="inline-flex items-center" :class="canManageAttendance ? 'cursor-pointer' : 'cursor-not-allowed opacity-60'">
+                <input type="radio" :name="'att_'+item.id" value="permission" v-model="item.status" :disabled="!canManageAttendance" class="sr-only peer" />
+                <div class="px-3 py-1.5 text-xs font-semibold rounded-lg
                   bg-gray-100 text-gray-500 border border-gray-200
                   peer-checked:bg-amber-500 peer-checked:text-white peer-checked:border-amber-500
                   hover:bg-amber-50 hover:text-amber-700 hover:border-amber-300
-                  transition-all duration-150">
+                  transition-all duration-150" :class="canManageAttendance ? 'cursor-pointer' : 'cursor-not-allowed'">
                   ⚠ {{ $tr('attendance.general.permission') }}
                 </div>
               </label>
-              <label class="inline-flex items-center cursor-pointer">
-                <input type="radio" :name="'att_'+item.id" value="absent" v-model="item.status" class="sr-only peer" />
-                <div class="px-3 py-1.5 text-xs font-semibold rounded-lg cursor-pointer
+              <label class="inline-flex items-center" :class="canManageAttendance ? 'cursor-pointer' : 'cursor-not-allowed opacity-60'">
+                <input type="radio" :name="'att_'+item.id" value="absent" v-model="item.status" :disabled="!canManageAttendance" class="sr-only peer" />
+                <div class="px-3 py-1.5 text-xs font-semibold rounded-lg
                   bg-gray-100 text-gray-500 border border-gray-200
                   peer-checked:bg-red-600 peer-checked:text-white peer-checked:border-red-600
                   hover:bg-red-50 hover:text-red-700 hover:border-red-300
-                  transition-all duration-150">
+                  transition-all duration-150" :class="canManageAttendance ? 'cursor-pointer' : 'cursor-not-allowed'">
                   ✗ {{ $tr('attendance.general.absent') }}
                 </div>
               </label>
@@ -184,12 +184,15 @@ import DataTable from '@/components/common/DataTable.vue';
 import TableColumn from '@/components/common/TableColumn.vue';
 import { useLanguageStore } from '@/stores/languageStore';
 import { useToastStore } from '@/stores/toast';
+import { usePermissions } from '@/composables/usePermissions';
+import { Modules } from '@/constants/permissions';
 
 const { proxy } = getCurrentInstance() as any;
 const $tr = proxy.$tr;
 
 const langStore = useLanguageStore();
 const toast = useToastStore();
+const { canManage: canManageAttendance } = usePermissions(Modules.ACADEMIC_CLASSES);
 
 const localize = (obj: any) => {
   if (!obj) return '';
