@@ -97,7 +97,7 @@
           <template #default="{ row: item }">
             <div class="flex items-center gap-3">
               <div class="w-8 h-8 rounded-full bg-brand-blue flex items-center justify-center text-white text-xs font-bold shrink-0 overflow-hidden">
-                <span class="uppercase">{{ initials(item.name) }}</span>
+                <span class="capitalize">{{ initials(item.name) }}</span>
               </div>
               <p class="text-sm font-medium text-main-text group-hover:text-accent transition-colors">{{ localize(item.name) }}</p>
             </div>

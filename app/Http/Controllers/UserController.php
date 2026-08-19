@@ -230,6 +230,7 @@ class UserController extends Controller implements HasMiddleware {
                 $membershipData = [
                     'date_of_birth' => $data['senbet_date_of_birth'] ?? null,
                     'education_level' => $data['education_level'] ?? null,
+                    'work_status' => $data['work_status'] ?? 'student',
                     'emergency_name' => $data['emergency_name'] ?? null,
                     'emergency_phone' => $data['emergency_phone'] ?? null,
                     'emergency_sub_city' => $data['emergency_sub_city'] ?? null,
@@ -374,6 +375,7 @@ class UserController extends Controller implements HasMiddleware {
                     $membershipFields = [
                         'senbet_date_of_birth' => 'date_of_birth',
                         'education_level' => 'education_level',
+                        'work_status' => 'work_status',
                         'emergency_name' => 'emergency_name',
                         'emergency_phone' => 'emergency_phone',
                         'emergency_sub_city' => 'emergency_sub_city',

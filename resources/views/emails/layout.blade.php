@@ -87,7 +87,7 @@
         .info-label {
             font-size: 12px;
             font-weight: 600;
-            text-transform: uppercase;
+            text-transform: capitalize;
             letter-spacing: 1px;
             color: #9ca3af;
             margin-bottom: 6px;

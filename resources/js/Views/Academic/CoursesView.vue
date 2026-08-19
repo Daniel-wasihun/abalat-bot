@@ -149,7 +149,7 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 pt-2">
         <!-- Course Name -->
         <div class="sm:col-span-2">
-          <label class="block text-xs font-bold text-main-text/50 uppercase tracking-wider mb-1.5">
+          <label class="block text-xs font-bold text-main-text/50 capitalize tracking-wider mb-1.5">
             {{ t('course.name_required') }}
           </label>
           <input v-model="form.name" type="text" :placeholder="t('course.name_placeholder')" class="premium-input w-full" />
@@ -158,7 +158,7 @@
 
         <!-- Course Code -->
         <div>
-          <label class="block text-xs font-bold text-main-text/50 uppercase tracking-wider mb-1.5">
+          <label class="block text-xs font-bold text-main-text/50 capitalize tracking-wider mb-1.5">
             {{ t('course.code_required') }}
           </label>
           <input v-model="form.code" type="text" :placeholder="t('course.course_code_placeholder')" class="premium-input w-full font-mono" />
@@ -167,7 +167,7 @@
 
         <!-- Credit Hours -->
         <div>
-          <label class="block text-xs font-bold text-main-text/50 uppercase tracking-wider mb-1.5">
+          <label class="block text-xs font-bold text-main-text/50 capitalize tracking-wider mb-1.5">
             {{ t('course.credit_hours_required') }}
           </label>
           <input v-model.number="form.credit_hours" type="number" min="1" max="10" class="premium-input w-full" />
@@ -176,7 +176,7 @@
 
         <!-- Semester -->
         <div>
-          <label class="block text-xs font-bold text-main-text/50 uppercase tracking-wider mb-1.5">{{ t('course.semester_required') }}</label>
+          <label class="block text-xs font-bold text-main-text/50 capitalize tracking-wider mb-1.5">{{ t('course.semester_required') }}</label>
           <select v-model="form.semester" class="premium-input w-full">
             <option value="1">{{ t('course.semester_1') }}</option>
             <option value="2">{{ t('course.semester_2') }}</option>
@@ -201,7 +201,7 @@
 
         <!-- Grade Levels -->
         <div class="sm:col-span-2">
-          <label class="block text-xs font-bold text-main-text/50 uppercase tracking-wider mb-1.5">{{ t('course.grade_levels') }}</label>
+          <label class="block text-xs font-bold text-main-text/50 capitalize tracking-wider mb-1.5">{{ t('course.grade_levels') }}</label>
           <div class="grid grid-cols-4 sm:grid-cols-7 gap-1.5 p-3 border border-card-border rounded-xl bg-card-hover/40 max-h-36 overflow-y-auto custom-scrollbar">
             <label
               v-for="g in gradeLevelOptions"
@@ -222,7 +222,7 @@
 
         <!-- Prerequisites -->
         <div class="sm:col-span-2">
-          <label class="block text-xs font-bold text-main-text/50 uppercase tracking-wider mb-1.5">{{ t('course.prerequisites') }}</label>
+          <label class="block text-xs font-bold text-main-text/50 capitalize tracking-wider mb-1.5">{{ t('course.prerequisites') }}</label>
           <div class="flex gap-2">
             <input
               v-model="prerequisiteInput"
@@ -251,7 +251,7 @@
 
         <!-- Description -->
         <div class="sm:col-span-2">
-          <label class="block text-xs font-bold text-main-text/50 uppercase tracking-wider mb-1.5">{{ t('course.description') }}</label>
+          <label class="block text-xs font-bold text-main-text/50 capitalize tracking-wider mb-1.5">{{ t('course.description') }}</label>
           <textarea v-model="form.description" rows="3" :placeholder="t('course.description_placeholder')" class="premium-input w-full resize-none" />
         </div>
       </div>

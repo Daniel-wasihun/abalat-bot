@@ -38,7 +38,7 @@ const emit = defineEmits(["close", "confirm"]);
  <div
  v-if="itemName"
  class="bg-main-bg border border-card-border/60 rounded-2xl p-5 space-y-1.5 transition-all hover:border-rose-500/10">
- <h5 class="text-[10px] font-bold text-main-text/30 uppercase tracking-[0.15em]">
+ <h5 class="text-[10px] font-bold text-main-text/30 capitalize tracking-[0.15em]">
  {{ $tr("common.target_item") || "Target Item" }}
  </h5>
  <p class="text-[16px] font-bold text-rose-500 leading-tight">

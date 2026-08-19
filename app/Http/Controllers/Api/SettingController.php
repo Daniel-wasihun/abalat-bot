@@ -126,4 +126,23 @@ class SettingController extends Controller
             return response()->json(['message' => 'Failed to register Telegram webhook: ' . $e->getMessage()], 502);
         }
     }
+    public function getPaymentSettings()
+    {
+        $all = $this->settingRepo->getAll();
+        $defaults = [
+            'payment.student_amount'         => 100,
+            'payment.worker_amount'          => 150,
+            'payment.student_fine_per_month' => 10,
+            'payment.worker_fine_per_month'  => 20,
+            'payment.deadline_day'           => 10,
+            'payment.minimum_grade_level'    => 7,
+            'payment.minimum_age'            => 13,
+            'payment.calendar_type'          => 'ethiopian',
+        ];
+        $result = [];
+        foreach ($defaults as $key => $default) {
+            $result[$key] = $all[$key] ?? $default;
+        }
+        return response()->json($result);
+    }
 }

@@ -79,7 +79,7 @@
 
           <!-- Assigned Teacher Chip -->
           <div class="px-4 pt-3 pb-2">
-            <p class="text-[10px] font-bold text-main-text/40 uppercase tracking-wider mb-2">Assigned Teacher</p>
+            <p class="text-[10px] font-bold text-main-text/40 capitalize tracking-wider mb-2">Assigned Teacher</p>
             <div class="flex flex-wrap gap-2 min-h-[2.25rem] items-center">
               <div
                 v-if="offeringTeacher[offering.id]"

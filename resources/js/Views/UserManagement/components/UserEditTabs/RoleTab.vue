@@ -25,7 +25,9 @@ import {
 import Button from "@/components/common/Button.vue";
 import FormField from "@/components/common/FormField.vue";
 import { useUserStore } from "@/stores/userStore";
-import { localize } from "@/utils/format";
+import { useLanguageStore } from "@/stores/languageStore";
+import { storeToRefs } from "pinia";
+import { localize, formatDate } from "@/utils/format";
 
 const props = defineProps<{
  user: any;
@@ -46,6 +48,7 @@ const emit = defineEmits([
 ]);
 
 const userStore = useUserStore();
+const { currentLanguage } = storeToRefs(useLanguageStore());
 
 const onRoleSelect = (slug: string) => {
     const currentRoles = [...props.selectedRoles];

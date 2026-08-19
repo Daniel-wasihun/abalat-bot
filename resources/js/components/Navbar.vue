@@ -64,7 +64,7 @@
                    dark:border-slate-800 dark:bg-slate-900 dark:shadow-slate-950/60 py-1 z-50"
           >
             <div class="px-4 py-2.5 border-b border-slate-100 dark:border-slate-800">
-              <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{{ t('nav.signedInAs') }}</p>
+              <p class="text-[10px] font-bold text-slate-400 capitalize tracking-wider">{{ t('nav.signedInAs') }}</p>
               <p class="text-sm font-semibold text-slate-800 dark:text-slate-100 truncate mt-0.5">
                 {{ authStore.admin?.email }}
               </p>
@@ -100,15 +100,15 @@
             <h3 class="text-lg font-bold text-slate-900 dark:text-slate-100 mb-5">{{ t('profile.editProfile') }}</h3>
             <form @submit.prevent="saveProfile" class="space-y-4">
               <div>
-                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">{{ t('profile.name') }}</label>
+                <label class="block text-xs font-semibold text-slate-500 capitalize tracking-wider mb-1.5">{{ t('profile.name') }}</label>
                 <input v-model="profileForm.name" type="text" required class="input-base" />
               </div>
               <div>
-                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">{{ t('profile.emailAddress') }}</label>
+                <label class="block text-xs font-semibold text-slate-500 capitalize tracking-wider mb-1.5">{{ t('profile.emailAddress') }}</label>
                 <input v-model="profileForm.email" type="email" required class="input-base" />
               </div>
               <div>
-                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">{{ t('profile.avatarImageUrl') }}</label>
+                <label class="block text-xs font-semibold text-slate-500 capitalize tracking-wider mb-1.5">{{ t('profile.avatarImageUrl') }}</label>
                 <input v-model="profileForm.avatar" type="url" placeholder="https://..." class="input-base" />
               </div>
               <div class="flex justify-end gap-3 pt-2">
@@ -131,15 +131,15 @@
             <h3 class="text-lg font-bold text-slate-900 dark:text-slate-100 mb-5">{{ t('profile.changePassword') }}</h3>
             <form @submit.prevent="savePassword" class="space-y-4">
               <div>
-                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">{{ t('profile.currentPassword') }}</label>
+                <label class="block text-xs font-semibold text-slate-500 capitalize tracking-wider mb-1.5">{{ t('profile.currentPassword') }}</label>
                 <input v-model="passwordForm.current" type="password" required class="input-base" />
               </div>
               <div>
-                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">{{ t('profile.newPassword') }}</label>
+                <label class="block text-xs font-semibold text-slate-500 capitalize tracking-wider mb-1.5">{{ t('profile.newPassword') }}</label>
                 <input v-model="passwordForm.new" type="password" required class="input-base" />
               </div>
               <div>
-                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">{{ t('profile.confirmNewPassword') }}</label>
+                <label class="block text-xs font-semibold text-slate-500 capitalize tracking-wider mb-1.5">{{ t('profile.confirmNewPassword') }}</label>
                 <input v-model="passwordForm.confirm" type="password" required class="input-base" />
               </div>
               <div class="flex justify-end gap-3 pt-2">

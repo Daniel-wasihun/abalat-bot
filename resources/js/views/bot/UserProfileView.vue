@@ -88,23 +88,23 @@
             <!-- Profile Info Fields -->
             <div class="space-y-4 text-xs">
               <div class="flex justify-between items-center">
-                <span class="text-slate-400 font-semibold uppercase tracking-wider">{{ t('user.telegramId') }}</span>
+                <span class="text-slate-400 font-semibold capitalize tracking-wider">{{ t('user.telegramId') }}</span>
                 <span class="font-mono font-bold text-slate-700 dark:text-slate-300 select-all">{{ profile.user.telegramId }}</span>
               </div>
               <div class="flex justify-between items-center">
-                <span class="text-slate-400 font-semibold uppercase tracking-wider">{{ t('user.chatId') }}</span>
+                <span class="text-slate-400 font-semibold capitalize tracking-wider">{{ t('user.chatId') }}</span>
                 <span class="font-mono text-slate-600 dark:text-slate-400">{{ profile.user.chatId || 'N/A' }}</span>
               </div>
               <div class="flex justify-between items-center">
-                <span class="text-slate-400 font-semibold uppercase tracking-wider">{{ t('user.joined') }}</span>
+                <span class="text-slate-400 font-semibold capitalize tracking-wider">{{ t('user.joined') }}</span>
                 <span class="text-slate-600 dark:text-slate-400">{{ formatDate(profile.user.joinedAt) }}</span>
               </div>
               <div class="flex justify-between items-center">
-                <span class="text-slate-400 font-semibold uppercase tracking-wider">{{ t('user.lastActive') }}</span>
+                <span class="text-slate-400 font-semibold capitalize tracking-wider">{{ t('user.lastActive') }}</span>
                 <span class="text-slate-600 dark:text-slate-400">{{ formatDate(profile.user.lastActivity) }}</span>
               </div>
               <div class="flex justify-between items-center">
-                <span class="text-slate-400 font-semibold uppercase tracking-wider">{{ t('user.status') }}</span>
+                <span class="text-slate-400 font-semibold capitalize tracking-wider">{{ t('user.status') }}</span>
                 <span class="badge" :class="(profile.user.active !== false)
                   ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-800'
                   : 'bg-red-50 text-red-700 border border-red-200 dark:bg-red-950/20 dark:text-red-400 dark:border-red-800'">
@@ -142,15 +142,15 @@
             <div class="grid grid-cols-3 gap-4">
               <div class="card p-4 text-center bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/60 hover:shadow-md transition-shadow">
                 <span class="block text-xl font-bold text-slate-800 dark:text-slate-200 font-mono">{{ profile.feedbacks.length }}</span>
-                <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">{{ t('user.totalFeedback') }}</span>
+                <span class="text-[10px] font-semibold text-slate-400 capitalize tracking-wider">{{ t('user.totalFeedback') }}</span>
               </div>
               <div class="card p-4 text-center bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/60 hover:shadow-md transition-shadow">
                 <span class="block text-xl font-bold text-slate-800 dark:text-slate-200 font-mono">{{ profile.notifications.length }}</span>
-                <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">{{ t('user.notifications') }}</span>
+                <span class="text-[10px] font-semibold text-slate-400 capitalize tracking-wider">{{ t('user.notifications') }}</span>
               </div>
               <div class="card p-4 text-center bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/60 hover:shadow-md transition-shadow">
                 <span class="block text-xl font-bold text-slate-800 dark:text-slate-200 font-mono">{{ profile.replies.length }}</span>
-                <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">{{ t('user.replies') }}</span>
+                <span class="text-[10px] font-semibold text-slate-400 capitalize tracking-wider">{{ t('user.replies') }}</span>
               </div>
             </div>
 
@@ -162,7 +162,7 @@
                   v-for="tab in ['feedbacks', 'notifications', 'replies']"
                   :key="tab"
                   @click="activeTab = tab"
-                  class="px-5 py-4 text-xs font-bold uppercase tracking-wider border-b-2 transition-all duration-200"
+                  class="px-5 py-4 text-xs font-bold capitalize tracking-wider border-b-2 transition-all duration-200"
                   :class="activeTab === tab
                     ? 'border-amber-500 text-amber-600 dark:text-amber-400 bg-white dark:bg-slate-900'
                     : 'border-transparent text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'"
@@ -181,7 +181,7 @@
                   <div v-else class="overflow-x-auto">
                     <table class="w-full text-left text-xs">
                       <thead>
-                        <tr class="border-b border-slate-100 dark:border-slate-800 text-slate-400 font-semibold uppercase tracking-wider pb-2">
+                        <tr class="border-b border-slate-100 dark:border-slate-800 text-slate-400 font-semibold capitalize tracking-wider pb-2">
                           <th class="pb-3">{{ t('feedback.category') }}</th>
                           <th class="pb-3">{{ t('feedback.message') }}</th>
                           <th class="pb-3">{{ t('feedback.status') }}</th>
@@ -243,7 +243,7 @@
                       </div>
                       <p class="text-slate-700 dark:text-slate-200 leading-relaxed mb-3">{{ reply.message }}</p>
                       <div class="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800/80 text-[11px]">
-                        <span class="block font-bold text-slate-400 uppercase tracking-wider mb-1">Original Feedback Category: {{ reply.feedbackCategory }}</span>
+                        <span class="block font-bold text-slate-400 capitalize tracking-wider mb-1">Original Feedback Category: {{ reply.feedbackCategory }}</span>
                         <p class="text-slate-500 italic">"{{ reply.feedbackMessage }}"</p>
                       </div>
                     </div>
@@ -272,12 +272,12 @@
             
             <form @submit.prevent="sendDirectNotification" class="space-y-4">
               <div>
-                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">{{ t('notifications.campaignTitle') }}</label>
+                <label class="block text-xs font-semibold text-slate-500 capitalize tracking-wider mb-1.5">{{ t('notifications.campaignTitle') }}</label>
                 <input v-model="directNotif.title" type="text" required placeholder="e.g. የነገው ጉባኤ ማሳሰቢያ" class="input-base text-xs" />
               </div>
               
               <div>
-                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">{{ t('notifications.messageContent') }}</label>
+                <label class="block text-xs font-semibold text-slate-500 capitalize tracking-wider mb-1.5">{{ t('notifications.messageContent') }}</label>
                 <textarea v-model="directNotif.message" rows="5" required placeholder="Write direct telegram notification content..." class="input-base text-xs resize-none" />
               </div>
 

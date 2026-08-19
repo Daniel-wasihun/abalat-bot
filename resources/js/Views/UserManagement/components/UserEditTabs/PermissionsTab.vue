@@ -22,7 +22,9 @@ import DeleteConfirmModal from "@/components/common/DeleteConfirmModal.vue";
 import Button from "@/components/common/Button.vue";
 import FormField from "@/components/common/FormField.vue";
 import { useUserStore } from "@/stores/userStore";
-import { localize } from "@/utils/format";
+import { useLanguageStore } from "@/stores/languageStore";
+import { storeToRefs } from "pinia";
+import { localize, formatDate } from "@/utils/format";
 
 const props = defineProps<{
  user: any;
@@ -43,6 +45,7 @@ const emit = defineEmits([
 ]);
 
 const userStore = useUserStore();
+const { currentLanguage } = storeToRefs(useLanguageStore());
 
 const groupedPermissions = computed(() =>
  groupPermissionsByModule(userStore.allPermissions),
@@ -442,8 +445,8 @@ const showLifecycle = ref(false);
  <Check
  class="w-4 h-4 text-emerald-500/40" />
  <span>{{
- item.start_date || "Immediate"
- }}</span>
+  item.start_date ? formatDate(item.start_date, currentLanguage) : ($tr('user.immediate') || 'Immediate')
+  }}</span>
  </div>
  </div>
  <div
@@ -455,7 +458,7 @@ const showLifecycle = ref(false);
  <div
  class="flex items-center gap-2 text-sm font-normal text-rose-600">
  <Clock class="w-4 h-4" />
- <span>{{ item.end_date }}</span>
+ <span>{{ item.end_date ? formatDate(item.end_date, currentLanguage) : '-' }}</span>
  </div>
  </div>
  </div>
@@ -483,7 +486,7 @@ const showLifecycle = ref(false);
  <span
  class="text-xs font-medium text-main-text/50 truncate mt-0.5"
  >{{
- item.assigned_by || "System"
+ item.assigned_by || $tr("user.system")
  }}</span
  >
  </div>
@@ -629,7 +632,7 @@ const showLifecycle = ref(false);
  class="flex items-center gap-2 text-sm font-semibold text-main-text">
  <Calendar
  class="w-4 h-4 text-indigo-500/40" />
- <span>{{ item.start_date }}</span>
+ <span>{{ item.start_date ? formatDate(item.start_date, currentLanguage) : '-' }}</span>
  </div>
  </div>
  <div
@@ -643,8 +646,7 @@ const showLifecycle = ref(false);
  <Clock
  class="w-4 h-4 text-rose-500/40" />
  <span class="truncate">{{
- item.end_date ||
- $tr("user.no_expiration")
+  item.end_date ? formatDate(item.end_date, currentLanguage) : $tr("user.no_expiration")
  }}</span>
  </div>
  </div>

@@ -11,7 +11,7 @@
       </div>
 
       <div class="relative z-10 space-y-2">
-        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white/10 text-xs font-bold tracking-widest text-blue-200 uppercase backdrop-blur-sm">
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white/10 text-xs font-bold tracking-widest text-blue-200 capitalize backdrop-blur-sm">
           ⛪ {{ t('dashboard.welcome') }}
         </span>
         <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight">
@@ -57,7 +57,7 @@
             <p class="text-2xl font-black text-main-text font-mono tracking-tight leading-none">
               {{ card.value }}
             </p>
-            <span class="text-[10px] font-bold text-main-text/40 uppercase tracking-widest block truncate">
+            <span class="text-[10px] font-bold text-main-text/40 capitalize tracking-widest block truncate">
               {{ card.label }}
             </span>
           </div>
@@ -86,7 +86,7 @@
           </div>
           <div class="text-right">
             <span class="text-xl font-bold font-mono text-brand-blue dark:text-blue-400">{{ lang.count }}</span>
-            <span class="text-[10px] text-main-text/30 block uppercase tracking-wider font-semibold">users</span>
+            <span class="text-[10px] text-main-text/30 block capitalize tracking-wider font-semibold">users</span>
           </div>
         </div>
       </div>

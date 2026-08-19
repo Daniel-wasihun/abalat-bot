@@ -148,7 +148,7 @@
             <!-- Header -->
             <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-slate-800 shrink-0">
               <div>
-                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{{ t('feedback.modal.id') }}: {{ selectedItem.id }}</p>
+                <p class="text-[10px] font-bold text-slate-400 capitalize tracking-wider">{{ t('feedback.modal.id') }}: {{ selectedItem.id }}</p>
                 <h3 class="text-base font-bold text-slate-900 dark:text-slate-100 mt-0.5 flex items-center gap-2">
                   <span>{{ selectedItem.userName || t('common.anonymous') }}</span>
                   <span :class="getLanguageBadgeClass(selectedItem.language || 'am')">
@@ -168,10 +168,10 @@
                 <!-- Left: Message + Reply -->
                 <div class="lg:col-span-7 space-y-5">
                   <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">{{ t('feedback.modal.messageTitle') }}</p>
+                    <p class="text-[10px] font-bold text-slate-400 capitalize tracking-wider mb-2">{{ t('feedback.modal.messageTitle') }}</p>
                     <p class="text-sm text-slate-700 dark:text-slate-300 whitespace-pre-line leading-relaxed">{{ selectedItem.message }}</p>
                     <div v-if="selectedItem.attachmentUrl" class="mt-4 pt-4 border-t border-slate-200/60 dark:border-slate-800/60">
-                      <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-3">{{ t('feedback.modal.attachment') }}</p>
+                      <p class="text-[10px] font-bold text-slate-400 capitalize tracking-wider mb-3">{{ t('feedback.modal.attachment') }}</p>
                       <MediaAttachment
                         :url="selectedItem.attachmentUrl"
                         :type="selectedItem.attachmentType || selectedItem.type || ''"
@@ -217,22 +217,22 @@
                 <!-- Right: Controls -->
                 <div class="lg:col-span-5 space-y-5">
                   <div class="p-4 rounded-xl bg-slate-50/50 dark:bg-slate-950/40 border border-slate-200/80 dark:border-slate-800/60 space-y-4">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{{ t('feedback.manage') }} Parameters</p>
+                    <p class="text-[10px] font-bold text-slate-400 capitalize tracking-wider">{{ t('feedback.manage') }} Parameters</p>
                     <div class="space-y-3">
                       <div>
-                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">{{ t('feedback.category') }}</label>
+                        <label class="block text-[10px] font-bold text-slate-400 capitalize tracking-wider mb-1.5">{{ t('feedback.category') }}</label>
                         <select v-model="selectedItem.category" @change="updateParameter('category')" class="input-base text-xs">
                           <option v-for="opt in categoryOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
                         </select>
                       </div>
                       <div>
-                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">{{ t('feedback.priority') }}</label>
+                        <label class="block text-[10px] font-bold text-slate-400 capitalize tracking-wider mb-1.5">{{ t('feedback.priority') }}</label>
                         <select v-model="selectedItem.priority" @change="updateParameter('priority')" class="input-base text-xs">
                           <option v-for="opt in priorityOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
                         </select>
                       </div>
                       <div>
-                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">{{ t('feedback.status') }}</label>
+                        <label class="block text-[10px] font-bold text-slate-400 capitalize tracking-wider mb-1.5">{{ t('feedback.status') }}</label>
                         <select v-model="selectedItem.status" @change="updateParameter('status')" class="input-base text-xs">
                           <option v-for="opt in statusOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
                         </select>

@@ -43,7 +43,7 @@
 
             <!-- Score inputs -->
             <div class="space-y-4">
-              <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Assessment Scores</h3>
+              <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 capitalize tracking-wider">Assessment Scores</h3>
 
               <div v-for="comp in componentInfo" :key="comp.key" class="space-y-1">
                 <div class="flex items-center justify-between">
@@ -124,7 +124,7 @@
 
             <!-- Edit history -->
             <div v-if="history.length" class="space-y-3">
-              <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Edit History</h3>
+              <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 capitalize tracking-wider">Edit History</h3>
               <div class="space-y-2 max-h-52 overflow-y-auto">
                 <div v-for="entry in history" :key="entry.id"
                   class="text-xs bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2.5 space-y-1">

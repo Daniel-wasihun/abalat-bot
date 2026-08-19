@@ -27,7 +27,7 @@
         <form v-else @submit.prevent="handleForgotPassword" class="space-y-4">
           
           <div>
-            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">{{ t('auth.registeredEmail') }}</label>
+            <label class="block text-xs font-semibold text-slate-400 capitalize tracking-wider mb-1.5">{{ t('auth.registeredEmail') }}</label>
             <div class="relative">
               <input v-model="email" type="email" required placeholder="admin@example.com" 
                      class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-700 bg-slate-800/60

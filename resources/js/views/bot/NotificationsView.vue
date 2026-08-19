@@ -267,10 +267,10 @@
                       </div>
                       <div class="flex-1 min-w-0">
                         <p class="text-sm font-bold text-main-text truncate">{{ form.title }}</p>
-                        <p class="text-[11px] text-main-text/50 mt-0.5 uppercase tracking-wider">{{ t('notifications.reviewTitle') }}</p>
+                        <p class="text-[11px] text-main-text/50 mt-0.5 capitalize tracking-wider">{{ t('notifications.reviewTitle') }}</p>
                       </div>
                       <!-- Target badge -->
-                      <span class="text-[11px] font-bold px-3 py-1 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 border border-blue-200 dark:border-blue-800 uppercase">
+                      <span class="text-[11px] font-bold px-3 py-1 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 border border-blue-200 dark:border-blue-800 capitalize">
                         {{ form.targetType }}
                       </span>
                     </div>
@@ -278,11 +278,11 @@
                     <!-- Stats row -->
                     <div class="grid grid-cols-2 divide-x divide-blue-200/40 dark:divide-blue-900/30">
                       <div class="p-4">
-                        <p class="text-[10px] text-main-text/40 uppercase tracking-widest font-semibold mb-1">{{ t('notifications.labelTarget') }}</p>
+                        <p class="text-[10px] text-main-text/40 capitalize tracking-widest font-semibold mb-1">{{ t('notifications.labelTarget') }}</p>
                         <p class="text-sm font-bold text-main-text capitalize">{{ form.targetType }}</p>
                       </div>
                       <div class="p-4">
-                        <p class="text-[10px] text-main-text/40 uppercase tracking-widest font-semibold mb-1">{{ t('notifications.labelReach') }}</p>
+                        <p class="text-[10px] text-main-text/40 capitalize tracking-widest font-semibold mb-1">{{ t('notifications.labelReach') }}</p>
                         <p class="text-sm font-bold text-main-text flex items-center gap-1.5">
                           <span v-if="estimate !== null">{{ estimate }} {{ t('notifications.usersCountLabel') }}</span>
                           <span v-else class="flex items-center gap-1.5 text-main-text/40">
@@ -295,7 +295,7 @@
 
                     <!-- Message preview -->
                     <div class="p-4 border-t border-blue-200/40 dark:border-blue-900/30">
-                      <p class="text-[10px] text-main-text/40 uppercase tracking-widest font-semibold mb-2">{{ t('notifications.labelPreview') }}</p>
+                      <p class="text-[10px] text-main-text/40 capitalize tracking-widest font-semibold mb-2">{{ t('notifications.labelPreview') }}</p>
                       <div class="p-3 bg-card-bg rounded-xl border border-card-border text-sm text-main-text whitespace-pre-wrap leading-relaxed max-h-32 overflow-y-auto custom-scrollbar">
                         {{ form.message }}
                       </div>
@@ -440,15 +440,15 @@
             <div class="grid grid-cols-3 divide-x divide-card-border border-b border-card-border shrink-0">
               <div class="p-4 text-center">
                 <p class="text-lg font-bold text-main-text">{{ selectedCampaign.totalRecipients || 0 }}</p>
-                <p class="text-[10px] text-main-text/40 uppercase tracking-wider mt-0.5">{{ t('notifications.total') }}</p>
+                <p class="text-[10px] text-main-text/40 capitalize tracking-wider mt-0.5">{{ t('notifications.total') }}</p>
               </div>
               <div class="p-4 text-center">
                 <p class="text-lg font-bold text-emerald-600 dark:text-emerald-400">{{ selectedCampaign.sentCount || 0 }}</p>
-                <p class="text-[10px] text-main-text/40 uppercase tracking-wider mt-0.5">{{ t('notifications.sent') }}</p>
+                <p class="text-[10px] text-main-text/40 capitalize tracking-wider mt-0.5">{{ t('notifications.sent') }}</p>
               </div>
               <div class="p-4 text-center">
                 <p class="text-lg font-bold text-rose-600 dark:text-rose-400">{{ selectedCampaign.failedCount || 0 }}</p>
-                <p class="text-[10px] text-main-text/40 uppercase tracking-wider mt-0.5">{{ t('notifications.failed') }}</p>
+                <p class="text-[10px] text-main-text/40 capitalize tracking-wider mt-0.5">{{ t('notifications.failed') }}</p>
               </div>
             </div>
 

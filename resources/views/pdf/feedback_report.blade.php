@@ -12,7 +12,7 @@
         th, td { border: 1px solid #cbd5e1; padding: 8px; text-align: left; vertical-align: top; }
         th { background-color: #f1f5f9; color: #334155; font-weight: bold; }
         tr:nth-child(even) { background-color: #f8fafc; }
-        .badge { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; text-transform: uppercase; }
+        .badge { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; text-transform: capitalize; }
         .status-new { background-color: #fef3c7; color: #92400e; }
         .status-in-progress { background-color: #dbeafe; color: #1e40af; }
         .status-resolved { background-color: #dcfce7; color: #166534; }

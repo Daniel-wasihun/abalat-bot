@@ -124,7 +124,7 @@
             
             <form @submit.prevent="sendDM" class="space-y-4">
               <div>
-                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">{{ t('feedback.message') }}</label>
+                <label class="block text-[10px] font-bold text-slate-400 capitalize tracking-wider mb-1.5">{{ t('feedback.message') }}</label>
                 <textarea v-model="dmText" rows="4" required
                           placeholder="Write your message to this subscriber…"
                           class="input-base text-xs w-full resize-none" />

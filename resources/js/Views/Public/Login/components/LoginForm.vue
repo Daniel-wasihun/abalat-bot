@@ -99,14 +99,14 @@ defineEmits(["submit", "forgot-password", "clear-error"]);
                 </svg>
               </div>
             </div>
-            <span class="text-[11px] font-bold text-main-text/40 group-hover/check:text-brand-blue transition-colors uppercase tracking-[0.08em]">{{ $tr('auth.remember_me') }}</span>
+            <span class="text-[11px] font-bold text-main-text/40 group-hover/check:text-brand-blue transition-colors capitalize tracking-[0.08em]">{{ $tr('auth.remember_me') }}</span>
           </label>
 
           <Button
             variant="ghost"
             size="sm"
             @click.prevent="$emit('forgot-password')"
-            class="text-brand-blue! font-bold tracking-widest uppercase text-[10px]! px-0! bg-transparent hover:bg-transparent">
+            class="text-brand-blue! font-bold tracking-widest capitalize text-[10px]! px-0! bg-transparent hover:bg-transparent">
             {{ $tr("auth.forgot_password") }}
           </Button>
         </div>
@@ -116,7 +116,7 @@ defineEmits(["submit", "forgot-password", "clear-error"]);
           type="submit"
           variant="primary"
           :loading="loading"
-          class="w-full h-13 text-sm! font-bold! uppercase! tracking-widest shadow-lg shadow-brand-blue/10">
+          class="w-full h-13 text-sm! font-bold! capitalize! tracking-widest shadow-lg shadow-brand-blue/10">
           <template #default>
             <div class="flex items-center justify-center gap-2">
               {{ $tr("auth.sign_in") }}

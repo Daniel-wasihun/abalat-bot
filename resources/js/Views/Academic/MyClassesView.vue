@@ -149,7 +149,7 @@
               <!-- Overall score card -->
               <div class="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-blue-50 to-blue-100/50 dark:from-blue-900/20 dark:to-blue-800/10 border border-blue-200 dark:border-blue-700/40">
                 <div>
-                  <p class="text-xs font-semibold text-blue-600 uppercase tracking-wider">{{ $tr('my_courses.overall_score') }}</p>
+                  <p class="text-xs font-semibold text-blue-600 capitalize tracking-wider">{{ $tr('my_courses.overall_score') }}</p>
                   <p class="text-3xl font-bold text-blue-700 dark:text-blue-300 mt-0.5">
                     {{ currentResult.total_score ?? '—' }}<span class="text-lg text-blue-500">%</span>
                   </p>
@@ -169,7 +169,7 @@
 
               <!-- Component breakdown -->
               <div v-if="currentResult.components && Object.keys(currentResult.components).length > 0" class="space-y-2">
-                <p class="text-xs font-semibold text-main-text/40 uppercase tracking-wider">{{ $tr('my_courses.breakdown') }}</p>
+                <p class="text-xs font-semibold text-main-text/40 capitalize tracking-wider">{{ $tr('my_courses.breakdown') }}</p>
                 <div
                   v-for="(score, comp) in currentResult.components"
                   :key="comp"
@@ -182,7 +182,7 @@
 
               <!-- Remarks -->
               <div v-if="currentResult.remarks" class="px-4 py-3 rounded-xl bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-700/30">
-                <p class="text-xs font-semibold text-amber-600 uppercase tracking-wider mb-1">{{ $tr('my_courses.remarks') }}</p>
+                <p class="text-xs font-semibold text-amber-600 capitalize tracking-wider mb-1">{{ $tr('my_courses.remarks') }}</p>
                 <p class="text-sm text-main-text/70">{{ currentResult.remarks }}</p>
               </div>
             </div>

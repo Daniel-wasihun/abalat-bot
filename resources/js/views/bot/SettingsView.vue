@@ -120,7 +120,7 @@
               <!-- Webhook Health Panel -->
               <div class="rounded-xl bg-main-bg border border-card-border/60 overflow-hidden">
                 <div class="flex items-center justify-between px-4 py-2.5 border-b border-card-border/40">
-                  <span class="text-xs font-semibold text-main-text/70 uppercase tracking-wider">{{ t('settings.webhookStatus') }}</span>
+                  <span class="text-xs font-semibold text-main-text/70 capitalize tracking-wider">{{ t('settings.webhookStatus') }}</span>
                   <button
                     @click="checkWebhookHealth"
                     class="flex items-center gap-1.5 text-[11px] font-semibold text-brand-blue hover:text-brand-blue/70 transition-colors"
@@ -153,7 +153,7 @@
                     </span>
                   </div>
                   <div v-if="webhookHealth.last_error_date" class="px-4 py-3 bg-rose-50/50 dark:bg-rose-900/10">
-                    <p class="text-[10px] text-rose-500 font-bold uppercase tracking-widest mb-1">{{ t('settings.lastError') }}</p>
+                    <p class="text-[10px] text-rose-500 font-bold capitalize tracking-widest mb-1">{{ t('settings.lastError') }}</p>
                     <p class="text-xs text-rose-600 dark:text-rose-400 font-medium leading-relaxed">{{ webhookHealth.last_error_message }}</p>
                     <p class="text-[10px] text-rose-400/70 mt-0.5">{{ formatDate(webhookHealth.last_error_date) }}</p>
                   </div>

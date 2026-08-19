@@ -106,7 +106,7 @@ const isStudentOnly = computed(() => {
         <div class="px-1 pt-4 pb-6">
             <div class="flex items-center gap-2 mb-5">
                 <div class="w-1 h-5 bg-brand-blue rounded-full"></div>
-                <h3 class="text-sm font-semibold text-main-text/60 uppercase tracking-wider">
+                <h3 class="text-sm font-semibold text-main-text/60 capitalize tracking-wider">
                     {{ $tr('user.section.identity') || 'Identity' }}
                 </h3>
             </div>
@@ -198,7 +198,7 @@ const isStudentOnly = computed(() => {
         <div v-if="!user" class="px-1 py-6">
             <div class="flex items-center gap-2 mb-4">
                 <div class="w-1 h-5 bg-indigo-500 rounded-full"></div>
-                <h3 class="text-sm font-semibold text-main-text/60 uppercase tracking-wider">
+                <h3 class="text-sm font-semibold text-main-text/60 capitalize tracking-wider">
                     {{ $tr('user.section.roles') || 'Roles' }}
                 </h3>
                 <span class="text-xs text-rose-500 font-medium ml-1">{{ $tr('user.form.roles_required') || '*required' }}</span>
@@ -232,7 +232,7 @@ const isStudentOnly = computed(() => {
         <div class="px-1 py-6">
             <div class="flex items-center gap-2 mb-5">
                 <div class="w-1 h-5 bg-emerald-500 rounded-full"></div>
-                <h3 class="text-sm font-semibold text-main-text/60 uppercase tracking-wider">
+                <h3 class="text-sm font-semibold text-main-text/60 capitalize tracking-wider">
                     {{ $tr('user.section.contact_address') || 'Contact & Address' }}
                 </h3>
             </div>
@@ -281,7 +281,7 @@ const isStudentOnly = computed(() => {
         <div v-if="user" class="px-1 py-6">
             <div class="flex items-center gap-2 mb-5">
                 <div class="w-1 h-5 bg-amber-500 rounded-full"></div>
-                <h3 class="text-sm font-semibold text-main-text/60 uppercase tracking-wider">
+                <h3 class="text-sm font-semibold text-main-text/60 capitalize tracking-wider">
                     {{ $tr('user.section.account_status') || 'Account Status' }}
                 </h3>
             </div>
@@ -301,7 +301,7 @@ const isStudentOnly = computed(() => {
         <div class="px-1 py-6">
             <div class="flex items-center gap-2 mb-5">
                 <div class="w-1 h-5 bg-purple-500 rounded-full"></div>
-                <h3 class="text-sm font-semibold text-main-text/60 uppercase tracking-wider">
+                <h3 class="text-sm font-semibold text-main-text/60 capitalize tracking-wider">
                     {{ $tr('user.section.senbet') || 'Senbet School Membership' }}
                 </h3>
             </div>
@@ -315,7 +315,7 @@ const isStudentOnly = computed(() => {
 
                 <!-- 5a. Academic Info -->
                 <div>
-                    <p class="flex items-center gap-1.5 text-xs font-semibold text-purple-500 uppercase tracking-wider mb-4">
+                    <p class="flex items-center gap-1.5 text-xs font-semibold text-purple-500 capitalize tracking-wider mb-4">
                         <BookOpen class="w-3.5 h-3.5" />
                         {{ $tr('user.section.academic_info') || 'Academic Information' }}
                     </p>
@@ -344,6 +344,12 @@ const isStudentOnly = computed(() => {
                             :label="$tr('user.form.education_level') || 'Education Level'"
                             :placeholder="$tr('user.form.education_level_placeholder') || 'e.g. Grade 10, Degree'"
                             :icon="Briefcase" :error="errors.education_level" @input="clearFieldError('education_level')" />
+
+                        <FormSelect
+                            v-model="profileForm.work_status"
+                            :label="$tr('user.form.work_status') || 'Work Status'"
+                            :options="[{ value: 'student', label: $tr('user.form.work_student') || 'Student' }, { value: 'worker', label: $tr('user.form.work_worker') || 'Worker' }]"
+                            :error="errors.work_status" @change="clearFieldError('work_status')" />
                     </div>
                 </div>
 
@@ -351,7 +357,7 @@ const isStudentOnly = computed(() => {
 
                 <!-- 5b. Emergency Contact -->
                 <div>
-                    <p class="flex items-center gap-1.5 text-xs font-semibold text-rose-500 uppercase tracking-wider mb-4">
+                    <p class="flex items-center gap-1.5 text-xs font-semibold text-rose-500 capitalize tracking-wider mb-4">
                         <Phone class="w-3.5 h-3.5" />
                         {{ $tr('user.section.emergency_contact') || 'Emergency Contact' }}
                     </p>
@@ -372,7 +378,7 @@ const isStudentOnly = computed(() => {
 
                 <!-- 5c. Emergency Contact Address -->
                 <div>
-                    <p class="flex items-center gap-1.5 text-xs font-semibold text-main-text/40 uppercase tracking-wider mb-4">
+                    <p class="flex items-center gap-1.5 text-xs font-semibold text-main-text/40 capitalize tracking-wider mb-4">
                         <MapPin class="w-3.5 h-3.5" />
                         {{ $tr('user.section.emergency_address') || 'Emergency Contact Address' }}
                     </p>
@@ -409,7 +415,7 @@ const isStudentOnly = computed(() => {
 
                 <!-- 5d. Previous Participation -->
                 <div>
-                    <p class="flex items-center gap-1.5 text-xs font-semibold text-main-text/40 uppercase tracking-wider mb-4">
+                    <p class="flex items-center gap-1.5 text-xs font-semibold text-main-text/40 capitalize tracking-wider mb-4">
                         <ChevronRight class="w-3.5 h-3.5" />
                         {{ $tr('user.section.participation') || 'Participation History' }}
                     </p>
