@@ -1,38 +1,44 @@
 <template>
-  <div class="space-y-6">
-    <!-- Header -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-      <div>
-        <h1 class="text-2xl font-bold text-main-text">{{ $tr('academic.config.title') }}</h1>
-        <p class="text-sm mt-1 text-main-text/60">{{ $tr('academic.config.subtitle') }}</p>
+  <div class="h-full flex flex-col relative">
+    <!-- Sticky Header & Tabs Container -->
+    <div class="sticky top-0 z-50 bg-main-bg pb-0 shrink-0 pt-2 border-b border-card-border/60">
+      <!-- Header -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-1">
+        <div>
+          <h1 class="text-2xl font-bold text-main-text">{{ $tr('academic.config.title') }}</h1>
+          <p class="text-sm mt-1 text-main-text/60">{{ $tr('academic.config.subtitle') }}</p>
+        </div>
+      </div>
+
+      <!-- Tabs (ClassHub style) -->
+      <div class="mt-6 px-1">
+        <nav class="flex gap-6 -mb-px" aria-label="Tabs">
+          <button
+            v-for="tab in tabs"
+            :key="tab.key"
+            @click="activeTab = tab.key"
+            :id="`config-tab-${tab.key}`"
+            :class="[
+              'flex items-center gap-2 py-3 px-1 text-sm font-semibold transition-colors whitespace-nowrap bg-transparent outline-none focus-visible:ring-2 focus-visible:ring-brand-blue rounded-t-sm border-b-2',
+              activeTab === tab.key
+                ? 'border-brand-blue text-brand-blue'
+                : 'border-transparent text-main-text/50 hover:text-brand-blue hover:border-main-text/20',
+            ]"
+          >
+            <component :is="tab.icon" class="w-4 h-4" />
+            {{ tab.label }}
+          </button>
+        </nav>
       </div>
     </div>
 
-    <!-- Tabs (ClassHub style) -->
-    <div>
-      <nav class="flex gap-6" aria-label="Tabs">
-        <button
-          v-for="tab in tabs"
-          :key="tab.key"
-          @click="activeTab = tab.key"
-          :id="`config-tab-${tab.key}`"
-          :class="[
-            'flex items-center gap-2 py-3 px-1 text-sm font-semibold transition-colors whitespace-nowrap bg-transparent outline-none focus-visible:ring-2 focus-visible:ring-brand-blue rounded-t-sm',
-            activeTab === tab.key
-              ? 'border-b-2 border-brand-blue text-brand-blue'
-              : 'text-main-text/50 hover:text-brand-blue',
-          ]"
-        >
-          <component :is="tab.icon" class="w-4 h-4" />
-          {{ tab.label }}
-        </button>
-      </nav>
-    </div>
+    <!-- Tab Contents Container -->
+    <div class="flex-1 min-h-0 flex flex-col mt-6 pb-6 overflow-hidden">
 
     <!-- Classes Tab -->
     <div v-if="activeTab === 'classes'" class="flex flex-col flex-1 min-h-0 relative font-sans animate-in fade-in duration-500">
-      <div class="bg-card-bg border border-card-border/60 rounded-2xl flex flex-col min-h-0 shrink overflow-hidden shadow-sm">
-        <div class="flex flex-col min-h-0 shrink">
+      <div class="bg-card-bg border border-card-border/60 rounded-2xl flex flex-col flex-1 min-h-0 overflow-hidden shadow-sm">
+        <div class="flex flex-col flex-1 min-h-0">
           <TableToolbar
             modelValue=""
             :placeholder="$tr('academic.config.search_classes')"
@@ -106,14 +112,14 @@
 
     <!-- Assessment Types Tab -->
     <div v-if="activeTab === 'assessments'" class="flex flex-col flex-1 min-h-0 space-y-4 relative font-sans animate-in fade-in duration-500">
-      <div class="flex items-center justify-between">
+      <div class="flex items-center justify-between shrink-0">
         <p class="text-sm font-medium text-main-text/60">
           {{ $tr('academic.config.total_weight') }} <span :class="totalWeight === 100 ? 'text-emerald-600' : 'text-amber-600'" class="font-bold">{{ totalWeight.toFixed(0) }} / 100</span>
           <span v-if="totalWeight !== 100" class="text-xs text-amber-500 ml-2">{{ $tr('academic.config.should_equal_100') }}</span>
         </p>
       </div>
-      <div class="bg-card-bg border border-card-border/60 rounded-2xl flex flex-col min-h-0 shrink overflow-hidden shadow-sm">
-        <div class="flex flex-col min-h-0 shrink">
+      <div class="bg-card-bg border border-card-border/60 rounded-2xl flex flex-col flex-1 min-h-0 overflow-hidden shadow-sm">
+        <div class="flex flex-col flex-1 min-h-0">
           <TableToolbar
             modelValue=""
             :placeholder="$tr('academic.config.search_assessments')"
@@ -206,7 +212,7 @@
           <div class="p-6 space-y-5">
             <!-- Logo Upload -->
             <div>
-              <label class="block text-xs font-semibold text-main-text/60 uppercase tracking-widest mb-2">{{ $tr('id_card.config.logo', 'School Logo') }}</label>
+              <label class="block text-xs font-semibold text-main-text/60 capitalize tracking-widest mb-2">{{ $tr('id_card.config.logo', 'School Logo') }}</label>
               <div class="flex items-center gap-4">
                 <div class="w-16 h-16 rounded-xl border-2 border-dashed border-card-border/60 bg-main-bg flex items-center justify-center overflow-hidden shrink-0">
                   <img v-if="currentLogoUrl" :src="currentLogoUrl" class="w-full h-full object-contain p-1" alt="School logo" />
@@ -223,15 +229,15 @@
               </div>
             </div>
             <div>
-              <label class="block text-xs font-semibold text-main-text/60 uppercase tracking-widest mb-1.5">{{ $tr('id_card.config.title_am', 'Title (Amharic)') }}</label>
+              <label class="block text-xs font-semibold text-main-text/60 capitalize tracking-widest mb-1.5">{{ $tr('id_card.config.title_am', 'Title (Amharic)') }}</label>
               <input v-model="idCardForm['id_card.title_am']" type="text" class="w-full px-4 h-11 rounded-xl border text-sm bg-input-bg text-main-text border-input-border focus:ring-2 focus:ring-brand-blue/30 outline-none transition-all" />
             </div>
             <div>
-              <label class="block text-xs font-semibold text-main-text/60 uppercase tracking-widest mb-1.5">{{ $tr('id_card.config.title_en', 'Title (English)') }}</label>
+              <label class="block text-xs font-semibold text-main-text/60 capitalize tracking-widest mb-1.5">{{ $tr('id_card.config.title_en', 'Title (English)') }}</label>
               <input v-model="idCardForm['id_card.title_en']" type="text" class="w-full px-4 h-11 rounded-xl border text-sm bg-input-bg text-main-text border-input-border focus:ring-2 focus:ring-brand-blue/30 outline-none transition-all" />
             </div>
             <div>
-              <label class="block text-xs font-semibold text-main-text/60 uppercase tracking-widest mb-1.5">{{ $tr('id_card.config.title_or', 'Title (Oromiffa)') }}</label>
+              <label class="block text-xs font-semibold text-main-text/60 capitalize tracking-widest mb-1.5">{{ $tr('id_card.config.title_or', 'Title (Oromiffa)') }}</label>
               <input v-model="idCardForm['id_card.title_or']" type="text" class="w-full px-4 h-11 rounded-xl border text-sm bg-input-bg text-main-text border-input-border focus:ring-2 focus:ring-brand-blue/30 outline-none transition-all" />
             </div>
           </div>
@@ -250,15 +256,15 @@
             </div>
             <div class="p-6 space-y-4">
               <div>
-                <label class="block text-xs font-semibold text-main-text/60 uppercase tracking-widest mb-1.5">{{ $tr('id_card.config.authority_am') }}</label>
+                <label class="block text-xs font-semibold text-main-text/60 capitalize tracking-widest mb-1.5">{{ $tr('id_card.config.authority_am') }}</label>
                 <input v-model="idCardForm['id_card.authority_am']" type="text" class="w-full px-4 h-11 rounded-xl border text-sm bg-input-bg text-main-text border-input-border focus:ring-2 focus:ring-brand-blue/30 outline-none transition-all" />
               </div>
               <div>
-                <label class="block text-xs font-semibold text-main-text/60 uppercase tracking-widest mb-1.5">{{ $tr('id_card.config.authority_en') }}</label>
+                <label class="block text-xs font-semibold text-main-text/60 capitalize tracking-widest mb-1.5">{{ $tr('id_card.config.authority_en') }}</label>
                 <input v-model="idCardForm['id_card.authority_en']" type="text" class="w-full px-4 h-11 rounded-xl border text-sm bg-input-bg text-main-text border-input-border focus:ring-2 focus:ring-brand-blue/30 outline-none transition-all" />
               </div>
               <div>
-                <label class="block text-xs font-semibold text-main-text/60 uppercase tracking-widest mb-1.5">{{ $tr('id_card.config.authority_or') }}</label>
+                <label class="block text-xs font-semibold text-main-text/60 capitalize tracking-widest mb-1.5">{{ $tr('id_card.config.authority_or') }}</label>
                 <input v-model="idCardForm['id_card.authority_or']" type="text" class="w-full px-4 h-11 rounded-xl border text-sm bg-input-bg text-main-text border-input-border focus:ring-2 focus:ring-brand-blue/30 outline-none transition-all" />
               </div>
             </div>
@@ -271,11 +277,11 @@
             </div>
             <div class="p-6 grid grid-cols-2 gap-4">
               <div>
-                <label class="block text-xs font-semibold text-main-text/60 uppercase tracking-widest mb-1.5">{{ $tr('id_card.config.id_prefix', 'ID Prefix') }}</label>
+                <label class="block text-xs font-semibold text-main-text/60 capitalize tracking-widest mb-1.5">{{ $tr('id_card.config.id_prefix', 'ID Prefix') }}</label>
                 <input v-model="idCardForm['id_card.id_prefix']" type="text" placeholder="DBSS" class="w-full px-4 h-11 rounded-xl border text-sm font-mono bg-input-bg text-main-text border-input-border focus:ring-2 focus:ring-brand-blue/30 outline-none transition-all" />
               </div>
               <div>
-                <label class="block text-xs font-semibold text-main-text/60 uppercase tracking-widest mb-1.5">{{ $tr('id_card.config.validity_years', 'Validity (Years)') }}</label>
+                <label class="block text-xs font-semibold text-main-text/60 capitalize tracking-widest mb-1.5">{{ $tr('id_card.config.validity_years', 'Validity (Years)') }}</label>
                 <input v-model.number="idCardForm['id_card.validity_years']" type="number" min="1" max="10" class="w-full px-4 h-11 rounded-xl border text-sm bg-input-bg text-main-text border-input-border focus:ring-2 focus:ring-brand-blue/30 outline-none transition-all" />
               </div>
             </div>
@@ -407,6 +413,93 @@
         </div>
       </div>
     </Teleport>
+
+    <!-- ══ PAYMENTS TAB ══ -->
+    <div v-if="activeTab === 'payments'" class="flex flex-col flex-1 min-h-0 relative font-sans animate-in fade-in duration-500">
+      <div class="bg-card-bg border border-card-border/60 rounded-2xl flex flex-col min-h-0 shrink overflow-hidden shadow-sm">
+        <div class="flex flex-col min-h-0 shrink">
+          <div class="flex-1 min-h-0 flex flex-col">
+            <div class="p-6 md:p-8 space-y-8 flex-1 overflow-auto">
+              
+              <div class="max-w-2xl">
+                <h3 class="text-sm font-semibold text-main-text">{{ $tr('payments.config.rates', 'Payment Rates & Fines') }}</h3>
+                <p class="text-xs text-main-text/50 mt-0.5 mb-4">{{ $tr('payments.config.rates_desc', 'Set the monthly amounts for students and workers.') }}</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-xs font-semibold text-main-text/60 capitalize tracking-widest mb-1.5">{{ $tr('payments.config.student_amount', 'Student Amount (ETB)') }}</label>
+                    <input v-model.number="paymentForm['payment.student_amount']" type="number" min="0" class="w-full px-4 h-11 rounded-xl border text-sm bg-input-bg text-main-text border-input-border focus:ring-2 focus:ring-brand-blue/30 outline-none transition-all" />
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold text-main-text/60 capitalize tracking-widest mb-1.5">{{ $tr('payments.config.worker_amount', 'Worker Amount (ETB)') }}</label>
+                    <input v-model.number="paymentForm['payment.worker_amount']" type="number" min="0" class="w-full px-4 h-11 rounded-xl border text-sm bg-input-bg text-main-text border-input-border focus:ring-2 focus:ring-brand-blue/30 outline-none transition-all" />
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold text-main-text/60 capitalize tracking-widest mb-1.5">{{ $tr('payments.config.student_fine', 'Student Late Fine / Month (ETB)') }}</label>
+                    <input v-model.number="paymentForm['payment.student_fine_per_month']" type="number" min="0" class="w-full px-4 h-11 rounded-xl border text-sm bg-input-bg text-main-text border-input-border focus:ring-2 focus:ring-brand-blue/30 outline-none transition-all" />
+                    <p class="text-xs text-main-text/40 mt-1">Fine applied to students per overdue month</p>
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold text-main-text/60 capitalize tracking-widest mb-1.5">{{ $tr('payments.config.worker_fine', 'Worker Late Fine / Month (ETB)') }}</label>
+                    <input v-model.number="paymentForm['payment.worker_fine_per_month']" type="number" min="0" class="w-full px-4 h-11 rounded-xl border text-sm bg-input-bg text-main-text border-input-border focus:ring-2 focus:ring-brand-blue/30 outline-none transition-all" />
+                    <p class="text-xs text-main-text/40 mt-1">Fine applied to workers per overdue month</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="w-full h-px bg-card-border/40"></div>
+
+              <div class="max-w-2xl">
+                <h3 class="text-sm font-semibold text-main-text">{{ $tr('payments.config.eligibility', 'Payment Eligibility') }}</h3>
+                <p class="text-xs text-main-text/50 mt-0.5 mb-4">{{ $tr('payments.config.eligibility_desc', 'Define who is required to pay.') }}</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-xs font-semibold text-main-text/60 capitalize tracking-widest mb-1.5">{{ $tr('payments.config.min_grade', 'Minimum Grade Level') }}</label>
+                    <input v-model.number="paymentForm['payment.minimum_grade_level']" type="number" min="1" class="w-full px-4 h-11 rounded-xl border text-sm bg-input-bg text-main-text border-input-border focus:ring-2 focus:ring-brand-blue/30 outline-none transition-all" />
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold text-main-text/60 capitalize tracking-widest mb-1.5">{{ $tr('payments.config.min_age', 'Minimum Age') }}</label>
+                    <input v-model.number="paymentForm['payment.minimum_age']" type="number" min="1" class="w-full px-4 h-11 rounded-xl border text-sm bg-input-bg text-main-text border-input-border focus:ring-2 focus:ring-brand-blue/30 outline-none transition-all" />
+                  </div>
+                </div>
+              </div>
+
+              <div class="w-full h-px bg-card-border/40"></div>
+
+              <div class="max-w-2xl">
+                <h3 class="text-sm font-semibold text-main-text">{{ $tr('payments.config.timing', 'Timing & Calendar') }}</h3>
+                <p class="text-xs text-main-text/50 mt-0.5 mb-4">{{ $tr('payments.config.timing_desc', 'Configure when payments are due.') }}</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-xs font-semibold text-main-text/60 capitalize tracking-widest mb-1.5">{{ $tr('payments.config.deadline_day', 'Monthly Deadline Day') }}</label>
+                    <input v-model.number="paymentForm['payment.deadline_day']" type="number" min="1" max="30" class="w-full px-4 h-11 rounded-xl border text-sm bg-input-bg text-main-text border-input-border focus:ring-2 focus:ring-brand-blue/30 outline-none transition-all" />
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold text-main-text/60 capitalize tracking-widest mb-1.5">{{ $tr('payments.config.calendar_type', 'Calendar System') }}</label>
+                    <select v-model="paymentForm['payment.calendar_type']" class="w-full px-4 h-11 rounded-xl border text-sm bg-input-bg text-main-text border-input-border focus:ring-2 focus:ring-brand-blue/30 outline-none transition-all">
+                      <option value="ethiopian">Ethiopian Calendar</option>
+                      <option value="gregorian">Gregorian Calendar</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <div class="p-4 border-t border-card-border/60 bg-card-bg/30 flex items-center justify-end shrink-0">
+          <button
+            @click="savePaymentSettings"
+            :disabled="savingPayments"
+            class="flex items-center gap-2 px-6 h-11 bg-brand-blue hover:bg-brand-blue-dark text-white font-semibold rounded-xl transition-all shadow-lg shadow-brand-blue/20 hover:shadow-brand-blue/30 disabled:opacity-50 disabled:cursor-not-allowed">
+            <Loader2 v-if="savingPayments" class="w-4 h-4 animate-spin" />
+            <Save v-else class="w-4 h-4" />
+            {{ $tr('payments.config.save', 'Save Payment Settings') }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
   </div>
 </template>
 
@@ -430,6 +523,7 @@ const tabs = computed(() => [
   { key: 'classes',     label: $tr('academic.config.classes_tab'),     icon: GraduationCap },
   { key: 'assessments', label: $tr('academic.config.assessments_tab'), icon: FileText },
   { key: 'idcard',      label: $tr('id_card.config.tab', 'ID Card'),   icon: CreditCard },
+  { key: 'payments',    label: $tr('payments.config.tab', 'Payments'), icon: CreditCard },
 ]);
 const activeTab = ref('classes');
 
@@ -700,5 +794,41 @@ async function saveIdCardSettings() {
   }
 }
 
-onMounted(() => { loadClasses(); loadAssessments(); loadIdCardSettings(); });
+// --- Payment Settings ---
+const savingPayments = ref(false);
+const paymentForm = ref<Record<string, any>>({
+  'payment.student_amount': 50,
+  'payment.worker_amount': 200,
+  'payment.student_fine_per_month': 10,
+  'payment.worker_fine_per_month': 20,
+  'payment.minimum_grade_level': 3,
+  'payment.minimum_age': 18,
+  'payment.deadline_day': 10,
+  'payment.calendar_type': 'ethiopian',
+  'payment.is_enabled': true,
+  'payment.payment_info': '',
+});
+
+async function savePaymentSettings() {
+  savingPayments.value = true;
+  try {
+    await apiClient.put('/bot/settings', { settings: paymentForm.value });
+    toast.success($tr('payments.config.saved', 'Payment settings saved'));
+  } catch (err: any) {
+    toast.error($tr('payments.config.save_failed', 'Failed to save'));
+  } finally {
+    savingPayments.value = false;
+  }
+}
+
+async function loadPaymentSettings() {
+  try {
+    const { data } = await apiClient.get('/bot/settings/payments');
+    Object.entries(data).forEach(([k, v]) => {
+      paymentForm.value[k] = v;
+    });
+  } catch { /* use defaults */ }
+}
+
+onMounted(() => { loadClasses(); loadAssessments(); loadIdCardSettings(); loadPaymentSettings(); });
 </script>
