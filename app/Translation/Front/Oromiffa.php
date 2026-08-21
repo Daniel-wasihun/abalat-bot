@@ -670,6 +670,47 @@ class Oromiffa extends Lang {
             'payments.config.saved' => 'Qindaa\'inni kaffaltii olkaawwameera',
             'payments.config.save_failed' => 'Olkaawuun hin milkoofne',
 
+            // ── Galmee Sakatta\'aa (Audit Logs) ─────────────────────────────────
+            'nav.audit_logs'                       => 'Galmee Sakatta\'aa',
+
+            'audit.title'                          => 'Galmee Sakatta\'aa',
+            'audit.description'                    => 'Jijjiirama sirnaa ilaalii fi tarkaanfiiwwan duraatti deebi\'i.',
+            'audit.filter_event'                   => 'Tarkaanfiidhaan Callelsi',
+            'audit.filter_type'                    => 'Akaakuudhaan Callelsi',
+            'audit.no_logs_title'                  => 'Galmeen sakatta\'aa hin argamne',
+            'audit.no_logs_desc'                   => 'Filannoo kee waliin wal qabatu galmee tarkaanfii hin jiru.',
+            'audit.causer'                         => 'Fayyadamaa (Sababa)',
+            'audit.resource'                       => 'Madda',
+            'audit.changes'                        => 'Jijjiiramoota',
+            'audit.rollback'                       => 'Duraatti Deebi\'i',
+            'audit.rollback_title'                 => 'Tarkaanfii Duraatti Deebi\'i',
+            'audit.rollback_desc'                  => 'Galmee kana duraatti deebisuuf mirkaneessitaa? Kun madda yeroo sakatta\'aa kanaa ture tti battalumatti deebi\'a.',
+            'audit.rollback_confirm'               => 'Eeyyee, Deebi\'i',
+            'audit.rollback_success'               => 'Galmeen milkaa\'inaan duraatti deebi\'eera.',
+            'audit.rollback_failed'                => 'Duraatti deebi\'uun hin milkoofne.',
+
+            'audit.events.all'                     => 'Tarkaanfii Hunda',
+            'audit.events.created'                 => 'Uumame',
+            'audit.events.updated'                 => 'Haaromfame',
+            'audit.events.deleted'                 => 'Haaqame',
+
+            'audit.resources.all'                  => 'Madda Hunda',
+            'audit.resources.user'                 => 'Galmee Fayyadamaa',
+            'audit.resources.role'                 => 'Gahee fi Hayyama',
+            'audit.resources.gen_attendance'       => 'Argama Waliigalaa',
+            'audit.resources.gen_session'          => 'Walgahii Argama Waliigalaa',
+            'audit.resources.course_attendance'    => 'Argama Koorsii',
+            'audit.resources.course_session'       => 'Walgahii Argama Koorsii',
+            'audit.resources.student_mark'         => 'Mallattoo Barataa',
+            'audit.resources.student_result'       => 'Bu\'aa Xumuraa Barataa',
+            'audit.resources.payment'              => 'Kaffaltii',
+            'audit.resources.transaction'          => 'Gochaa Kaffaltii',
+            'audit.resources.class'                => 'Qindaa\'ina Kutaa',
+            'audit.resources.course'               => 'Qindaa\'ina Koorsii',
+            'audit.resources.offering'             => 'Dhiyeessii Koorsii',
+            'audit.resources.assessment'           => 'Qindaa\'ina Madaallii',
+            'audit.resources.setting'              => 'Qindaa\'ina Sirna',
+
         ];
     }
 }
