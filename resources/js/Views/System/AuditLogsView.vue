@@ -47,95 +47,95 @@
         class="border-0 rounded-none flex-1 custom-scrollbar"
       >
 
-        <template #row="{ item }">
-          <td class="px-5 py-3.5 whitespace-nowrap">
-            <div class="text-sm font-medium text-main-text">{{ formatDate(item.created_at) }}</div>
-            <div class="text-xs text-main-text/50 mt-0.5">{{ formatTime(item.created_at) }}</div>
-          </td>
+        <template #cell-time="{ item }">
+          <div class="text-sm font-medium text-main-text">{{ formatDate(item.created_at) }}</div>
+          <div class="text-xs text-main-text/50 mt-0.5">{{ formatTime(item.created_at) }}</div>
+        </template>
 
-          <td class="px-5 py-3.5 whitespace-nowrap">
-            <span :class="eventConfig(item.event).badge" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border">
-              <component :is="eventConfig(item.event).icon" class="w-3 h-3" />
-              {{ eventLabel(item.event) }}
-            </span>
-          </td>
+        <template #cell-action="{ item }">
+          <span :class="eventConfig(item.event).badge" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border">
+            <component :is="eventConfig(item.event).icon" class="w-3 h-3" />
+            {{ eventLabel(item.event) }}
+          </span>
+        </template>
 
-          <td class="px-5 py-3.5 whitespace-nowrap text-sm text-main-text/80" :title="item.causer_name">
+        <template #cell-user="{ item }">
+          <span class="text-sm text-main-text/80 truncate" :title="item.causer_name">
             {{ item.causer_name || '—' }}
-          </td>
+          </span>
+        </template>
 
-          <td class="px-5 py-3.5 whitespace-nowrap">
-            <div class="flex items-center gap-2 min-w-0">
-              <div class="w-1.5 h-1.5 rounded-full shrink-0" :class="eventConfig(item.event).dot"></div>
-              <div class="min-w-0">
-                <div class="text-sm font-medium text-main-text truncate">{{ friendlyModel(item.model_type) }}</div>
-                <div class="text-xs text-main-text/40 font-mono truncate max-w-[120px]" :title="item.model_id">
-                  {{ isStringId(item.model_id) ? item.model_id : `#${item.model_id}` }}
-                </div>
+        <template #cell-resource="{ item }">
+          <div class="flex items-center gap-2 min-w-0">
+            <div class="w-1.5 h-1.5 rounded-full shrink-0" :class="eventConfig(item.event).dot"></div>
+            <div class="min-w-0">
+              <div class="text-sm font-medium text-main-text truncate">{{ friendlyModel(item.model_type) }}</div>
+              <div class="text-xs text-main-text/40 font-mono truncate max-w-[120px]" :title="item.model_id">
+                {{ isStringId(item.model_id) ? item.model_id : `#${item.model_id}` }}
               </div>
             </div>
-          </td>
+          </div>
+        </template>
 
-          <td class="px-5 py-3.5 w-full max-w-[350px]">
-            <div class="min-w-0 space-y-1 max-h-32 overflow-y-auto custom-scrollbar pr-1">
-              <template v-if="item.event?.toLowerCase() === 'updated'">
-                <div v-for="(pair, i) in diffPairs(item.old_values, item.new_values).slice(0, 3)" :key="i"
-                  class="flex items-center gap-1.5 text-xs font-mono overflow-hidden">
-                  <span class="text-main-text/40 shrink-0 truncate max-w-[80px]" :title="pair.key">{{ pair.key }}</span>
-                  <span class="shrink-0 text-main-text/20">→</span>
-                  <span class="truncate text-rose-500 bg-rose-500/5 px-1.5 py-0.5 rounded border border-rose-500/10 flex-1 max-w-[140px]" :title="String(pair.old)">{{ formatDiffValue(pair.old) }}</span>
-                  <span class="shrink-0 text-main-text/20">→</span>
-                  <span class="truncate text-emerald-600 bg-emerald-500/5 px-1.5 py-0.5 rounded border border-emerald-500/10 flex-1 max-w-[140px]" :title="String(pair.new)">{{ formatDiffValue(pair.new) }}</span>
-                </div>
-                <div v-if="diffPairs(item.old_values, item.new_values).length > 3" class="text-xs text-main-text/30 italic cursor-pointer hover:text-main-text/60" @click="viewDetails(item)">
-                  + {{ diffPairs(item.old_values, item.new_values).length - 3 }} more...
-                </div>
-                <div v-if="diffPairs(item.old_values, item.new_values).length === 0" class="text-xs text-main-text/30 italic">—</div>
-              </template>
-              <template v-else-if="item.event?.toLowerCase() === 'deleted'">
-                <div v-for="(pair, i) in diffPairs(item.old_values, {}).slice(0, 3)" :key="i" class="flex items-center gap-1.5 text-xs font-mono overflow-hidden">
-                  <span class="text-main-text/40 shrink-0 truncate max-w-[80px]" :title="pair.key">{{ pair.key }}</span>
-                  <span class="shrink-0 text-main-text/20">→</span>
-                  <span class="truncate text-rose-500 bg-rose-500/5 px-1.5 py-0.5 rounded border border-rose-500/10 flex-1 max-w-[200px]" :title="String(pair.old)">{{ formatDiffValue(pair.old) }}</span>
-                </div>
-                <div v-if="diffPairs(item.old_values, {}).length > 3" class="text-xs text-main-text/30 italic cursor-pointer hover:text-main-text/60" @click="viewDetails(item)">
-                  + {{ diffPairs(item.old_values, {}).length - 3 }} more...
-                </div>
-              </template>
-              <template v-else>
-                <div v-for="(pair, i) in diffPairs({}, item.new_values).slice(0, 3)" :key="i" class="flex items-center gap-1.5 text-xs font-mono overflow-hidden">
-                  <span class="text-main-text/40 shrink-0 truncate max-w-[80px]" :title="pair.key">{{ pair.key }}</span>
-                  <span class="shrink-0 text-main-text/20">→</span>
-                  <span class="truncate text-emerald-600 bg-emerald-500/5 px-1.5 py-0.5 rounded border border-emerald-500/10 flex-1 max-w-[200px]" :title="String(pair.new)">{{ formatDiffValue(pair.new) }}</span>
-                </div>
-                <div v-if="diffPairs({}, item.new_values).length > 3" class="text-xs text-main-text/30 italic cursor-pointer hover:text-main-text/60" @click="viewDetails(item)">
-                  + {{ diffPairs({}, item.new_values).length - 3 }} more...
-                </div>
-              </template>
-            </div>
-          </td>
+        <template #cell-changes="{ item }">
+          <div class="min-w-0 space-y-1 max-h-32 overflow-y-auto custom-scrollbar pr-1 w-full max-w-[350px]">
+            <template v-if="item.event?.toLowerCase() === 'updated'">
+              <div v-for="(pair, i) in diffPairs(item.old_values, item.new_values).slice(0, 3)" :key="i"
+                class="flex items-center gap-1.5 text-xs font-mono overflow-hidden">
+                <span class="text-main-text/40 shrink-0 truncate max-w-[80px]" :title="pair.key">{{ pair.key }}</span>
+                <span class="shrink-0 text-main-text/20">→</span>
+                <span class="truncate text-rose-500 bg-rose-500/5 px-1.5 py-0.5 rounded border border-rose-500/10 flex-1 max-w-[140px]" :title="String(pair.old)">{{ formatDiffValue(pair.old) }}</span>
+                <span class="shrink-0 text-main-text/20">→</span>
+                <span class="truncate text-emerald-600 bg-emerald-500/5 px-1.5 py-0.5 rounded border border-emerald-500/10 flex-1 max-w-[140px]" :title="String(pair.new)">{{ formatDiffValue(pair.new) }}</span>
+              </div>
+              <div v-if="diffPairs(item.old_values, item.new_values).length > 3" class="text-xs text-main-text/30 italic cursor-pointer hover:text-main-text/60" @click="viewDetails(item)">
+                + {{ diffPairs(item.old_values, item.new_values).length - 3 }} more...
+              </div>
+              <div v-if="diffPairs(item.old_values, item.new_values).length === 0" class="text-xs text-main-text/30 italic">—</div>
+            </template>
+            <template v-else-if="item.event?.toLowerCase() === 'deleted'">
+              <div v-for="(pair, i) in diffPairs(item.old_values, {}).slice(0, 3)" :key="i" class="flex items-center gap-1.5 text-xs font-mono overflow-hidden">
+                <span class="text-main-text/40 shrink-0 truncate max-w-[80px]" :title="pair.key">{{ pair.key }}</span>
+                <span class="shrink-0 text-main-text/20">→</span>
+                <span class="truncate text-rose-500 bg-rose-500/5 px-1.5 py-0.5 rounded border border-rose-500/10 flex-1 max-w-[200px]" :title="String(pair.old)">{{ formatDiffValue(pair.old) }}</span>
+              </div>
+              <div v-if="diffPairs(item.old_values, {}).length > 3" class="text-xs text-main-text/30 italic cursor-pointer hover:text-main-text/60" @click="viewDetails(item)">
+                + {{ diffPairs(item.old_values, {}).length - 3 }} more...
+              </div>
+            </template>
+            <template v-else>
+              <div v-for="(pair, i) in diffPairs({}, item.new_values).slice(0, 3)" :key="i" class="flex items-center gap-1.5 text-xs font-mono overflow-hidden">
+                <span class="text-main-text/40 shrink-0 truncate max-w-[80px]" :title="pair.key">{{ pair.key }}</span>
+                <span class="shrink-0 text-main-text/20">→</span>
+                <span class="truncate text-emerald-600 bg-emerald-500/5 px-1.5 py-0.5 rounded border border-emerald-500/10 flex-1 max-w-[200px]" :title="String(pair.new)">{{ formatDiffValue(pair.new) }}</span>
+              </div>
+              <div v-if="diffPairs({}, item.new_values).length > 3" class="text-xs text-main-text/30 italic cursor-pointer hover:text-main-text/60" @click="viewDetails(item)">
+                + {{ diffPairs({}, item.new_values).length - 3 }} more...
+              </div>
+            </template>
+          </div>
+        </template>
 
-          <td class="px-5 py-3.5 whitespace-nowrap text-right">
-            <div class="flex justify-end gap-2">
-              <Button
-                variant="secondary"
-                class="h-8 px-2.5 text-xs"
-                :icon="Eye"
-                @click="viewDetails(item)"
-                title="View Details"
-              />
-              <Button
-                v-if="item.event?.toLowerCase() !== 'created'"
-                variant="soft-danger"
-                class="h-8 px-3 text-xs"
-                :icon="RotateCcw"
-                @click="confirmRollback(item)"
-                :loading="rollingBack === item.id"
-              >
-                {{ $tr('audit.rollback', 'Rollback') }}
-              </Button>
-            </div>
-          </td>
+        <template #cell-actions="{ item }">
+          <div class="flex justify-end gap-2">
+            <Button
+              variant="secondary"
+              class="h-8 px-2.5 text-xs"
+              :icon="Eye"
+              @click="viewDetails(item)"
+              title="View Details"
+            />
+            <Button
+              v-if="item.event?.toLowerCase() !== 'created'"
+              variant="soft-danger"
+              class="h-8 px-3 text-xs"
+              :icon="RotateCcw"
+              @click="confirmRollback(item)"
+              :loading="rollingBack === item.id"
+            >
+              {{ $tr('audit.rollback', 'Rollback') }}
+            </Button>
+          </div>
         </template>
       </DataTable>
 
