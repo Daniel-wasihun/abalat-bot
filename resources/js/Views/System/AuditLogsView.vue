@@ -30,79 +30,41 @@
     <!-- Table container -->
     <div class="bg-card-bg border border-card-border/60 rounded-2xl overflow-hidden shadow-sm flex flex-col">
 
-      <!-- Skeleton shimmer while loading -->
-      <div v-if="loading" class="divide-y divide-card-border/40">
-        <div class="px-5 py-3 bg-card-bg/80 grid grid-cols-6 gap-4 border-b border-card-border/60">
-          <div v-for="i in 6" :key="i" class="h-3 rounded-full bg-main-text/5 animate-pulse" :class="i === 4 ? 'col-span-2' : ''"></div>
-        </div>
-        <div v-for="i in 8" :key="i" class="px-5 py-4 grid grid-cols-6 gap-4 items-center">
-          <!-- time -->
-          <div class="flex flex-col gap-1.5">
-            <div class="h-3 w-20 rounded-full bg-main-text/8 animate-pulse"></div>
-            <div class="h-2.5 w-14 rounded-full bg-main-text/5 animate-pulse"></div>
-          </div>
-          <!-- event badge -->
-          <div class="h-5 w-16 rounded-full bg-main-text/8 animate-pulse"></div>
-          <!-- causer -->
-          <div class="h-3 w-24 rounded-full bg-main-text/8 animate-pulse"></div>
-          <!-- resource -->
-          <div class="col-span-2 h-3 w-32 rounded-full bg-main-text/8 animate-pulse"></div>
-          <!-- action -->
-          <div class="flex justify-end">
-            <div class="h-7 w-20 rounded-lg bg-main-text/5 animate-pulse"></div>
-          </div>
-        </div>
-      </div>
-
       <!-- Table when loaded -->
-      <template v-else>
-        <div class="overflow-x-auto min-w-full">
-          <!-- Column headers -->
-          <div class="px-5 py-3 bg-main-bg/50 grid grid-cols-[140px_110px_160px_200px_minmax(300px,_1fr)_160px] min-w-[1080px] gap-4 border-b border-card-border/60 text-xs font-semibold uppercase tracking-wider text-main-text/40">
-            <div>{{ $tr('common.time', 'Time') }}</div>
-            <div>{{ $tr('common.action', 'Action') }}</div>
-            <div>{{ $tr('audit.causer', 'User') }}</div>
-            <div>{{ $tr('audit.resource', 'Resource') }}</div>
-            <div>{{ $tr('audit.changes', 'Changes') }}</div>
-            <div class="text-right">{{ $tr('common.actions', 'Actions') }}</div>
-          </div>
+      <DataTable
+        :items="logs"
+        :loading="loading"
+        :empty-title="$tr('audit.no_logs_title', 'No audit logs found')"
+        :empty-desc="$tr('audit.no_logs_desc', 'There are no recorded actions matching your filters.')"
+        class="border-0 rounded-none flex-1 custom-scrollbar"
+      >
+        <template #columns>
+          <TableColumn :label="$tr('common.time', 'Time')" />
+          <TableColumn :label="$tr('common.action', 'Action')" />
+          <TableColumn :label="$tr('audit.causer', 'User')" />
+          <TableColumn :label="$tr('audit.resource', 'Resource')" />
+          <TableColumn :label="$tr('audit.changes', 'Changes')" />
+          <TableColumn label="" align="right" />
+        </template>
 
-        <!-- Empty state — compact -->
-        <div v-if="logs.length === 0" class="py-16 flex flex-col items-center justify-center gap-3">
-          <div class="w-12 h-12 rounded-full bg-main-text/5 flex items-center justify-center">
-            <ClipboardList class="w-6 h-6 text-main-text/25" />
-          </div>
-          <p class="text-sm font-medium text-main-text/50">{{ $tr('audit.no_logs_title', 'No audit logs found') }}</p>
-          <p class="text-xs text-main-text/35 max-w-xs text-center">{{ $tr('audit.no_logs_desc', 'There are no recorded actions matching your filters.') }}</p>
-        </div>
+        <template #row="{ item }">
+          <td class="px-5 py-3.5 whitespace-nowrap">
+            <div class="text-sm font-medium text-main-text">{{ formatDate(item.created_at) }}</div>
+            <div class="text-xs text-main-text/50 mt-0.5">{{ formatTime(item.created_at) }}</div>
+          </td>
 
-        <!-- Rows -->
-        <div v-else class="divide-y divide-card-border/40 min-w-[1080px]">
-          <div
-            v-for="item in logs"
-            :key="item.id"
-            class="px-5 py-3.5 grid grid-cols-[140px_110px_160px_200px_minmax(300px,_1fr)_160px] min-w-[1080px] gap-4 items-center hover:bg-main-bg/30 transition-colors duration-150"
-          >
-            <!-- Time -->
-            <div>
-              <div class="text-sm font-medium text-main-text">{{ formatDate(item.created_at) }}</div>
-              <div class="text-xs text-main-text/50 mt-0.5">{{ formatTime(item.created_at) }}</div>
-            </div>
+          <td class="px-5 py-3.5 whitespace-nowrap">
+            <span :class="eventConfig(item.event).badge" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border">
+              <component :is="eventConfig(item.event).icon" class="w-3 h-3" />
+              {{ eventLabel(item.event) }}
+            </span>
+          </td>
 
-            <!-- Event badge -->
-            <div>
-              <span :class="eventConfig(item.event).badge" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border">
-                <component :is="eventConfig(item.event).icon" class="w-3 h-3" />
-                {{ eventLabel(item.event) }}
-              </span>
-            </div>
+          <td class="px-5 py-3.5 whitespace-nowrap text-sm text-main-text/80" :title="item.causer_name">
+            {{ item.causer_name || '—' }}
+          </td>
 
-            <!-- Causer -->
-            <div class="text-sm text-main-text/80 truncate" :title="item.causer_name">
-              {{ item.causer_name || '—' }}
-            </div>
-
-            <!-- Resource -->
+          <td class="px-5 py-3.5 whitespace-nowrap">
             <div class="flex items-center gap-2 min-w-0">
               <div class="w-1.5 h-1.5 rounded-full shrink-0" :class="eventConfig(item.event).dot"></div>
               <div class="min-w-0">
@@ -112,8 +74,9 @@
                 </div>
               </div>
             </div>
+          </td>
 
-            <!-- Changes -->
+          <td class="px-5 py-3.5 w-full max-w-[350px]">
             <div class="min-w-0 space-y-1 max-h-32 overflow-y-auto custom-scrollbar pr-1">
               <template v-if="item.event?.toLowerCase() === 'updated'">
                 <div v-for="(pair, i) in diffPairs(item.old_values, item.new_values).slice(0, 3)" :key="i"
@@ -150,8 +113,9 @@
                 </div>
               </template>
             </div>
+          </td>
 
-            <!-- Action -->
+          <td class="px-5 py-3.5 whitespace-nowrap text-right">
             <div class="flex justify-end gap-2">
               <Button
                 variant="secondary"
@@ -171,10 +135,9 @@
                 {{ $tr('audit.rollback', 'Rollback') }}
               </Button>
             </div>
-          </div>
-        </div>
-        </div> <!-- End overflow-x-auto wrapper -->
-      </template>
+          </td>
+        </template>
+      </DataTable>
 
       <!-- Pagination -->
       <TablePagination
@@ -271,6 +234,8 @@ import { formatDate as utilFormatDate, formatTime as utilFormatTime, localize } 
 
 import Button from '@/components/common/Button.vue';
 import TablePagination from '@/components/common/TablePagination.vue';
+import DataTable from '@/components/common/DataTable.vue';
+import TableColumn from '@/components/common/TableColumn.vue';
 import FormSelect from '@/components/common/FormSelect.vue';
 import ConfirmDialog from '@/components/common/ConfirmDialog.vue';
 import Modal from '@/components/common/Modal.vue';
@@ -339,8 +304,8 @@ const modelOptions = computed(() => [
   { value: 'Setting', label: $tr('audit.resources.setting', 'System Settings') },
 ]);
 
-const fetchLogs = async (page = 1) => {
-  loading.value = true;
+const fetchLogs = async (page = 1, silent = false) => {
+  if (!silent) loading.value = true;
   try {
     const params = new URLSearchParams();
     params.append('page', page.toString());
@@ -356,7 +321,7 @@ const fetchLogs = async (page = 1) => {
   } catch {
     toast.error('Failed to load audit logs.');
   } finally {
-    loading.value = false;
+    if (!silent) loading.value = false;
   }
 };
 
@@ -385,7 +350,8 @@ const executeRollback = async () => {
     const res = await apiClient.post(`/audit-logs/${auditId}/rollback`);
     if (res.data.status === 'success') {
       toast.success($tr('audit.rollback_success', 'Record successfully rolled back.'));
-      fetchLogs(pagination.current_page);
+      // Gentle silent refresh so table updates instantly without skeleton
+      fetchLogs(pagination.current_page, true);
     } else {
       toast.error(res.data.message || $tr('audit.rollback_failed', 'Rollback failed.'));
     }
