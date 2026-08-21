@@ -34,7 +34,7 @@ class AuditLogController extends Controller
         // Sort latest first
         $query->orderBy('created_at', 'desc');
 
-        $audits = $query->paginate($request->query('per_page', 20));
+        $audits = $query->paginate($request->query('per_page', 10));
 
         // Format the output for the frontend
         $formatted = $audits->through(function ($audit) {
@@ -101,6 +101,13 @@ class AuditLogController extends Controller
         }
 
         try {
+            // OwenIt Auditing does a strict comparison (===) between $model->getKey() and $audit->auditable_id
+            // Because our auditable_id column is VARCHAR (to support Settings), it returns as string.
+            // If the model's primary key is an integer (like User ID 44), it will fail: "Expected integer, got string".
+            if (is_int($model->getKey())) {
+                $audit->auditable_id = (int) $audit->auditable_id;
+            }
+
             // transitionTo transitions the model attributes to how they were at this audit state
             $model->transitionTo($audit, true);
             $model->save();

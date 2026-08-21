@@ -114,26 +114,30 @@
             </div>
 
             <!-- Changes -->
-            <div class="min-w-0 space-y-1">
+            <div class="min-w-0 space-y-1 max-h-32 overflow-y-auto custom-scrollbar pr-1">
               <template v-if="item.event?.toLowerCase() === 'updated'">
-                <div v-for="(pair, i) in diffPairs(item.old_values, item.new_values).slice(0, 2)" :key="i"
+                <div v-for="(pair, i) in diffPairs(item.old_values, item.new_values)" :key="i"
                   class="flex items-center gap-1.5 text-xs font-mono overflow-hidden">
-                  <span class="text-main-text/40 shrink-0 truncate max-w-[60px]" :title="pair.key">{{ pair.key }}</span>
+                  <span class="text-main-text/40 shrink-0 truncate max-w-[80px]" :title="pair.key">{{ pair.key }}</span>
                   <span class="shrink-0 text-main-text/20">→</span>
-                  <span class="truncate text-rose-500 bg-rose-500/5 px-1.5 py-0.5 rounded border border-rose-500/10 max-w-[55px]" :title="String(pair.old)">{{ String(pair.old ?? '∅') }}</span>
+                  <span class="truncate text-rose-500 bg-rose-500/5 px-1.5 py-0.5 rounded border border-rose-500/10 flex-1 max-w-[120px]" :title="String(pair.old)">{{ String(pair.old ?? '∅') }}</span>
                   <span class="shrink-0 text-main-text/20">→</span>
-                  <span class="truncate text-emerald-600 bg-emerald-500/5 px-1.5 py-0.5 rounded border border-emerald-500/10 max-w-[55px]" :title="String(pair.new)">{{ String(pair.new ?? '∅') }}</span>
+                  <span class="truncate text-emerald-600 bg-emerald-500/5 px-1.5 py-0.5 rounded border border-emerald-500/10 flex-1 max-w-[120px]" :title="String(pair.new)">{{ String(pair.new ?? '∅') }}</span>
                 </div>
                 <div v-if="diffPairs(item.old_values, item.new_values).length === 0" class="text-xs text-main-text/30 italic">—</div>
               </template>
               <template v-else-if="item.event?.toLowerCase() === 'deleted'">
-                <div class="truncate text-xs font-mono text-rose-500/70 bg-rose-500/5 px-2 py-1 rounded-md border border-rose-500/10" :title="formatJSON(item.old_values)">
-                  {{ formatJSON(item.old_values) || '∅' }}
+                <div v-for="(pair, i) in diffPairs(item.old_values, {})" :key="i" class="flex items-center gap-1.5 text-xs font-mono overflow-hidden">
+                  <span class="text-main-text/40 shrink-0 truncate max-w-[80px]" :title="pair.key">{{ pair.key }}</span>
+                  <span class="shrink-0 text-main-text/20">→</span>
+                  <span class="truncate text-rose-500 bg-rose-500/5 px-1.5 py-0.5 rounded border border-rose-500/10 flex-1 max-w-[200px]" :title="String(pair.old)">{{ String(pair.old ?? '∅') }}</span>
                 </div>
               </template>
               <template v-else>
-                <div class="truncate text-xs font-mono text-emerald-600/80 bg-emerald-500/5 px-2 py-1 rounded-md border border-emerald-500/10" :title="formatJSON(item.new_values)">
-                  {{ formatJSON(item.new_values) || '∅' }}
+                <div v-for="(pair, i) in diffPairs({}, item.new_values)" :key="i" class="flex items-center gap-1.5 text-xs font-mono overflow-hidden">
+                  <span class="text-main-text/40 shrink-0 truncate max-w-[80px]" :title="pair.key">{{ pair.key }}</span>
+                  <span class="shrink-0 text-main-text/20">→</span>
+                  <span class="truncate text-emerald-600 bg-emerald-500/5 px-1.5 py-0.5 rounded border border-emerald-500/10 flex-1 max-w-[200px]" :title="String(pair.new)">{{ String(pair.new ?? '∅') }}</span>
                 </div>
               </template>
             </div>
@@ -187,6 +191,7 @@ import { ref, reactive, watch, onMounted, computed } from 'vue';
 import { RefreshCcw, ArrowRight, RotateCcw, PlusCircle, PencilLine, Trash2, RefreshCw, ClipboardList } from 'lucide-vue-next';
 import { useToastStore } from '@/stores/toast';
 import apiClient from '@/api/apiClient';
+import { formatDate as utilFormatDate, formatTime as utilFormatTime } from '@/utils/format';
 
 import Button from '@/components/common/Button.vue';
 import TablePagination from '@/components/common/TablePagination.vue';
@@ -209,7 +214,7 @@ const pagination = reactive({
   current_page: 1,
   last_page: 1,
   total: 0,
-  per_page: 20,
+  per_page: 10,
 });
 
 const filters = reactive({
@@ -340,11 +345,8 @@ const friendlyModel = (fqn: string) => {
   return key ? $tr(`audit.resources.${key}`, name) : name;
 };
 
-const formatDate = (dateString: string) =>
-  new Date(dateString).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-
-const formatTime = (dateString: string) =>
-  new Date(dateString).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+const formatDate = (dateString: string) => utilFormatDate(dateString, langStore.currentLanguage);
+const formatTime = (dateString: string) => utilFormatTime(dateString, langStore.currentLanguage);
 
 const formatJSON = (val: any) => {
   if (!val) return '';
