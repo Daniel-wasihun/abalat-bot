@@ -212,7 +212,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, watch, onMounted, computed } from 'vue';
+import { ref, reactive, watch, onMounted, onActivated, computed } from 'vue';
 import { RefreshCcw, ArrowRight, RotateCcw, PlusCircle, PencilLine, Trash2, RefreshCw, ClipboardList, Eye } from 'lucide-vue-next';
 import { useToastStore } from '@/stores/toast';
 import apiClient from '@/api/apiClient';
@@ -320,7 +320,15 @@ watch(filters, () => {
 });
 
 onMounted(() => {
-  fetchLogs();
+  if (logs.value.length === 0) {
+    fetchLogs();
+  }
+});
+
+onActivated(() => {
+  if (logs.value.length === 0) {
+    fetchLogs();
+  }
 });
 
 const confirmRollback = (item: any) => {

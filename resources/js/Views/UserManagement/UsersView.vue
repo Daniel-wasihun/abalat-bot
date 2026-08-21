@@ -88,9 +88,9 @@ function handleBulkGenerate() {
 
 // Simplified bulk action handlers for UserStore
 const showBulkModal = ref(false);
-const pendingBulkAction = ref("");
+const pendingBulkAction = ref<"delete" | "activate" | "deactivate">("delete");
 
-const openBulkConfirm = (action: string) => {
+const openBulkConfirm = (action: "delete" | "activate" | "deactivate") => {
   pendingBulkAction.value = action;
   showBulkModal.value = true;
 };
@@ -99,10 +99,10 @@ const handleBulkAction = async () => {
   if (!selectedIds.value.length || !pendingBulkAction.value) return;
   deleting.value = true;
   try {
-    await userStore.bulkAction(pendingBulkAction.value as any, selectedIds.value);
+    await userStore.bulkAction(selectedIds.value, pendingBulkAction.value as any);
     selectedIds.value = [];
     showBulkModal.value = false;
-    userStore.fetchUsers(1, true);
+    userStore.fetchUsers(userStore.pagination.currentPage, true, true);
   } finally {
     deleting.value = false;
   }
@@ -111,8 +111,10 @@ const handleBulkAction = async () => {
 const hasActiveFilters = computed(() => userStore.filters.search !== "");
 
 onMounted(() => {
-  userStore.resetFilters();
-  userStore.fetchUsers(1, true);
+  if (userStore.users.length === 0) {
+    userStore.resetFilters();
+    userStore.fetchUsers(1, false);
+  }
   userStore.fetchMetadata(); // pre-load roles for the create-user modal
 });
 

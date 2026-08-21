@@ -13,7 +13,7 @@ export function useTableState(config?: {
     store?: any;
     deleteAction?: (id: any) => Promise<any>;
     previewAction?: (id: any) => Promise<string>;
-    refreshAction?: (page?: number, search?: boolean) => Promise<any> | void;
+    refreshAction?: (page?: number, force?: boolean, silent?: boolean) => Promise<any> | void;
     onDeleteSuccess?: () => void;
 }) {
     const toast = useToastStore();
@@ -97,7 +97,10 @@ export function useTableState(config?: {
                 config?.onDeleteSuccess ||
                 (() => {
                     if (config?.refreshAction && !skipRefresh) {
-                        config.refreshAction();
+                        // For stores that have a pagination state (like userStore), 
+                        // we can pass the current page, force = true, silent = true
+                        const storePage = config.store?.pagination?.currentPage || config.store?.pagination?.current_page || 1;
+                        config.refreshAction(storePage, true, true);
                     }
                 });
 

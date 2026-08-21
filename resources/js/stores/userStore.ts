@@ -182,8 +182,8 @@ export const useUserStore = defineStore(
             sort_order: "desc",
         });
 
-        const fetchUsers = async (page = 1, force = false) => {
-            if (loading.value) return;
+        const fetchUsers = async (page = 1, force = false, silent = false) => {
+            if (loading.value && !silent) return;
 
             const currentLang = languageStore.currentLanguage;
             const params: any = {
@@ -219,12 +219,18 @@ export const useUserStore = defineStore(
                 return userCache[cacheKey];
             }
 
-            loading.value = true;
+            if (!silent) loading.value = true;
             try {
                 const response = await apiClient.get("/system/users", {
                     params,
                 });
                 const data = response.data;
+                
+                // Handle empty page fallback (if we deleted the last item on a page)
+                if (data.data && data.data.length === 0 && page > 1) {
+                    return fetchUsers(page - 1, true, silent);
+                }
+
                 users.value = data.data;
 
                 if (data.meta) {
@@ -244,7 +250,7 @@ export const useUserStore = defineStore(
             } catch (error) {
                 console.error("Failed to fetch users", error);
             } finally {
-                loading.value = false;
+                if (!silent) loading.value = false;
             }
         };
 

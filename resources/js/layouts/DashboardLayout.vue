@@ -252,9 +252,11 @@ onUnmounted(() => {
  class="flex-1 overflow-y-auto custom-scrollbar px-4 md:px-6 lg:px-8 pb-6 pt-4 flex flex-col min-h-0">
  <div
  class="max-w-full mx-auto flex-1 flex flex-col w-full min-h-0">
- <router-view v-slot="{ Component }">
+ <router-view v-slot="{ Component, route }">
  <transition name="page" mode="out-in">
- <component :is="Component" :key="route.fullPath" />
+ <keep-alive>
+ <component :is="Component" :key="route.name || route.fullPath" />
+ </keep-alive>
  </transition>
  </router-view>
  </div>

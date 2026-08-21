@@ -94,6 +94,32 @@ class AuditLogController extends Controller
         }
 
         if (!$model) {
+            if ($audit->event === 'deleted') {
+                // Recreate hard-deleted model
+                try {
+                    $modelClass::unguard();
+                    $model = new $modelClass();
+                    $model->setRawAttributes($audit->old_values);
+                    $keyName = $model->getKeyName();
+                    if (!$model->getAttribute($keyName)) {
+                        $model->setAttribute($keyName, $audit->auditable_id);
+                    }
+                    // Insert the record explicitly to preserve the ID
+                    $modelClass::insert($model->getAttributes());
+                    $modelClass::reguard();
+                    
+                    return response()->json([
+                        'status' => 'success',
+                        'message' => 'Record successfully recreated.'
+                    ]);
+                } catch (\Exception $e) {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Failed to recreate deleted record: ' . $e->getMessage()
+                    ], 500);
+                }
+            }
+
             return response()->json([
                 'status' => 'error',
                 'message' => 'The associated record no longer exists.'
@@ -111,6 +137,11 @@ class AuditLogController extends Controller
             // transitionTo transitions the model attributes to how they were at this audit state
             $model->transitionTo($audit, true);
             $model->save();
+
+            // If we are rolling back a deletion and the model uses SoftDeletes, we must restore it.
+            if ($audit->event === 'deleted' && method_exists($model, 'restore')) {
+                $model->restore();
+            }
 
             return response()->json([
                 'status' => 'success',
