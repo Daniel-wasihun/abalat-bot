@@ -850,7 +850,7 @@ export const useUserStore = defineStore(
     },
     {
         persist: {
-            pick: ["activeImports"],
+            paths: ["activeImports"],
         },
     },
 );
