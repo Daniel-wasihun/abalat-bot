@@ -70,9 +70,6 @@
             <div class="w-1.5 h-1.5 rounded-full shrink-0" :class="eventConfig(item.event).dot"></div>
             <div class="min-w-0">
               <div class="text-sm font-medium text-main-text truncate">{{ friendlyModel(item.model_type) }}</div>
-              <div class="text-xs text-main-text/40 font-mono truncate max-w-[120px]" :title="item.model_id">
-                {{ isStringId(item.model_id) ? item.model_id : `#${item.model_id}` }}
-              </div>
             </div>
           </div>
         </template>
@@ -117,24 +114,13 @@
         </template>
 
         <template #cell-actions="{ item }">
-          <div class="flex justify-end gap-2">
-            <Button
-              variant="secondary"
-              class="h-8 px-2.5 text-xs"
-              :icon="Eye"
-              @click="viewDetails(item)"
-              title="View Details"
+          <div class="flex justify-end p-1">
+            <ActionDropdown
+              :actions="getAuditActions(item)"
+              :item="item"
+              :index="0"
+              :total="logs.length"
             />
-            <Button
-              v-if="item.event?.toLowerCase() !== 'created'"
-              variant="soft-danger"
-              class="h-8 px-3 text-xs"
-              :icon="RotateCcw"
-              @click="confirmRollback(item)"
-              :loading="rollingBack === item.id"
-            >
-              {{ $tr('audit.rollback', 'Rollback') }}
-            </Button>
           </div>
         </template>
       </DataTable>
@@ -235,7 +221,7 @@ import { formatDate as utilFormatDate, formatTime as utilFormatTime, localize } 
 import Button from '@/components/common/Button.vue';
 import TablePagination from '@/components/common/TablePagination.vue';
 import DataTable from '@/components/common/DataTable.vue';
-import TableColumn from '@/components/common/TableColumn.vue';
+import ActionDropdown from '@/components/common/ActionDropdown.vue';
 import FormSelect from '@/components/common/FormSelect.vue';
 import ConfirmDialog from '@/components/common/ConfirmDialog.vue';
 import Modal from '@/components/common/Modal.vue';
@@ -362,6 +348,27 @@ const executeRollback = async () => {
     showConfirm.value = false;
     itemToRollback.value = null;
   }
+};
+
+const getAuditActions = (item: any) => {
+  const actions: any[] = [
+    {
+      label: $tr('common.view_details', 'View Details'),
+      icon: Eye,
+      onClick: (log: any) => viewDetails(log),
+    }
+  ];
+
+  if (item.event?.toLowerCase() !== 'created') {
+    actions.push({
+      label: $tr('audit.rollback', 'Rollback'),
+      icon: RotateCcw,
+      colorClass: 'text-rose-500 hover:bg-rose-50',
+      onClick: (log: any) => confirmRollback(log),
+    });
+  }
+
+  return actions;
 };
 
 const eventConfig = (event: string) => {
