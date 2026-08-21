@@ -34,16 +34,18 @@
       <DataTable
         :items="logs"
         :loading="loading"
+        :columns="[
+          { key: 'time', label: $tr('common.time', 'Time') },
+          { key: 'action', label: $tr('common.action', 'Action') },
+          { key: 'user', label: $tr('audit.causer', 'User') },
+          { key: 'resource', label: $tr('audit.resource', 'Resource') },
+          { key: 'changes', label: $tr('audit.changes', 'Changes') },
+          { key: 'actions', label: '', align: 'right' }
+        ]"
         :empty-title="$tr('audit.no_logs_title', 'No audit logs found')"
         :empty-desc="$tr('audit.no_logs_desc', 'There are no recorded actions matching your filters.')"
         class="border-0 rounded-none flex-1 custom-scrollbar"
       >
-        <TableColumn :label="$tr('common.time', 'Time')" />
-        <TableColumn :label="$tr('common.action', 'Action')" />
-        <TableColumn :label="$tr('audit.causer', 'User')" />
-        <TableColumn :label="$tr('audit.resource', 'Resource')" />
-        <TableColumn :label="$tr('audit.changes', 'Changes')" />
-        <TableColumn label="" align="right" />
 
         <template #row="{ item }">
           <td class="px-5 py-3.5 whitespace-nowrap">
