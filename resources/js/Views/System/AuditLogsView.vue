@@ -106,27 +106,35 @@
               <div class="w-1.5 h-1.5 rounded-full shrink-0" :class="eventConfig(item.event).dot"></div>
               <div class="min-w-0">
                 <div class="text-sm font-medium text-main-text truncate">{{ friendlyModel(item.model_type) }}</div>
-                <div class="text-xs text-main-text/40 font-mono">#{{ item.model_id }}</div>
+                <div class="text-xs text-main-text/40 font-mono truncate max-w-[120px]" :title="item.model_id">
+                  {{ isStringId(item.model_id) ? item.model_id : `#${item.model_id}` }}
+                </div>
               </div>
             </div>
 
             <!-- Changes -->
-            <div class="min-w-0">
-              <div v-if="item.event?.toLowerCase() === 'updated'" class="flex items-center gap-1.5 overflow-hidden">
-                <div class="flex-1 truncate text-xs font-mono text-rose-500 bg-rose-500/5 px-2 py-1 rounded-md border border-rose-500/10">
-                  {{ formatJSON(item.old_values) }}
+            <div class="min-w-0 space-y-1">
+              <template v-if="item.event?.toLowerCase() === 'updated'">
+                <div v-for="(pair, i) in diffPairs(item.old_values, item.new_values).slice(0, 2)" :key="i"
+                  class="flex items-center gap-1.5 text-xs font-mono overflow-hidden">
+                  <span class="text-main-text/40 shrink-0 truncate max-w-[60px]" :title="pair.key">{{ pair.key }}</span>
+                  <span class="shrink-0 text-main-text/20">→</span>
+                  <span class="truncate text-rose-500 bg-rose-500/5 px-1.5 py-0.5 rounded border border-rose-500/10 max-w-[55px]" :title="String(pair.old)">{{ String(pair.old ?? '∅') }}</span>
+                  <span class="shrink-0 text-main-text/20">→</span>
+                  <span class="truncate text-emerald-600 bg-emerald-500/5 px-1.5 py-0.5 rounded border border-emerald-500/10 max-w-[55px]" :title="String(pair.new)">{{ String(pair.new ?? '∅') }}</span>
                 </div>
-                <ArrowRight class="w-3 h-3 text-main-text/30 shrink-0" />
-                <div class="flex-1 truncate text-xs font-mono text-emerald-600 bg-emerald-500/5 px-2 py-1 rounded-md border border-emerald-500/10">
-                  {{ formatJSON(item.new_values) }}
+                <div v-if="diffPairs(item.old_values, item.new_values).length === 0" class="text-xs text-main-text/30 italic">—</div>
+              </template>
+              <template v-else-if="item.event?.toLowerCase() === 'deleted'">
+                <div class="truncate text-xs font-mono text-rose-500/70 bg-rose-500/5 px-2 py-1 rounded-md border border-rose-500/10" :title="formatJSON(item.old_values)">
+                  {{ formatJSON(item.old_values) || '∅' }}
                 </div>
-              </div>
-              <div v-else-if="item.event?.toLowerCase() === 'deleted'" class="truncate text-xs font-mono text-rose-500/70 bg-rose-500/5 px-2 py-1 rounded-md border border-rose-500/10">
-                {{ formatJSON(item.old_values) || '{}' }}
-              </div>
-              <div v-else class="truncate text-xs font-mono text-emerald-600/80 bg-emerald-500/5 px-2 py-1 rounded-md border border-emerald-500/10">
-                {{ formatJSON(item.new_values) || '{}' }}
-              </div>
+              </template>
+              <template v-else>
+                <div class="truncate text-xs font-mono text-emerald-600/80 bg-emerald-500/5 px-2 py-1 rounded-md border border-emerald-500/10" :title="formatJSON(item.new_values)">
+                  {{ formatJSON(item.new_values) || '∅' }}
+                </div>
+              </template>
             </div>
 
             <!-- Action -->
@@ -345,5 +353,19 @@ const formatJSON = (val: any) => {
   } catch {
     return String(val);
   }
+};
+
+const isStringId = (id: any) => typeof id === 'string' && isNaN(Number(id));
+
+const diffPairs = (oldValues: any, newValues: any) => {
+  const oldV = oldValues || {};
+  const newV = newValues || {};
+  const keys = Array.from(new Set([...Object.keys(oldV), ...Object.keys(newV)]));
+  
+  return keys.map(key => ({
+    key,
+    old: oldV[key],
+    new: newV[key]
+  })).filter(pair => pair.old !== pair.new);
 };
 </script>
