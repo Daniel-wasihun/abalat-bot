@@ -253,11 +253,9 @@ onUnmounted(() => {
  <div
  class="max-w-full mx-auto flex-1 flex flex-col w-full min-h-0">
  <router-view v-slot="{ Component, route }">
- <transition name="page" mode="out-in">
  <keep-alive>
- <component :is="Component" :key="route.name || route.fullPath" />
+ <component :is="Component" :key="route.name as string" />
  </keep-alive>
- </transition>
  </router-view>
  </div>
  </main>
