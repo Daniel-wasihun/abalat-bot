@@ -1328,6 +1328,8 @@ class Amharic extends Lang
             'user.delete_account' => 'መለያ አጥፋ',
             'user.delete_record' => 'Remove Override',
             'user.delete_warning' => 'እርግጠኛ ነዎት :nameን ከስርዓቱ በቋሚነት ለማስወገድ ይፈልጋሉ?',
+            'user.user_deletion' => 'ተጠቃሚ ሰርዝ',
+            'user.delete_warning_desc' => 'ይህ ድርጊት <strong>:name</strong>ን እና ሁሉንም ተዛማጅ ውሂብ ከስርዓቱ በቋሚነት ያስወግዳል። ይህ ድርጊት መቀልበስ አይቻልም።',
             'user.department' => 'ክፍል',
             'user.deprovision' => 'Deprovision Access',
             'user.directory_empty' => 'ማህደሩ ባዶ ነው',
@@ -4362,6 +4364,7 @@ class Amharic extends Lang
             'audit.events.created'                 => 'ተፈጥሯል',
             'audit.events.updated'                 => 'ተዘምኗል',
             'audit.events.deleted'                 => 'ተሰርዟል',
+            'audit.events.restored'                => 'ተመለሰ',
 
             'audit.resources.all'                  => 'ሁሉም ምንጮች',
             'audit.resources.user'                 => 'የተጠቃሚ መዝገብ',

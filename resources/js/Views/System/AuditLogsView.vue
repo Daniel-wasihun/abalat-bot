@@ -12,7 +12,7 @@
     </div>
 
     <!-- Toolbar -->
-    <div class="mt-6 flex flex-col sm:flex-row gap-4 mb-4">
+    <div class="mt-6 flex flex-col sm:flex-row gap-3 mb-4">
       <FormSelect
         v-model="filters.event"
         :options="eventOptions"
@@ -28,75 +28,133 @@
     </div>
 
     <!-- Table container -->
-    <div class="flex-1 min-h-0 bg-card-bg border border-card-border/60 rounded-2xl overflow-hidden shadow-sm flex flex-col">
-      <DataTable
-        :items="logs"
-        :loading="loading"
-        :empty-title="$tr('audit.no_logs_title', 'No audit logs found')"
-        :empty-desc="$tr('audit.no_logs_desc', 'There are no recorded actions matching your filters.')"
-        class="border-0 rounded-none flex-1 custom-scrollbar"
-      >
-        <template #columns>
-          <TableColumn :label="$tr('common.time', 'Time')" />
-          <TableColumn :label="$tr('common.action', 'Action')" />
-          <TableColumn :label="$tr('audit.causer', 'User (Causer)')" />
-          <TableColumn :label="$tr('audit.resource', 'Resource')" />
-          <TableColumn :label="$tr('audit.changes', 'Changes')" />
-          <TableColumn label="" align="right" />
-        </template>
+    <div class="bg-card-bg border border-card-border/60 rounded-2xl overflow-hidden shadow-sm flex flex-col">
 
-        <template #row="{ item }">
-          <td class="px-5 py-3.5 whitespace-nowrap">
-            <div class="text-sm font-medium text-main-text">{{ formatDate(item.created_at) }}</div>
-            <div class="text-xs text-main-text/50">{{ formatTime(item.created_at) }}</div>
-          </td>
-          <td class="px-5 py-3.5 whitespace-nowrap">
-            <span :class="eventClass(item.event)" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border">
-              {{ item.event }}
-            </span>
-          </td>
-          <td class="px-5 py-3.5 whitespace-nowrap text-sm text-main-text/80">
-            {{ item.causer_name }}
-          </td>
-          <td class="px-5 py-3.5 whitespace-nowrap text-sm font-medium text-main-text">
-            {{ item.model_type }} #{{ item.model_id }}
-          </td>
-          <td class="px-5 py-3.5 w-full max-w-[300px]">
-            <div v-if="item.event === 'Updated'" class="flex items-center gap-2 overflow-hidden">
-              <div class="flex-1 truncate text-xs font-mono text-rose-500 bg-rose-500/5 px-2 py-1 rounded">
-                {{ formatJSON(item.old_values) }}
-              </div>
-              <ArrowRight class="w-3 h-3 text-main-text/40 shrink-0" />
-              <div class="flex-1 truncate text-xs font-mono text-emerald-500 bg-emerald-500/5 px-2 py-1 rounded">
-                {{ formatJSON(item.new_values) }}
+      <!-- Skeleton shimmer while loading -->
+      <div v-if="loading" class="divide-y divide-card-border/40">
+        <div class="px-5 py-3 bg-card-bg/80 grid grid-cols-6 gap-4 border-b border-card-border/60">
+          <div v-for="i in 6" :key="i" class="h-3 rounded-full bg-main-text/5 animate-pulse" :class="i === 4 ? 'col-span-2' : ''"></div>
+        </div>
+        <div v-for="i in 8" :key="i" class="px-5 py-4 grid grid-cols-6 gap-4 items-center">
+          <!-- time -->
+          <div class="flex flex-col gap-1.5">
+            <div class="h-3 w-20 rounded-full bg-main-text/8 animate-pulse"></div>
+            <div class="h-2.5 w-14 rounded-full bg-main-text/5 animate-pulse"></div>
+          </div>
+          <!-- event badge -->
+          <div class="h-5 w-16 rounded-full bg-main-text/8 animate-pulse"></div>
+          <!-- causer -->
+          <div class="h-3 w-24 rounded-full bg-main-text/8 animate-pulse"></div>
+          <!-- resource -->
+          <div class="col-span-2 h-3 w-32 rounded-full bg-main-text/8 animate-pulse"></div>
+          <!-- action -->
+          <div class="flex justify-end">
+            <div class="h-7 w-20 rounded-lg bg-main-text/5 animate-pulse"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Table when loaded -->
+      <template v-else>
+        <!-- Column headers -->
+        <div class="px-5 py-3 bg-main-bg/50 grid grid-cols-[160px_120px_160px_1fr_220px_100px] gap-4 border-b border-card-border/60 text-xs font-semibold uppercase tracking-wider text-main-text/40">
+          <div>{{ $tr('common.time', 'Time') }}</div>
+          <div>{{ $tr('common.action', 'Action') }}</div>
+          <div>{{ $tr('audit.causer', 'User') }}</div>
+          <div>{{ $tr('audit.resource', 'Resource') }}</div>
+          <div>{{ $tr('audit.changes', 'Changes') }}</div>
+          <div class="text-right">{{ $tr('common.actions', 'Actions') }}</div>
+        </div>
+
+        <!-- Empty state — compact -->
+        <div v-if="logs.length === 0" class="py-16 flex flex-col items-center justify-center gap-3">
+          <div class="w-12 h-12 rounded-full bg-main-text/5 flex items-center justify-center">
+            <ClipboardList class="w-6 h-6 text-main-text/25" />
+          </div>
+          <p class="text-sm font-medium text-main-text/50">{{ $tr('audit.no_logs_title', 'No audit logs found') }}</p>
+          <p class="text-xs text-main-text/35 max-w-xs text-center">{{ $tr('audit.no_logs_desc', 'There are no recorded actions matching your filters.') }}</p>
+        </div>
+
+        <!-- Rows -->
+        <div v-else class="divide-y divide-card-border/40">
+          <div
+            v-for="item in logs"
+            :key="item.id"
+            class="px-5 py-3.5 grid grid-cols-[160px_120px_160px_1fr_220px_100px] gap-4 items-center hover:bg-main-bg/30 transition-colors duration-150"
+          >
+            <!-- Time -->
+            <div>
+              <div class="text-sm font-medium text-main-text">{{ formatDate(item.created_at) }}</div>
+              <div class="text-xs text-main-text/50 mt-0.5">{{ formatTime(item.created_at) }}</div>
+            </div>
+
+            <!-- Event badge -->
+            <div>
+              <span :class="eventConfig(item.event).badge" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border">
+                <component :is="eventConfig(item.event).icon" class="w-3 h-3" />
+                {{ eventLabel(item.event) }}
+              </span>
+            </div>
+
+            <!-- Causer -->
+            <div class="text-sm text-main-text/80 truncate" :title="item.causer_name">
+              {{ item.causer_name || '—' }}
+            </div>
+
+            <!-- Resource -->
+            <div class="flex items-center gap-2 min-w-0">
+              <div class="w-1.5 h-1.5 rounded-full shrink-0" :class="eventConfig(item.event).dot"></div>
+              <div class="min-w-0">
+                <div class="text-sm font-medium text-main-text truncate">{{ friendlyModel(item.model_type) }}</div>
+                <div class="text-xs text-main-text/40 font-mono">#{{ item.model_id }}</div>
               </div>
             </div>
-            <div v-else class="truncate text-xs font-mono text-main-text/60 bg-main-bg px-2 py-1 rounded border border-card-border/60">
-              {{ formatJSON(item.new_values) || formatJSON(item.old_values) || '{}' }}
+
+            <!-- Changes -->
+            <div class="min-w-0">
+              <div v-if="item.event?.toLowerCase() === 'updated'" class="flex items-center gap-1.5 overflow-hidden">
+                <div class="flex-1 truncate text-xs font-mono text-rose-500 bg-rose-500/5 px-2 py-1 rounded-md border border-rose-500/10">
+                  {{ formatJSON(item.old_values) }}
+                </div>
+                <ArrowRight class="w-3 h-3 text-main-text/30 shrink-0" />
+                <div class="flex-1 truncate text-xs font-mono text-emerald-600 bg-emerald-500/5 px-2 py-1 rounded-md border border-emerald-500/10">
+                  {{ formatJSON(item.new_values) }}
+                </div>
+              </div>
+              <div v-else-if="item.event?.toLowerCase() === 'deleted'" class="truncate text-xs font-mono text-rose-500/70 bg-rose-500/5 px-2 py-1 rounded-md border border-rose-500/10">
+                {{ formatJSON(item.old_values) || '{}' }}
+              </div>
+              <div v-else class="truncate text-xs font-mono text-emerald-600/80 bg-emerald-500/5 px-2 py-1 rounded-md border border-emerald-500/10">
+                {{ formatJSON(item.new_values) || '{}' }}
+              </div>
             </div>
-          </td>
-          <td class="px-5 py-3.5 whitespace-nowrap text-right">
-            <Button
-              v-if="item.event !== 'Created'"
-              variant="danger"
-              class="h-8 px-3 text-xs"
-              :icon="RotateCcw"
-              @click="confirmRollback(item)"
-              :loading="rollingBack === item.id"
-            >
-              {{ $tr('audit.rollback', 'Rollback') }}
-            </Button>
-          </td>
-        </template>
-      </DataTable>
+
+            <!-- Action -->
+            <div class="flex justify-end">
+              <Button
+                v-if="item.event?.toLowerCase() !== 'created'"
+                variant="soft-danger"
+                class="h-8 px-3 text-xs"
+                :icon="RotateCcw"
+                @click="confirmRollback(item)"
+                :loading="rollingBack === item.id"
+              >
+                {{ $tr('audit.rollback', 'Rollback') }}
+              </Button>
+            </div>
+          </div>
+        </div>
+      </template>
 
       <!-- Pagination -->
       <TablePagination
+        v-if="!loading && logs.length > 0"
         :current-page="pagination.current_page"
         :last-page="pagination.last_page"
         :total="pagination.total"
         :per-page="pagination.per_page"
         @page-change="changePage"
+        class="border-t border-card-border/60"
       />
     </div>
 
@@ -116,13 +174,11 @@
 
 <script setup lang="ts">
 import { ref, reactive, watch, onMounted, computed } from 'vue';
-import { RefreshCcw, ArrowRight, RotateCcw } from 'lucide-vue-next';
+import { RefreshCcw, ArrowRight, RotateCcw, PlusCircle, PencilLine, Trash2, RefreshCw, ClipboardList } from 'lucide-vue-next';
 import { useToastStore } from '@/stores/toast';
 import apiClient from '@/api/apiClient';
 
 import Button from '@/components/common/Button.vue';
-import DataTable from '@/components/common/DataTable.vue';
-import TableColumn from '@/components/common/TableColumn.vue';
 import TablePagination from '@/components/common/TablePagination.vue';
 import FormSelect from '@/components/common/FormSelect.vue';
 import ConfirmDialog from '@/components/common/ConfirmDialog.vue';
@@ -156,6 +212,7 @@ const eventOptions = computed(() => [
   { value: 'created', label: $tr('audit.events.created', 'Created') },
   { value: 'updated', label: $tr('audit.events.updated', 'Updated') },
   { value: 'deleted', label: $tr('audit.events.deleted', 'Deleted') },
+  { value: 'restored', label: $tr('audit.events.restored', 'Restored') },
 ]);
 
 const modelOptions = computed(() => [
@@ -222,13 +279,13 @@ const executeRollback = async () => {
   try {
     const res = await apiClient.post(`/audit-logs/${auditId}/rollback`);
     if (res.data.status === 'success') {
-      toast.success('Record successfully rolled back.');
+      toast.success($tr('audit.rollback_success', 'Record successfully rolled back.'));
       fetchLogs(pagination.current_page);
     } else {
-      toast.error(res.data.message || 'Failed to rollback.');
+      toast.error(res.data.message || $tr('audit.rollback_failed', 'Rollback failed.'));
     }
   } catch (err: any) {
-    toast.error(err.response?.data?.message || 'Rollback failed.');
+    toast.error(err.response?.data?.message || $tr('audit.rollback_failed', 'Rollback failed.'));
   } finally {
     rollingBack.value = null;
     showConfirm.value = false;
@@ -236,13 +293,41 @@ const executeRollback = async () => {
   }
 };
 
-const eventClass = (event: string) => {
-  switch (event.toLowerCase()) {
-    case 'created': return 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20';
-    case 'updated': return 'bg-blue-500/10 text-blue-500 border-blue-500/20';
-    case 'deleted': return 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20';
-    default:        return 'bg-main-text/5 text-main-text/50 border-main-text/10';
+const eventConfig = (event: string) => {
+  switch (event?.toLowerCase()) {
+    case 'created':  return { badge: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20', icon: PlusCircle,  dot: 'bg-emerald-500' };
+    case 'updated':  return { badge: 'bg-blue-500/10 text-blue-500 border-blue-500/20',         icon: PencilLine,  dot: 'bg-blue-500' };
+    case 'deleted':  return { badge: 'bg-rose-500/10 text-rose-600 border-rose-500/20',          icon: Trash2,      dot: 'bg-rose-500' };
+    case 'restored': return { badge: 'bg-amber-500/10 text-amber-600 border-amber-500/20',       icon: RefreshCw,   dot: 'bg-amber-500' };
+    default:         return { badge: 'bg-main-text/5 text-main-text/50 border-main-text/10',     icon: ClipboardList, dot: 'bg-main-text/30' };
   }
+};
+
+const eventLabel = (event: string) => {
+  switch (event?.toLowerCase()) {
+    case 'created':  return $tr('audit.events.created', 'Created');
+    case 'updated':  return $tr('audit.events.updated', 'Updated');
+    case 'deleted':  return $tr('audit.events.deleted', 'Deleted');
+    case 'restored': return $tr('audit.events.restored', 'Restored');
+    default:         return event;
+  }
+};
+
+// Map fully-qualified model class names to friendly labels
+const MODEL_LABELS: Record<string, string> = {
+  User: 'user', Role: 'role',
+  GeneralAttendanceRecord: 'gen_attendance', GeneralAttendanceSession: 'gen_session',
+  AttendanceRecord: 'course_attendance', AttendanceSession: 'course_session',
+  StudentMark: 'student_mark', StudentResult: 'student_result',
+  Payment: 'payment', PaymentTransaction: 'transaction',
+  SenbetClass: 'class', Course: 'course',
+  CourseOffering: 'offering', AssessmentType: 'assessment', Setting: 'setting',
+};
+
+const friendlyModel = (fqn: string) => {
+  const name = fqn?.split('\\').pop() ?? fqn;
+  const key = MODEL_LABELS[name];
+  return key ? $tr(`audit.resources.${key}`, name) : name;
 };
 
 const formatDate = (dateString: string) =>
@@ -256,7 +341,7 @@ const formatJSON = (val: any) => {
   try {
     const keys = Object.keys(val);
     if (keys.length === 0) return '';
-    return `{ ${keys.slice(0, 3).join(', ')}${keys.length > 3 ? '...' : ''} }`;
+    return `{ ${keys.slice(0, 3).join(', ')}${keys.length > 3 ? '…' : ''} }`;
   } catch {
     return String(val);
   }

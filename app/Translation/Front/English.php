@@ -1304,6 +1304,8 @@ class English extends Lang {
             'user.delete_account' => 'Delete account',
             'user.delete_record' => 'Remove Override',
             'user.delete_warning' => 'Are you sure you want to permanently delete :name from the system?',
+            'user.user_deletion' => 'Delete User',
+            'user.delete_warning_desc' => 'This action will permanently remove <strong>:name</strong> and all their associated data from the system. This cannot be undone.',
             'user.department' => 'Department',
             'user.deprovision' => 'Deprovision Access',
             'user.directory_empty' => 'Directory empty',
@@ -4405,6 +4407,7 @@ class English extends Lang {
             'audit.events.created'                 => 'Created',
             'audit.events.updated'                 => 'Updated',
             'audit.events.deleted'                 => 'Deleted',
+            'audit.events.restored'                => 'Restored',
 
             'audit.resources.all'                  => 'All Resources',
             'audit.resources.user'                 => 'User Profile',

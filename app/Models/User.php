@@ -30,9 +30,24 @@ class User extends Authenticatable implements OAuthenticatableContract, Auditabl
         'two_factor_recovery_codes',
     ];
 
-    protected $fillable = ['name', 'email', 'password', 'is_active'];
+    /**
+     * Explicitly track created, updated, and deleted (soft-delete) events.
+     */
+    protected array $auditEvents = [
+        'created',
+        'updated',
+        'deleted',
+        'restored',
+    ];
 
-    protected $hidden = ['password', 'remember_token'];
+    protected $fillable = ['name', 'email', 'password', 'is_active', 'two_factor_secret', 'two_factor_recovery_codes', 'two_factor_confirmed'];
+
+    protected $hidden = ['password', 'remember_token', 'two_factor_secret', 'two_factor_recovery_codes'];
+
+    protected $casts = [
+        'two_factor_confirmed' => 'boolean',
+        'two_factor_recovery_codes' => 'array',
+    ];
 
     protected function casts(): array
     {

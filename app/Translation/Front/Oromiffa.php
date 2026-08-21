@@ -671,6 +671,10 @@ class Oromiffa extends Lang {
             'payments.config.save_failed' => 'Olkaawuun hin milkoofne',
 
             // ── Galmee Sakatta\'aa (Audit Logs) ─────────────────────────────────
+            // ── User Deletion ─────────────────────────────────────────────────
+            'user.user_deletion'                   => 'Fayyadamaa Haqi',
+            'user.delete_warning_desc'             => 'Tarkaanfiin kun <strong>:name</strong> fi odeeffannoo isaanii hunda sirna keessaa bara baraaf haqa. Tarkaanfiin kun deebi\'uu hin danda\'u.',
+
             'nav.audit_logs'                       => 'Galmee Sakatta\'aa',
 
             'audit.title'                          => 'Galmee Sakatta\'aa',
@@ -693,6 +697,7 @@ class Oromiffa extends Lang {
             'audit.events.created'                 => 'Uumame',
             'audit.events.updated'                 => 'Haaromfame',
             'audit.events.deleted'                 => 'Haaqame',
+            'audit.events.restored'                => 'Deebi\'ame',
 
             'audit.resources.all'                  => 'Madda Hunda',
             'audit.resources.user'                 => 'Galmee Fayyadamaa',

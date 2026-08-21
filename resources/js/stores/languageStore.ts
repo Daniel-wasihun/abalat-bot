@@ -5,7 +5,7 @@ import apiClient from "@/api/apiClient";
 
 // Bump this number whenever new translation keys are added.
 // It forces all clients to discard their cached translations and re-fetch.
-const TRANSLATION_VERSION = 13;
+const TRANSLATION_VERSION = 14;
 
 export interface LanguageOption {
     key: string;
