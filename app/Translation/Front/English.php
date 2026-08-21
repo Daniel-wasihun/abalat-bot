@@ -4382,6 +4382,47 @@ class English extends Lang {
             'payments.config.saved' => 'Payment settings saved',
             'payments.config.save_failed' => 'Failed to save',
 
+            // ── Audit Logs ──────────────────────────────────────────────
+            'nav.audit_logs'                       => 'Audit Logs',
+
+            'audit.title'                          => 'Audit Logs',
+            'audit.description'                    => 'Review system changes and rollback specific actions.',
+            'audit.filter_event'                   => 'Filter by Event',
+            'audit.filter_type'                    => 'Filter by Type',
+            'audit.no_logs_title'                  => 'No audit logs found',
+            'audit.no_logs_desc'                   => 'There are no recorded actions matching your filters.',
+            'audit.causer'                         => 'User (Causer)',
+            'audit.resource'                       => 'Resource',
+            'audit.changes'                        => 'Changes',
+            'audit.rollback'                       => 'Rollback',
+            'audit.rollback_title'                 => 'Rollback Action',
+            'audit.rollback_desc'                  => 'Are you sure you want to rollback this record? This will instantly revert the resource to the state it was in at the time of this audit.',
+            'audit.rollback_confirm'               => 'Yes, Rollback',
+            'audit.rollback_success'               => 'Record successfully rolled back.',
+            'audit.rollback_failed'                => 'Rollback failed.',
+
+            'audit.events.all'                     => 'All Events',
+            'audit.events.created'                 => 'Created',
+            'audit.events.updated'                 => 'Updated',
+            'audit.events.deleted'                 => 'Deleted',
+
+            'audit.resources.all'                  => 'All Resources',
+            'audit.resources.user'                 => 'User Profile',
+            'audit.resources.role'                 => 'Role & Permissions',
+            'audit.resources.gen_attendance'       => 'General Attendance',
+            'audit.resources.gen_session'          => 'General Attendance Session',
+            'audit.resources.course_attendance'    => 'Course Attendance',
+            'audit.resources.course_session'       => 'Course Attendance Session',
+            'audit.resources.student_mark'         => 'Student Mark',
+            'audit.resources.student_result'       => 'Student Final Result',
+            'audit.resources.payment'              => 'Payment',
+            'audit.resources.transaction'          => 'Payment Transaction',
+            'audit.resources.class'                => 'Class Configuration',
+            'audit.resources.course'               => 'Course Configuration',
+            'audit.resources.offering'             => 'Course Offering',
+            'audit.resources.assessment'           => 'Assessment Configuration',
+            'audit.resources.setting'              => 'System Settings',
+
         ];
     }
 }

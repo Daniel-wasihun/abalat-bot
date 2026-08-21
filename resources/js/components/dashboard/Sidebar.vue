@@ -286,7 +286,7 @@ const menuGroups = computed<MenuGroup[]>(() => [
         condition: () => perms.users.canView.value,
       },
       {
-        name: "Audit Logs",
+        name: "nav.audit_logs",
         icon: Activity,
         to: "/dashboard/system/audit-logs",
         condition: () => isSuperAdmin.value,

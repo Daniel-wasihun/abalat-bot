@@ -4339,6 +4339,47 @@ class Amharic extends Lang
             'payments.config.saved' => 'የክፍያ ቅንብሮች ተቀምጠዋል',
             'payments.config.save_failed' => 'ለማስቀመጥ አልተሳካም',
 
+            // ── የምርመራ መዝገቦች (Audit Logs) ────────────────────────────────────
+            'nav.audit_logs'                       => 'የምርመራ መዝገቦች',
+
+            'audit.title'                          => 'የምርመራ መዝገቦች',
+            'audit.description'                    => 'የስርዓቱ ለውጦችን ይከልሱ እና ድርጊቶችን ወደ ቀድሞ ሁኔታ ይመልሱ።',
+            'audit.filter_event'                   => 'በድርጊት ይጣሩ',
+            'audit.filter_type'                    => 'በዓይነት ይጣሩ',
+            'audit.no_logs_title'                  => 'ምንም የምርመራ መዝገብ አልተገኘም',
+            'audit.no_logs_desc'                   => 'ከተጣሩት ሁኔታዎች ጋር የሚዛመድ ምንም ድርጊት አልተመዘገበም።',
+            'audit.causer'                         => 'ተጠቃሚ (ምክንያቱ)',
+            'audit.resource'                       => 'ምንጭ',
+            'audit.changes'                        => 'ለውጦች',
+            'audit.rollback'                       => 'ወደ ቀድሞ መልስ',
+            'audit.rollback_title'                 => 'ድርጊትን ወደ ቀድሞ ሁኔታ ይመልሱ',
+            'audit.rollback_desc'                  => 'ይህን መዝገብ ወደ ቀድሞ ሁኔታ መመለስ እርግጠኛ ነዎት? ይህ ምንጩን ወዲያውኑ ወደ ቀዳሚ ሁኔታ ይመልሳል።',
+            'audit.rollback_confirm'               => 'አዎ፣ ወደ ቀድሞ ይመለስ',
+            'audit.rollback_success'               => 'መዝገቡ በተሳካ ሁኔታ ወደ ቀድሞ ሁኔታ ተመልሷል።',
+            'audit.rollback_failed'                => 'ወደ ቀድሞ ሁኔታ መመለስ አልተሳካም።',
+
+            'audit.events.all'                     => 'ሁሉም ድርጊቶች',
+            'audit.events.created'                 => 'ተፈጥሯል',
+            'audit.events.updated'                 => 'ተዘምኗል',
+            'audit.events.deleted'                 => 'ተሰርዟል',
+
+            'audit.resources.all'                  => 'ሁሉም ምንጮች',
+            'audit.resources.user'                 => 'የተጠቃሚ መዝገብ',
+            'audit.resources.role'                 => 'ሚናዎች እና ፈቃዶች',
+            'audit.resources.gen_attendance'       => 'ጠቅላላ ክትትል',
+            'audit.resources.gen_session'          => 'ጠቅላላ ክትትል ክፍለ-ጊዜ',
+            'audit.resources.course_attendance'    => 'የኮርስ ክትትል',
+            'audit.resources.course_session'       => 'የኮርስ ክትትል ክፍለ-ጊዜ',
+            'audit.resources.student_mark'         => 'የተማሪ ነጥብ',
+            'audit.resources.student_result'       => 'የተማሪ ምርጥ ውጤት',
+            'audit.resources.payment'              => 'ክፍያ',
+            'audit.resources.transaction'          => 'የክፍያ ግብይት',
+            'audit.resources.class'                => 'የክፍል ቅንብር',
+            'audit.resources.course'               => 'የኮርስ ቅንብር',
+            'audit.resources.offering'             => 'የኮርስ ቀረቤታ',
+            'audit.resources.assessment'           => 'የምዘና ቅንብር',
+            'audit.resources.setting'              => 'የስርዓት ቅንብሮች',
+
         ];
     }
 }
