@@ -58,7 +58,7 @@
       <template v-else>
         <div class="overflow-x-auto min-w-full">
           <!-- Column headers -->
-          <div class="px-5 py-3 bg-main-bg/50 grid grid-cols-[160px_120px_160px_1fr_220px_100px] min-w-[900px] gap-4 border-b border-card-border/60 text-xs font-semibold uppercase tracking-wider text-main-text/40">
+          <div class="px-5 py-3 bg-main-bg/50 grid grid-cols-[140px_110px_160px_200px_minmax(300px,_1fr)_160px] min-w-[1080px] gap-4 border-b border-card-border/60 text-xs font-semibold uppercase tracking-wider text-main-text/40">
             <div>{{ $tr('common.time', 'Time') }}</div>
             <div>{{ $tr('common.action', 'Action') }}</div>
             <div>{{ $tr('audit.causer', 'User') }}</div>
@@ -77,11 +77,11 @@
         </div>
 
         <!-- Rows -->
-        <div v-else class="divide-y divide-card-border/40 min-w-[900px]">
+        <div v-else class="divide-y divide-card-border/40 min-w-[1080px]">
           <div
             v-for="item in logs"
             :key="item.id"
-            class="px-5 py-3.5 grid grid-cols-[160px_120px_160px_1fr_220px_100px] min-w-[900px] gap-4 items-center hover:bg-main-bg/30 transition-colors duration-150"
+            class="px-5 py-3.5 grid grid-cols-[140px_110px_160px_200px_minmax(300px,_1fr)_160px] min-w-[1080px] gap-4 items-center hover:bg-main-bg/30 transition-colors duration-150"
           >
             <!-- Time -->
             <div>
@@ -116,34 +116,50 @@
             <!-- Changes -->
             <div class="min-w-0 space-y-1 max-h-32 overflow-y-auto custom-scrollbar pr-1">
               <template v-if="item.event?.toLowerCase() === 'updated'">
-                <div v-for="(pair, i) in diffPairs(item.old_values, item.new_values)" :key="i"
+                <div v-for="(pair, i) in diffPairs(item.old_values, item.new_values).slice(0, 3)" :key="i"
                   class="flex items-center gap-1.5 text-xs font-mono overflow-hidden">
                   <span class="text-main-text/40 shrink-0 truncate max-w-[80px]" :title="pair.key">{{ pair.key }}</span>
                   <span class="shrink-0 text-main-text/20">→</span>
-                  <span class="truncate text-rose-500 bg-rose-500/5 px-1.5 py-0.5 rounded border border-rose-500/10 flex-1 max-w-[120px]" :title="String(pair.old)">{{ String(pair.old ?? '∅') }}</span>
+                  <span class="truncate text-rose-500 bg-rose-500/5 px-1.5 py-0.5 rounded border border-rose-500/10 flex-1 max-w-[140px]" :title="String(pair.old)">{{ formatDiffValue(pair.old) }}</span>
                   <span class="shrink-0 text-main-text/20">→</span>
-                  <span class="truncate text-emerald-600 bg-emerald-500/5 px-1.5 py-0.5 rounded border border-emerald-500/10 flex-1 max-w-[120px]" :title="String(pair.new)">{{ String(pair.new ?? '∅') }}</span>
+                  <span class="truncate text-emerald-600 bg-emerald-500/5 px-1.5 py-0.5 rounded border border-emerald-500/10 flex-1 max-w-[140px]" :title="String(pair.new)">{{ formatDiffValue(pair.new) }}</span>
+                </div>
+                <div v-if="diffPairs(item.old_values, item.new_values).length > 3" class="text-xs text-main-text/30 italic cursor-pointer hover:text-main-text/60" @click="viewDetails(item)">
+                  + {{ diffPairs(item.old_values, item.new_values).length - 3 }} more...
                 </div>
                 <div v-if="diffPairs(item.old_values, item.new_values).length === 0" class="text-xs text-main-text/30 italic">—</div>
               </template>
               <template v-else-if="item.event?.toLowerCase() === 'deleted'">
-                <div v-for="(pair, i) in diffPairs(item.old_values, {})" :key="i" class="flex items-center gap-1.5 text-xs font-mono overflow-hidden">
+                <div v-for="(pair, i) in diffPairs(item.old_values, {}).slice(0, 3)" :key="i" class="flex items-center gap-1.5 text-xs font-mono overflow-hidden">
                   <span class="text-main-text/40 shrink-0 truncate max-w-[80px]" :title="pair.key">{{ pair.key }}</span>
                   <span class="shrink-0 text-main-text/20">→</span>
-                  <span class="truncate text-rose-500 bg-rose-500/5 px-1.5 py-0.5 rounded border border-rose-500/10 flex-1 max-w-[200px]" :title="String(pair.old)">{{ String(pair.old ?? '∅') }}</span>
+                  <span class="truncate text-rose-500 bg-rose-500/5 px-1.5 py-0.5 rounded border border-rose-500/10 flex-1 max-w-[200px]" :title="String(pair.old)">{{ formatDiffValue(pair.old) }}</span>
+                </div>
+                <div v-if="diffPairs(item.old_values, {}).length > 3" class="text-xs text-main-text/30 italic cursor-pointer hover:text-main-text/60" @click="viewDetails(item)">
+                  + {{ diffPairs(item.old_values, {}).length - 3 }} more...
                 </div>
               </template>
               <template v-else>
-                <div v-for="(pair, i) in diffPairs({}, item.new_values)" :key="i" class="flex items-center gap-1.5 text-xs font-mono overflow-hidden">
+                <div v-for="(pair, i) in diffPairs({}, item.new_values).slice(0, 3)" :key="i" class="flex items-center gap-1.5 text-xs font-mono overflow-hidden">
                   <span class="text-main-text/40 shrink-0 truncate max-w-[80px]" :title="pair.key">{{ pair.key }}</span>
                   <span class="shrink-0 text-main-text/20">→</span>
-                  <span class="truncate text-emerald-600 bg-emerald-500/5 px-1.5 py-0.5 rounded border border-emerald-500/10 flex-1 max-w-[200px]" :title="String(pair.new)">{{ String(pair.new ?? '∅') }}</span>
+                  <span class="truncate text-emerald-600 bg-emerald-500/5 px-1.5 py-0.5 rounded border border-emerald-500/10 flex-1 max-w-[200px]" :title="String(pair.new)">{{ formatDiffValue(pair.new) }}</span>
+                </div>
+                <div v-if="diffPairs({}, item.new_values).length > 3" class="text-xs text-main-text/30 italic cursor-pointer hover:text-main-text/60" @click="viewDetails(item)">
+                  + {{ diffPairs({}, item.new_values).length - 3 }} more...
                 </div>
               </template>
             </div>
 
             <!-- Action -->
-            <div class="flex justify-end">
+            <div class="flex justify-end gap-2">
+              <Button
+                variant="secondary"
+                class="h-8 px-2.5 text-xs"
+                :icon="Eye"
+                @click="viewDetails(item)"
+                title="View Details"
+              />
               <Button
                 v-if="item.event?.toLowerCase() !== 'created'"
                 variant="soft-danger"
@@ -183,20 +199,81 @@
       @close="showConfirm = false"
       @confirm="executeRollback"
     />
+    <!-- View Details Modal -->
+    <Modal :show="showViewModal" max-width="3xl" @close="closeViewModal">
+      <div class="p-6">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-lg font-bold text-main-text">Audit Details</h2>
+          <Button variant="ghost" class="w-8 h-8 p-0" @click="closeViewModal">✕</Button>
+        </div>
+        
+        <div v-if="viewItem" class="space-y-6">
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 bg-main-bg p-4 rounded-xl border border-card-border/60">
+            <div>
+              <div class="text-xs text-main-text/50 font-medium">Event</div>
+              <div class="text-sm font-semibold mt-1" :class="eventConfig(viewItem.event).badge.split(' ')[1]">{{ eventLabel(viewItem.event) }}</div>
+            </div>
+            <div>
+              <div class="text-xs text-main-text/50 font-medium">Causer</div>
+              <div class="text-sm font-medium mt-1">{{ viewItem.causer_name || 'System' }}</div>
+            </div>
+            <div>
+              <div class="text-xs text-main-text/50 font-medium">Resource</div>
+              <div class="text-sm font-medium mt-1">{{ friendlyModel(viewItem.model_type) }} #{{ viewItem.model_id }}</div>
+            </div>
+            <div>
+              <div class="text-xs text-main-text/50 font-medium">Date & Time</div>
+              <div class="text-sm font-medium mt-1">{{ formatDate(viewItem.created_at) }} {{ formatTime(viewItem.created_at) }}</div>
+            </div>
+          </div>
+
+          <div>
+            <h3 class="text-sm font-bold text-main-text mb-3">Changes</h3>
+            <div class="bg-card-bg border border-card-border/60 rounded-xl overflow-hidden">
+              <div class="grid grid-cols-12 bg-main-bg/50 px-4 py-2 border-b border-card-border/60 text-xs font-semibold text-main-text/40">
+                <div class="col-span-3">Property</div>
+                <div class="col-span-4" v-if="viewItem.event?.toLowerCase() !== 'created'">Old Value</div>
+                <div class="col-span-1" v-if="viewItem.event?.toLowerCase() === 'updated'"></div>
+                <div class="col-span-4" v-if="viewItem.event?.toLowerCase() !== 'deleted'" :class="{'col-span-8': viewItem.event?.toLowerCase() === 'created'}">New Value</div>
+              </div>
+              <div class="divide-y divide-card-border/40 max-h-[400px] overflow-y-auto custom-scrollbar">
+                <div v-for="(pair, i) in diffPairs(viewItem.old_values, viewItem.new_values)" :key="i" class="grid grid-cols-12 px-4 py-3 text-sm font-mono items-center hover:bg-main-bg/30">
+                  <div class="col-span-3 text-main-text/60 font-semibold pr-2 break-all">{{ pair.key }}</div>
+                  
+                  <div class="col-span-4 break-all text-rose-500 bg-rose-500/5 p-2 rounded-lg border border-rose-500/10 max-h-48 overflow-y-auto custom-scrollbar" v-if="viewItem.event?.toLowerCase() !== 'created'">
+                    {{ formatDiffValue(pair.old, true) }}
+                  </div>
+                  
+                  <div class="col-span-1 flex justify-center text-main-text/20" v-if="viewItem.event?.toLowerCase() === 'updated'">→</div>
+                  
+                  <div class="col-span-4 break-all text-emerald-600 bg-emerald-500/5 p-2 rounded-lg border border-emerald-500/10 max-h-48 overflow-y-auto custom-scrollbar" v-if="viewItem.event?.toLowerCase() !== 'deleted'" :class="{'col-span-9': viewItem.event?.toLowerCase() === 'created'}">
+                    {{ formatDiffValue(pair.new, true) }}
+                  </div>
+                </div>
+                <div v-if="diffPairs(viewItem.old_values, viewItem.new_values).length === 0" class="px-4 py-8 text-center text-main-text/40 italic text-sm">
+                  No property changes recorded.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Modal>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive, watch, onMounted, computed } from 'vue';
-import { RefreshCcw, ArrowRight, RotateCcw, PlusCircle, PencilLine, Trash2, RefreshCw, ClipboardList } from 'lucide-vue-next';
+import { RefreshCcw, ArrowRight, RotateCcw, PlusCircle, PencilLine, Trash2, RefreshCw, ClipboardList, Eye } from 'lucide-vue-next';
 import { useToastStore } from '@/stores/toast';
 import apiClient from '@/api/apiClient';
-import { formatDate as utilFormatDate, formatTime as utilFormatTime } from '@/utils/format';
+import { formatDate as utilFormatDate, formatTime as utilFormatTime, localize } from '@/utils/format';
 
 import Button from '@/components/common/Button.vue';
 import TablePagination from '@/components/common/TablePagination.vue';
 import FormSelect from '@/components/common/FormSelect.vue';
 import ConfirmDialog from '@/components/common/ConfirmDialog.vue';
+import Modal from '@/components/common/Modal.vue';
 import { useLanguageStore } from '@/stores/languageStore';
 
 const langStore = useLanguageStore();
@@ -209,6 +286,19 @@ const rollingBack = ref<number | null>(null);
 
 const showConfirm = ref(false);
 const itemToRollback = ref<any>(null);
+
+const showViewModal = ref(false);
+const viewItem = ref<any>(null);
+
+const viewDetails = (item: any) => {
+  viewItem.value = item;
+  showViewModal.value = true;
+};
+
+const closeViewModal = () => {
+  showViewModal.value = false;
+  setTimeout(() => { viewItem.value = null; }, 300);
+};
 
 const pagination = reactive({
   current_page: 1,
@@ -370,6 +460,39 @@ const diffPairs = (oldValues: any, newValues: any) => {
     key,
     old: oldV[key],
     new: newV[key]
-  })).filter(pair => pair.old !== pair.new);
+  })).filter(pair => {
+    // If objects, compare stringified to catch inner changes
+    if (typeof pair.old === 'object' || typeof pair.new === 'object') {
+      return JSON.stringify(pair.old) !== JSON.stringify(pair.new);
+    }
+    return pair.old !== pair.new;
+  });
+};
+
+const formatDiffValue = (val: any, multiline = false) => {
+  if (val === null || val === undefined) return '∅';
+  
+  // If it's a string, see if it is JSON we can parse and localize (like name)
+  if (typeof val === 'string' && val.trim().startsWith('{')) {
+    try {
+      const parsed = JSON.parse(val);
+      if (typeof parsed === 'object' && parsed !== null) {
+        // If it looks like a translation object {en, am, or}
+        if (parsed.en || parsed.am || parsed.or) {
+          return localize(parsed, langStore.currentLanguage);
+        }
+        return multiline ? JSON.stringify(parsed, null, 2) : JSON.stringify(parsed);
+      }
+    } catch (e) {
+      // not json, return raw
+    }
+  }
+
+  // If it's an object/array directly
+  if (typeof val === 'object') {
+    return multiline ? JSON.stringify(val, null, 2) : JSON.stringify(val);
+  }
+
+  return String(val);
 };
 </script>
