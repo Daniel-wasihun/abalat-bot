@@ -31,7 +31,7 @@ class AuthController extends Controller {
         try {
             $user = DB::transaction(function () use ($request, $currentUser) {
                 $user = User::create([
-                    'name'     => ['en' => $request->name],
+                    'name'     => $request->name,
                     'email'    => $request->email,
                     'password' => Hash::make($request->password),
                     'is_active' => true,
@@ -355,12 +355,9 @@ class AuthController extends Controller {
         $data = $request->validated();
 
         DB::transaction(function () use ($user, $data, $request) {
-            // Update User Table: Preserve other translations if present
+            // Update User Table
             if (!empty($data['name'])) {
-                $currentName = $user->name ?? [];
-                if (!is_array($currentName)) $currentName = ['en' => $currentName];
-                $currentName['en'] = $data['name'];
-                $user->update(['name' => $currentName]);
+                $user->update(['name' => $data['name']]);
             }
 
             // Prepare UserInfo data

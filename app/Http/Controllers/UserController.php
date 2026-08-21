@@ -175,17 +175,14 @@ class UserController extends Controller implements HasMiddleware {
 
             // 3. Create Core User
             $user = User::create([
-                'name' => ['en' => $data['name'] ?? 'No Name'], // name could be optional for students, handle properly
+                'name' => $data['name'] ?? 'No Name',
                 'email' => $data['email'] ?? null,
                 'password' => Hash::make($password),
                 'is_active' => $data['is_active'] ?? true,
             ]);
 
             if (isset($data['name']) && $data['name']) {
-                $user->name = ['en' => $data['name']];
-            } else {
-                // If name is omitted, construct it from info fields (as name might be nullable now for students, although validation in UserRequest checks name based on $isRegister...)
-                // Actually the validation says 'name' is required for register. So it's safe.
+                $user->name = $data['name'];
             }
 
             // 4. Create User Info
@@ -300,7 +297,7 @@ class UserController extends Controller implements HasMiddleware {
         try {
             DB::transaction(function () use ($user, $data, $request, $currentUser) {
                 $user->update([
-                    'name'      => isset($data['name']) ? ['en' => $data['name']] : $user->name,
+                    'name'      => isset($data['name']) ? $data['name'] : $user->name,
                     'email'     => array_key_exists('email', $data) ? $data['email'] : $user->email,
                     'is_active' => $data['is_active'] ?? $user->is_active,
                 ]);
@@ -792,7 +789,7 @@ class UserController extends Controller implements HasMiddleware {
         $password = Str::random(10) . '!';
 
         $user = User::create([
-            'name' => ['en' => $data['name']],
+            'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($password),
             'is_active' => true,

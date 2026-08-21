@@ -4,7 +4,6 @@ namespace App\Models;
 
 use App\Traits\HasCustomPermissions;
 use App\Traits\HasSorting;
-use App\Traits\Localizable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -18,7 +17,7 @@ use OwenIt\Auditing\Contracts\Auditable;
 
 class User extends Authenticatable implements OAuthenticatableContract, Auditable
 {
-    use HasApiTokens, HasFactory, Notifiable, HasCustomPermissions, SoftDeletes, Localizable, HasSorting, \OwenIt\Auditing\Auditable;
+    use HasApiTokens, HasFactory, Notifiable, HasCustomPermissions, SoftDeletes, HasSorting, \OwenIt\Auditing\Auditable;
 
     /**
      * Exclude sensitive fields from audit logs.
@@ -54,7 +53,6 @@ class User extends Authenticatable implements OAuthenticatableContract, Auditabl
         return [
             'email_verified_at' => 'datetime',
             'password'          => 'hashed',
-            'name'              => 'array',
             'is_active'         => 'boolean',
         ];
     }
