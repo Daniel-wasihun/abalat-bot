@@ -445,27 +445,28 @@ const diffPairs = (oldValues: any, newValues: any) => {
 const formatDiffValue = (val: any, multiline = false) => {
   if (val === null || val === undefined) return '∅';
   
-  // If it's a string, see if it is JSON we can parse and localize (like name)
-  if (typeof val === 'string' && val.trim().startsWith('{')) {
-    try {
-      const parsed = JSON.parse(val);
-      if (typeof parsed === 'object' && parsed !== null) {
-        // If it looks like a translation object {en, am, or}
-        if (parsed.en || parsed.am || parsed.or) {
-          return localize(parsed, langStore.currentLanguage);
-        }
-        return multiline ? JSON.stringify(parsed, null, 2) : JSON.stringify(parsed);
+  let currentVal = val;
+  // If it's a string, try to parse it recursively in case of double-encoded JSON (like name in audit DB)
+  if (typeof currentVal === 'string') {
+    let attempts = 0;
+    while (typeof currentVal === 'string' && currentVal.trim().startsWith('{') && attempts < 3) {
+      try {
+        currentVal = JSON.parse(currentVal);
+        attempts++;
+      } catch (e) {
+        break;
       }
-    } catch (e) {
-      // not json, return raw
     }
   }
 
-  // If it's an object/array directly
-  if (typeof val === 'object') {
-    return multiline ? JSON.stringify(val, null, 2) : JSON.stringify(val);
+  if (typeof currentVal === 'object' && currentVal !== null) {
+    // If it looks like a translation object {en, am, or}
+    if (currentVal.en || currentVal.am || currentVal.or || currentVal.om) {
+      return localize(currentVal, langStore.currentLanguage);
+    }
+    return multiline ? JSON.stringify(currentVal, null, 2) : JSON.stringify(currentVal);
   }
 
-  return String(val);
+  return String(currentVal);
 };
 </script>
