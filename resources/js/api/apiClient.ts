@@ -113,20 +113,6 @@ apiClient.interceptors.response.use(
             window.dispatchEvent(new CustomEvent("server-recovered"));
         }
 
-        // Show success toast for data modifications
-        const isMutation = ["post", "put", "patch", "delete"].includes(
-            response.config.method || "",
-        );
-        const skipSuccessToast = (response.config as any)?.skipSuccessToast;
-
-        if (
-            isMutation &&
-            response.data?.message &&
-            response.request?.responseType !== "blob" &&
-            !skipSuccessToast
-        ) {
-            useToastStore().success(response.data.message);
-        }
         return response;
     },
     async (error: AxiosError<any>) => {

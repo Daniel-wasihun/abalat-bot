@@ -136,11 +136,40 @@ export const useAuthStore = defineStore("auth", () => {
             const response = await apiClient.post("/login", credentials, {
                 skipSuccessToast: true,
             } as any);
+
+            if (response.data.requires_2fa) {
+                return { requires_2fa: true, message: response.data.message };
+            }
+
             // Laravel JsonResource structure: response.data.user and response.data.access_token
             const { user: userData, access_token, session_id } = response.data;
             setAuth(access_token, userData, session_id);
 
             // Sync missing translations immediately after a successful login
+            try {
+                const langStore = useLanguageStore();
+                if (!Object.keys(langStore.translations).length)
+                    langStore.fetchFrontLanguages(false);
+            } catch (e) {
+                console.warn("Recovery failed", e);
+            }
+
+            return response.data;
+        } finally {
+            loading.value = false;
+        }
+    };
+
+    const verify2faLogin = async (data: { email: string; password: string; code: string }) => {
+        loading.value = true;
+        try {
+            const response = await apiClient.post("/login/2fa", data, {
+                skipSuccessToast: true,
+            } as any);
+
+            const { user: userData, access_token, session_id } = response.data;
+            setAuth(access_token, userData, session_id);
+
             try {
                 const langStore = useLanguageStore();
                 if (!Object.keys(langStore.translations).length)

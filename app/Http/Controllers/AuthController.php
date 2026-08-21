@@ -20,15 +20,7 @@ use App\Constants\Type;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
-use Illuminate\Routing\Controllers\HasMiddleware;
-use Illuminate\Routing\Controllers\Middleware;
-
-class AuthController extends Controller implements HasMiddleware {
-    public static function middleware(): array {
-        return [
-            new Middleware(Permission::users()->create(), only: ['register']),
-        ];
-    }
+class AuthController extends Controller {
     /**
      * Register a new user
      */
@@ -219,6 +211,54 @@ class AuthController extends Controller implements HasMiddleware {
             'attempts' => 0,
             'locked_until' => null
         ]);
+
+        if ($user->two_factor_confirmed) {
+            return response()->json([
+                'requires_2fa' => true,
+                'message' => 'Please provide 2FA code.'
+            ]);
+        }
+
+        // Load relationships
+        $user->load(['info', 'roles', 'directPermissions']);
+
+        // Create token
+        $tokenResult = $user->createToken('auth_token');
+        $token = $tokenResult->accessToken;
+        $tokenId = $tokenResult->token->id;
+
+        return Response::_200(
+            UserResource::success($user, 'login_successfully')
+                ->withToken($token, $tokenId)
+        );
+    }
+
+    /**
+     * Verify 2FA code during login
+     */
+    public function verify2faLogin(Request $request) {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+            'code' => 'required|string|size:6'
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user || !Hash::check($request->password, $user->password)) {
+            return Response::_401(BackMessage::get('invalid_credentials'));
+        }
+
+        if (!$user->two_factor_confirmed || !$user->two_factor_secret) {
+            return response()->json(['message' => '2FA is not enabled for this account.'], 400);
+        }
+
+        $google2fa = new \PragmaRX\Google2FA\Google2FA();
+        $valid = $google2fa->verifyKey($user->two_factor_secret, $request->code);
+
+        if (!$valid) {
+            return response()->json(['message' => 'Invalid OTP code.'], 400);
+        }
 
         // Load relationships
         $user->load(['info', 'roles', 'directPermissions']);

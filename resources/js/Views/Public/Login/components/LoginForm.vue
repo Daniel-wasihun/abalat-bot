@@ -11,10 +11,12 @@ defineProps<{
   form: {
     email: string;
     password: string;
+    twoFactorCode: string;
     _hp_email_verification: string;
     _hp_timestamp: string;
   };
   loading: boolean;
+  requires2fa?: boolean;
   errors: Record<string, string>;
 }>();
 
@@ -66,8 +68,9 @@ defineEmits(["submit", "forgot-password", "clear-error"]);
           :error="errors.email"
           @input="$emit('clear-error', 'email')" />
 
-        <!-- Password Field -->
+        <!-- Password Field (Hidden if 2FA required to focus on OTP) -->
         <FormField
+          v-if="!requires2fa"
           v-model="form.password"
           :type="showPassword ? 'text' : 'password'"
           :label="$tr('auth.password', 'Password')"
@@ -86,6 +89,18 @@ defineEmits(["submit", "forgot-password", "clear-error"]);
             </button>
           </template>
         </FormField>
+
+        <!-- 2FA Code Field -->
+        <FormField
+          v-if="requires2fa"
+          v-model="form.twoFactorCode"
+          type="text"
+          label="2FA Code"
+          placeholder="123456"
+          :icon="Lock"
+          required
+          :error="errors.twoFactorCode"
+          @input="$emit('clear-error', 'twoFactorCode')" />
 
         <!-- Remember & Forgot -->
         <div class="flex items-center justify-between pt-1">

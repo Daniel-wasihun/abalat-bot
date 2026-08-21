@@ -3,11 +3,11 @@
     <!-- Header -->
     <div class="flex items-center justify-between shrink-0 pb-6 border-b border-card-border/60">
       <div>
-        <h1 class="text-2xl font-bold text-main-text">Audit Logs</h1>
-        <p class="text-sm text-main-text/60 mt-1">Review system changes and rollback specific actions.</p>
+        <h1 class="text-2xl font-bold text-main-text">{{ $tr('audit.title', 'Audit Logs') }}</h1>
+        <p class="text-sm text-main-text/60 mt-1">{{ $tr('audit.description', 'Review system changes and rollback specific actions.') }}</p>
       </div>
       <Button variant="secondary" :icon="RefreshCcw" @click="fetchLogs(pagination.current_page)" :loading="loading">
-        Refresh
+        {{ $tr('common.refresh', 'Refresh') }}
       </Button>
     </div>
 
@@ -16,13 +16,13 @@
       <FormSelect
         v-model="filters.event"
         :options="eventOptions"
-        placeholder="Filter by Event"
+        :placeholder="$tr('audit.filter_event', 'Filter by Event')"
         class="w-48"
       />
       <FormSelect
         v-model="filters.model_type"
         :options="modelOptions"
-        placeholder="Filter by Type"
+        :placeholder="$tr('audit.filter_type', 'Filter by Type')"
         class="w-56"
       />
     </div>
@@ -32,16 +32,16 @@
       <DataTable
         :items="logs"
         :loading="loading"
-        empty-title="No audit logs found"
-        empty-desc="There are no recorded actions matching your filters."
+        :empty-title="$tr('audit.no_logs_title', 'No audit logs found')"
+        :empty-desc="$tr('audit.no_logs_desc', 'There are no recorded actions matching your filters.')"
         class="border-0 rounded-none flex-1 custom-scrollbar"
       >
         <template #columns>
-          <TableColumn label="Time" />
-          <TableColumn label="Action" />
-          <TableColumn label="User (Causer)" />
-          <TableColumn label="Resource" />
-          <TableColumn label="Changes" />
+          <TableColumn :label="$tr('common.time', 'Time')" />
+          <TableColumn :label="$tr('common.action', 'Action')" />
+          <TableColumn :label="$tr('audit.causer', 'User (Causer)')" />
+          <TableColumn :label="$tr('audit.resource', 'Resource')" />
+          <TableColumn :label="$tr('audit.changes', 'Changes')" />
           <TableColumn label="" align="right" />
         </template>
 
@@ -84,7 +84,7 @@
               @click="confirmRollback(item)"
               :loading="rollingBack === item.id"
             >
-              Rollback
+              {{ $tr('audit.rollback', 'Rollback') }}
             </Button>
           </td>
         </template>
@@ -103,9 +103,9 @@
     <!-- Rollback Confirmation Modal -->
     <ConfirmDialog
       :show="showConfirm"
-      title="Rollback Action"
-      message="Are you sure you want to rollback this record? This will instantly revert the resource to the state it was in at the time of this audit."
-      confirm-text="Yes, Rollback"
+      :title="$tr('audit.rollback_title', 'Rollback Action')"
+      :message="$tr('audit.rollback_desc', 'Are you sure you want to rollback this record? This will instantly revert the resource to the state it was in at the time of this audit.')"
+      :confirm-text="$tr('audit.rollback_confirm', 'Yes, Rollback')"
       variant="danger"
       :loading="rollingBack !== null"
       @close="showConfirm = false"
@@ -115,7 +115,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, watch, onMounted } from 'vue';
+import { ref, reactive, watch, onMounted, computed } from 'vue';
 import { RefreshCcw, ArrowRight, RotateCcw } from 'lucide-vue-next';
 import { useToastStore } from '@/stores/toast';
 import apiClient from '@/api/apiClient';
@@ -126,6 +126,10 @@ import TableColumn from '@/components/common/TableColumn.vue';
 import TablePagination from '@/components/common/TablePagination.vue';
 import FormSelect from '@/components/common/FormSelect.vue';
 import ConfirmDialog from '@/components/common/ConfirmDialog.vue';
+import { useLanguageStore } from '@/stores/languageStore';
+
+const langStore = useLanguageStore();
+const $tr = (key: string, defaultText: string) => langStore.translate(key) || defaultText;
 
 const toast = useToastStore();
 const loading = ref(true);
@@ -147,31 +151,31 @@ const filters = reactive({
   model_type: '',
 });
 
-const eventOptions = [
-  { value: '', label: 'All Events' },
-  { value: 'created', label: 'Created' },
-  { value: 'updated', label: 'Updated' },
-  { value: 'deleted', label: 'Deleted' },
-];
+const eventOptions = computed(() => [
+  { value: '', label: $tr('audit.events.all', 'All Events') },
+  { value: 'created', label: $tr('audit.events.created', 'Created') },
+  { value: 'updated', label: $tr('audit.events.updated', 'Updated') },
+  { value: 'deleted', label: $tr('audit.events.deleted', 'Deleted') },
+]);
 
-const modelOptions = [
-  { value: '', label: 'All Resources' },
-  { value: 'User', label: 'User Profile' },
-  { value: 'Role', label: 'Role & Permissions' },
-  { value: 'GeneralAttendanceRecord', label: 'General Attendance' },
-  { value: 'GeneralAttendanceSession', label: 'General Attendance Session' },
-  { value: 'AttendanceRecord', label: 'Course Attendance' },
-  { value: 'AttendanceSession', label: 'Course Attendance Session' },
-  { value: 'StudentMark', label: 'Student Mark' },
-  { value: 'StudentResult', label: 'Student Final Result' },
-  { value: 'Payment', label: 'Payment' },
-  { value: 'PaymentTransaction', label: 'Payment Transaction' },
-  { value: 'SenbetClass', label: 'Class Configuration' },
-  { value: 'Course', label: 'Course Configuration' },
-  { value: 'CourseOffering', label: 'Course Offering' },
-  { value: 'AssessmentType', label: 'Assessment Configuration' },
-  { value: 'Setting', label: 'System Settings' },
-];
+const modelOptions = computed(() => [
+  { value: '', label: $tr('audit.resources.all', 'All Resources') },
+  { value: 'User', label: $tr('audit.resources.user', 'User Profile') },
+  { value: 'Role', label: $tr('audit.resources.role', 'Role & Permissions') },
+  { value: 'GeneralAttendanceRecord', label: $tr('audit.resources.gen_attendance', 'General Attendance') },
+  { value: 'GeneralAttendanceSession', label: $tr('audit.resources.gen_session', 'General Attendance Session') },
+  { value: 'AttendanceRecord', label: $tr('audit.resources.course_attendance', 'Course Attendance') },
+  { value: 'AttendanceSession', label: $tr('audit.resources.course_session', 'Course Attendance Session') },
+  { value: 'StudentMark', label: $tr('audit.resources.student_mark', 'Student Mark') },
+  { value: 'StudentResult', label: $tr('audit.resources.student_result', 'Student Final Result') },
+  { value: 'Payment', label: $tr('audit.resources.payment', 'Payment') },
+  { value: 'PaymentTransaction', label: $tr('audit.resources.transaction', 'Payment Transaction') },
+  { value: 'SenbetClass', label: $tr('audit.resources.class', 'Class Configuration') },
+  { value: 'Course', label: $tr('audit.resources.course', 'Course Configuration') },
+  { value: 'CourseOffering', label: $tr('audit.resources.offering', 'Course Offering') },
+  { value: 'AssessmentType', label: $tr('audit.resources.assessment', 'Assessment Configuration') },
+  { value: 'Setting', label: $tr('audit.resources.setting', 'System Settings') },
+]);
 
 const fetchLogs = async (page = 1) => {
   loading.value = true;

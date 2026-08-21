@@ -77,32 +77,40 @@ const config = computed(() => {
 <template>
  <Modal
  :show="show"
- :title="title"
- :icon="config.icon"
- :iconClass="config.color"
- :badgeClass="config.badge"
- size="confirm"
+ size="sm"
+ hideHeader
  @close="!loading && emit('close')">
  <!-- Modal body -->
- <div class="px-6 py-4">
- <p class="text-[14px] leading-relaxed text-main-text/70" v-html="message" />
- <slot />
+ <div class="px-6 py-8 flex flex-col items-center text-center">
+    <div 
+        class="w-16 h-16 rounded-full flex items-center justify-center mb-5 shrink-0"
+        :class="config.badge"
+    >
+        <component :is="config.icon" class="w-8 h-8" :class="config.color" stroke-width="1.5" />
+    </div>
+    
+    <h3 class="text-xl font-bold text-main-text tracking-tight mb-2">
+        {{ title }}
+    </h3>
+    
+    <p class="text-[15px] leading-relaxed text-main-text/60" v-html="message" />
+    <slot />
  </div>
 
   <template #footer>
-    <div
-      class="px-8 py-5 border-t border-card-border/40 bg-card-bg flex items-center gap-3 w-full justify-end rounded-b-[inherit]">
-      <Button class="font-bold tracking-tight capitalize px-6 border-card-border/60"
+    <div class="px-6 py-5 bg-card-bg/50 border-t border-card-border/40 flex items-center gap-3 w-full justify-center rounded-b-[inherit]">
+      <Button 
         variant="secondary"
+        class="flex-1 font-semibold tracking-tight !h-11"
         :disabled="loading"
         @click="emit('close')">
-        {{ $tr("common.cancel") }}
+        {{ $tr("common.cancel", "Cancel") }}
       </Button>
 
       <Button
         :variant="config.btn as any"
         :loading="loading"
-        class="px-8 font-bold tracking-tight capitalize"
+        class="flex-1 font-semibold tracking-tight !h-11"
         @click="emit('confirm')">
         {{ confirmText }}
       </Button>

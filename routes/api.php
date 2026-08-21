@@ -17,6 +17,7 @@ Route::get('id-card-settings', [\App\Http\Controllers\Api\SettingController::cla
 
 // Auth (public)
 Route::post('/login', [AuthController::class, 'login'])->name('login')->middleware('throttle:auth');
+Route::post('/login/2fa', [AuthController::class, 'verify2faLogin'])->name('login.2fa')->middleware('throttle:auth');
 
 // Password Reset
 Route::post('/forgot-password/send-otp', [ForgotPasswordController::class, 'sendOtp'])->middleware('throttle:auth');
@@ -35,7 +36,11 @@ Route::post('/telegram/webhook', [\App\Http\Controllers\Api\TelegramWebhookContr
 
 // Protected routes
 Route::middleware(['auth:api', 'active', \App\Http\Middleware\TrackUserDevice::class])->group(function () {
-    Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/me/avatar', [UserController::class, 'updateAvatar']);
+    Route::post('/me/2fa/enable', [\App\Http\Controllers\Api\TwoFactorController::class, 'enable']);
+    Route::post('/me/2fa/verify', [\App\Http\Controllers\Api\TwoFactorController::class, 'verify']);
+    Route::post('/me/2fa/disable', [\App\Http\Controllers\Api\TwoFactorController::class, 'disable']);
+    Route::post('/register', [AuthController::class, 'register'])->middleware(\App\Helpers\Permission::users()->create());
     Route::get('/me', [AuthController::class, 'me']);
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::put('/profile', [AuthController::class, 'updateProfile']);

@@ -34,19 +34,42 @@ export function useAuth() {
     const loginForm = reactive({
         email: "",
         password: "",
+        twoFactorCode: "",
         _hp_email_verification: "", // Honeypot field
         _hp_timestamp: btoa(Math.floor(Date.now() / 1000).toString()), // Time-based honeypot
     });
 
     const isLoggingIn = ref(false);
+    const requires2fa = ref(false);
 
     const handleLogin = async () => {
         const validated = validate(loginSchema, loginForm);
         if (!validated) return;
 
+        if (requires2fa.value && !loginForm.twoFactorCode) {
+            toast.error("Please enter the 2FA code.");
+            return;
+        }
+
         isLoggingIn.value = true;
         try {
-            const response = await authStore.login(loginForm);
+            let response;
+            if (requires2fa.value) {
+                response = await authStore.verify2faLogin({
+                    email: loginForm.email,
+                    password: loginForm.password,
+                    code: loginForm.twoFactorCode
+                });
+            } else {
+                response = await authStore.login(loginForm);
+            }
+            
+            if (response.requires_2fa) {
+                requires2fa.value = true;
+                toast.info(response.message || "Please provide 2FA code.");
+                return;
+            }
+
             toast.success(
                 response.message || lang.translate("auth.login_success"),
             );
@@ -217,6 +240,7 @@ export function useAuth() {
     return {
         loginForm,
         isLoggingIn,
+        requires2fa,
         handleLogin,
         errors,
         clearFieldError,

@@ -10,6 +10,7 @@ const { particles } = useParticles();
 const {
  loginForm,
  isLoggingIn,
+ requires2fa,
  handleLogin,
  errors,
  clearFieldError,
@@ -65,6 +66,7 @@ const {
  <LoginForm
  :form="loginForm"
  :loading="isLoggingIn"
+ :requires2fa="requires2fa"
  :errors="errors"
  @submit="handleLogin"
  @clear-error="clearFieldError"
