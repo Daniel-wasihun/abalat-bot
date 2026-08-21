@@ -39,18 +39,29 @@ class AuditLogController extends Controller
         // Format the output for the frontend
         $formatted = $audits->through(function ($audit) {
             $modelClass = class_basename($audit->auditable_type);
-            
+
+            // Safely extract English causer name from JSON-encoded name field
+            $causerName = 'System';
+            if ($audit->user) {
+                $rawName = $audit->user->getRawOriginal('name');
+                if ($rawName) {
+                    $decoded = json_decode($rawName, true);
+                    $causerName = is_array($decoded)
+                        ? ($decoded['en'] ?? $decoded[array_key_first($decoded)] ?? 'Unknown')
+                        : $rawName;
+                }
+            }
+
             return [
-                'id' => $audit->id,
-                'event' => ucfirst($audit->event),
-                'model_type' => $modelClass,
-                'model_id' => $audit->auditable_id,
-                'causer_name' => $audit->user ? $audit->user->full_name_en : 'System',
-                'old_values' => $audit->old_values,
-                'new_values' => $audit->new_values,
-                'ip_address' => $audit->ip_address,
-                'user_agent' => $audit->user_agent,
-                'created_at' => $audit->created_at->toIso8601String(),
+                'id'          => $audit->id,
+                'event'       => $audit->event,
+                'model_type'  => $audit->auditable_type,   // full class name — frontend maps it
+                'model_id'    => $audit->auditable_id,
+                'causer_name' => $causerName,
+                'old_values'  => $audit->old_values,
+                'new_values'  => $audit->new_values,
+                'ip_address'  => $audit->ip_address,
+                'created_at'  => $audit->created_at->toIso8601String(),
             ];
         });
 
@@ -74,7 +85,13 @@ class AuditLogController extends Controller
         }
 
         $modelClass = $audit->auditable_type;
-        $model = $modelClass::find($audit->auditable_id);
+        $model = null;
+
+        if (in_array(\Illuminate\Database\Eloquent\SoftDeletes::class, class_uses_recursive($modelClass))) {
+            $model = $modelClass::withTrashed()->find($audit->auditable_id);
+        } else {
+            $model = $modelClass::find($audit->auditable_id);
+        }
 
         if (!$model) {
             return response()->json([

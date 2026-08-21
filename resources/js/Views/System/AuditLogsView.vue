@@ -56,15 +56,16 @@
 
       <!-- Table when loaded -->
       <template v-else>
-        <!-- Column headers -->
-        <div class="px-5 py-3 bg-main-bg/50 grid grid-cols-[160px_120px_160px_1fr_220px_100px] gap-4 border-b border-card-border/60 text-xs font-semibold uppercase tracking-wider text-main-text/40">
-          <div>{{ $tr('common.time', 'Time') }}</div>
-          <div>{{ $tr('common.action', 'Action') }}</div>
-          <div>{{ $tr('audit.causer', 'User') }}</div>
-          <div>{{ $tr('audit.resource', 'Resource') }}</div>
-          <div>{{ $tr('audit.changes', 'Changes') }}</div>
-          <div class="text-right">{{ $tr('common.actions', 'Actions') }}</div>
-        </div>
+        <div class="overflow-x-auto min-w-full">
+          <!-- Column headers -->
+          <div class="px-5 py-3 bg-main-bg/50 grid grid-cols-[160px_120px_160px_1fr_220px_100px] min-w-[900px] gap-4 border-b border-card-border/60 text-xs font-semibold uppercase tracking-wider text-main-text/40">
+            <div>{{ $tr('common.time', 'Time') }}</div>
+            <div>{{ $tr('common.action', 'Action') }}</div>
+            <div>{{ $tr('audit.causer', 'User') }}</div>
+            <div>{{ $tr('audit.resource', 'Resource') }}</div>
+            <div>{{ $tr('audit.changes', 'Changes') }}</div>
+            <div class="text-right">{{ $tr('common.actions', 'Actions') }}</div>
+          </div>
 
         <!-- Empty state — compact -->
         <div v-if="logs.length === 0" class="py-16 flex flex-col items-center justify-center gap-3">
@@ -76,11 +77,11 @@
         </div>
 
         <!-- Rows -->
-        <div v-else class="divide-y divide-card-border/40">
+        <div v-else class="divide-y divide-card-border/40 min-w-[900px]">
           <div
             v-for="item in logs"
             :key="item.id"
-            class="px-5 py-3.5 grid grid-cols-[160px_120px_160px_1fr_220px_100px] gap-4 items-center hover:bg-main-bg/30 transition-colors duration-150"
+            class="px-5 py-3.5 grid grid-cols-[160px_120px_160px_1fr_220px_100px] min-w-[900px] gap-4 items-center hover:bg-main-bg/30 transition-colors duration-150"
           >
             <!-- Time -->
             <div>
@@ -152,6 +153,7 @@
             </div>
           </div>
         </div>
+        </div> <!-- End overflow-x-auto wrapper -->
       </template>
 
       <!-- Pagination -->
