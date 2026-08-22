@@ -12,7 +12,7 @@ return new class extends Migration {
         Schema::create('academic_years', function (Blueprint $row) {
             $row->id();
             $row->string('year')->unique(); // e.g., "2024/2025"
-            $row->json('name'); // Translatable name
+            $row->string('name'); // Translatable name
             $row->date('start_date');
             $row->date('end_date');
             $row->boolean('is_current')->default(false);

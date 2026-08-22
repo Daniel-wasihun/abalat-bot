@@ -28,6 +28,7 @@ class PaymentService
             'worker_amount'           => (float) $this->settingRepo->get('payment.worker_amount',             150),
             'student_fine_per_month'  => (float) $this->settingRepo->get('payment.student_fine_per_month',    10),
             'worker_fine_per_month'   => (float) $this->settingRepo->get('payment.worker_fine_per_month',     20),
+            'deadline_type'           =>         $this->settingRepo->get('payment.deadline_type', 'defined_days'),
             'deadline_day'            => (int)   $this->settingRepo->get('payment.deadline_day',              10),
             'minimum_grade_level'     => (int)   $this->settingRepo->get('payment.minimum_grade_level',        7),
             'minimum_age'             => (int)   $this->settingRepo->get('payment.minimum_age',               13),
@@ -42,7 +43,7 @@ class PaymentService
     public function exemptReason($membership, array $settings): ?string
     {
         if (! $membership) {
-            return 'No membership record';
+            return 'no_membership';
         }
 
         $grade    = is_numeric($membership->senbet_class) ? (int) $membership->senbet_class : null;
@@ -60,17 +61,17 @@ class PaymentService
 
         // If user fails BOTH criteria, they are exempt
         if ($failsGrade && $failsAge) {
-            return "Below minimum grade ({$minGrade}) and age ({$minAge})";
+            return "grade_and_age:{$minGrade},{$minAge}";
         }
-        
+
         // If user only has grade and fails it, they are exempt
         if ($failsGrade && !$hasAge) {
-            return "Below minimum grade (Grade {$minGrade} required)";
+            return "grade:{$minGrade}";
         }
-        
+
         // If user only has age and fails it, they are exempt
         if ($failsAge && !$hasGrade) {
-            return "Below minimum age ({$minAge} years required)";
+            return "age:{$minAge}";
         }
 
         // If they pass at least one criteria (or have no data), they are eligible and must pay
@@ -88,18 +89,49 @@ class PaymentService
     public function computeFine(int $ethYear, int $ethMonth, array $settings, string $workStatus = 'student'): float
     {
         $finePerMonth = $workStatus === 'worker'
-            ? $settings['worker_fine_per_month']
-            : $settings['student_fine_per_month'];
+            ? (float) $settings['worker_fine_per_month']
+            : (float) $settings['student_fine_per_month'];
 
-        $deadlineDate = $this->ethDeadlineDate($ethYear, $ethMonth, $settings['deadline_day']);
-        $today        = Carbon::today();
+        $deadlineType = $settings['deadline_type'] ?? 'defined_days';
+        $deadlineDaySetting = (int) $settings['deadline_day'];
 
-        if ($today->lte($deadlineDate)) {
-            return 0.0;
+        // Determine deadline day based on type
+        if ($deadlineType === 'end_of_month') {
+            if ($ethMonth === 13) {
+                $isLeap = ($ethYear % 4 === 3);
+                $deadlineDay = $isLeap ? 6 : 5;
+            } else {
+                $deadlineDay = 30;
+            }
+        } else {
+            // defined_days
+            if ($ethMonth === 13) {
+                $isLeap = ($ethYear % 4 === 3);
+                $maxDays = $isLeap ? 6 : 5;
+                $deadlineDay = min($deadlineDaySetting, $maxDays);
+            } else {
+                $deadlineDay = min($deadlineDaySetting, 30);
+            }
         }
 
-        // Count full calendar months past the deadline (minimum 1 once overdue)
-        $monthsLate = max(1, (int) $deadlineDate->diffInMonths($today));
+        // Current Ethiopian Date
+        [$currYear, $currMonth, $currDay] = $this->currentEthiopianDate();
+
+        // Convert both dates to total days from Ethiopian epoch
+        $deadlineTotalDays = $this->ethToTotalDays($ethYear, $ethMonth, $deadlineDay);
+        $currentTotalDays  = $this->ethToTotalDays($currYear, $currMonth, $currDay);
+
+        if ($currentTotalDays <= $deadlineTotalDays) {
+            return 0.0; // Not late
+        }
+
+        // Calculate how many months late
+        $monthDiff = ($currYear - $ethYear) * 13 + ($currMonth - $ethMonth);
+        if ($currDay < $deadlineDay) {
+            $monthDiff--; // didn't complete the full month past the deadline day yet
+        }
+        
+        $monthsLate = max(1, $monthDiff);
 
         return round($monthsLate * $finePerMonth, 2);
     }
@@ -144,8 +176,32 @@ class PaymentService
     // Obligation — Retrieve or generate
     // ─────────────────────────────────────────────────────────────────────────
 
+    public function isBeforeRegistrationDate(User $user, int $year, int $month): bool
+    {
+        $membership = $user->senbetMembership;
+        if (!$membership || !$membership->registration_date) {
+            return false;
+        }
+
+        $regCarbon = Carbon::parse($membership->registration_date);
+        [$regYear, $regMonth] = $this->gregToEth($regCarbon);
+
+        if ($year < $regYear) {
+            return true;
+        }
+        if ($year === $regYear && $month < $regMonth) {
+            return true;
+        }
+
+        return false;
+    }
+
     public function getOrGenerateObligation(User $user, int $year, int $month, array $settings): ?Payment
     {
+        if ($this->isBeforeRegistrationDate($user, $year, $month)) {
+            return null; // A member must only be charged from their registration/start date
+        }
+
         $membership = $user->senbetMembership;
         if (! $membership) {
             return null; // Not a member, no payment obligation.
@@ -193,6 +249,11 @@ class PaymentService
         $payment = $this->unsavedObligation($user->id, $year, $month, $workStatus, $baseAmount, $fineAmount, $totalDue, $status);
         $payment->save();
 
+        if ($month !== 13 && $totalDue > 0) {
+            $this->applyPendingCredits($user->id, $user->id);
+            $payment->refresh();
+        }
+
         return $payment;
     }
 
@@ -211,9 +272,10 @@ class PaymentService
         float   $finePaid,
         int     $recordedBy,
         string  $method = 'cash',
-        ?string $reference = null
+        ?string $reference = null,
+        bool    $giftSurplus = false
     ): PaymentTransaction {
-        return DB::transaction(function () use ($payment, $amount, $finePaid, $recordedBy, $method, $reference) {
+        return DB::transaction(function () use ($payment, $amount, $finePaid, $recordedBy, $method, $reference, $giftSurplus) {
 
             // Persist obligation first if new
             if (! $payment->exists) {
@@ -223,7 +285,7 @@ class PaymentService
             // Lock row to prevent concurrent updates
             $locked = Payment::lockForUpdate()->find($payment->id);
 
-            // How much of the payment goes to this obligation vs becomes credit
+            // How much of the payment goes to this obligation vs becomes credit/gift
             $balance     = max(0, (float) $locked->total_amount_due - (float) $locked->amount_paid);
             $appliedHere = min($amount, $balance);
             $surplus     = $amount - $appliedHere;
@@ -233,6 +295,7 @@ class PaymentService
                 'payment_id'       => $locked->id,
                 'amount'           => $amount,
                 'fine_paid'        => $finePaid,
+                'is_gift'          => $giftSurplus && $surplus > 0.005,
                 'payment_method'   => $method,
                 'reference_number' => $reference,
                 'paid_at'          => now(),
@@ -255,20 +318,30 @@ class PaymentService
 
             $locked->save();
 
-            // Handle surplus → create credit and apply to future obligations
+            // Handle surplus → create gift donation OR credit
             if ($surplus > 0.005) {
-                $credit = MemberCredit::create([
-                    'user_id'               => $locked->user_id,
-                    'amount'                => round($surplus, 2),
-                    'remaining'             => round($surplus, 2),
-                    'source_type'           => 'overpayment',
-                    'source_payment_id'     => $locked->id,
-                    'source_transaction_id' => $transaction->id,
-                    'created_by'            => $recordedBy,
-                    'note'                  => "Overpayment on {$locked->for_year}/{$locked->for_month}",
-                ]);
+                if ($giftSurplus) {
+                    \App\Models\SchoolDonation::create([
+                        'user_id'     => $locked->user_id,
+                        'amount'      => round($surplus, 2),
+                        'recorded_by' => $recordedBy,
+                        'payment_id'  => $locked->id,
+                        'note'        => "Gift/donation surplus on payment for {$locked->for_year}/{$locked->for_month}",
+                    ]);
+                } else {
+                    $credit = MemberCredit::create([
+                        'user_id'               => $locked->user_id,
+                        'amount'                => round($surplus, 2),
+                        'remaining'             => round($surplus, 2),
+                        'source_type'           => 'overpayment',
+                        'source_payment_id'     => $locked->id,
+                        'source_transaction_id' => $transaction->id,
+                        'created_by'            => $recordedBy,
+                        'note'                  => "Overpayment on {$locked->for_year}/{$locked->for_month}",
+                    ]);
 
-                $this->applyPendingCredits($locked->user_id, $recordedBy);
+                    $this->applyPendingCredits($locked->user_id, $recordedBy);
+                }
             }
 
             return $transaction;
@@ -291,24 +364,27 @@ class PaymentService
         float   $totalAmount,
         int     $recordedBy,
         string  $method = 'cash',
-        ?string $reference = null
+        ?string $reference = null,
+        bool    $giftSurplus = false
     ): array {
-        return DB::transaction(function () use ($user, $fromYear, $fromMonth, $numMonths, $totalAmount, $recordedBy, $method, $reference) {
+        return DB::transaction(function () use ($user, $fromYear, $fromMonth, $numMonths, $totalAmount, $recordedBy, $method, $reference, $giftSurplus) {
             $settings   = $this->getSettings();
             $remaining  = $totalAmount;
             $breakdown  = [];
             $months     = $this->consecutiveMonths($fromYear, $fromMonth, $numMonths);
+            $lastTransaction = null;
+            $lastObligation = null;
 
             foreach ($months as [$year, $month]) {
-                if ($remaining <= 0.005) {
-                    $breakdown[] = $this->breakdownRow($year, $month, null, 0);
-                    continue;
-                }
-
                 $obligation = $this->getOrGenerateObligation($user, $year, $month, $settings);
 
                 if (! $obligation || $obligation->status === 'exempt') {
                     $breakdown[] = $this->breakdownRow($year, $month, $obligation, 0, 'exempt');
+                    continue;
+                }
+
+                if ($remaining <= 0.005) {
+                    $breakdown[] = $this->breakdownRow($year, $month, $obligation, 0);
                     continue;
                 }
 
@@ -321,16 +397,24 @@ class PaymentService
                 $appliedHere = min($remaining, $balance);
                 $surplus     = $remaining - $appliedHere;
 
+                // Calculate fine paid
+                $previouslyPaidFine = (float) PaymentTransaction::where('payment_id', $obligation->id)->sum('fine_paid');
+                $fineRemaining      = max(0, (float) $obligation->fine_amount - $previouslyPaidFine);
+                $finePaidHere       = min($appliedHere, $fineRemaining);
+
                 // Record transaction for this month
-                PaymentTransaction::create([
+                $lastTransaction = PaymentTransaction::create([
                     'payment_id'       => $obligation->id,
                     'amount'           => $appliedHere,
-                    'fine_paid'        => 0,
+                    'fine_paid'        => $finePaidHere,
+                    'is_gift'          => false,
                     'payment_method'   => $method,
                     'reference_number' => $reference,
                     'paid_at'          => now(),
                     'recorded_by'      => $recordedBy,
                 ]);
+
+                $lastObligation = $obligation;
 
                 $totalPaid       = PaymentTransaction::where('payment_id', $obligation->id)->sum('amount');
                 $creditApplied   = (float) MemberCreditApplication::where('payment_id', $obligation->id)->sum('amount_applied');
@@ -351,27 +435,36 @@ class PaymentService
                 $remaining   = round($surplus, 2);
             }
 
-            // If there is still a surplus after all months, create credit
+            // If there is still a surplus after all months, create donation OR credit
             if ($remaining > 0.005) {
-                $lastObligation = null;
-                foreach (array_reverse($breakdown) as $row) {
-                    if ($row['payment_id']) {
-                        $lastObligation = Payment::find($row['payment_id']);
-                        break;
-                    }
+                // Attach the surplus to the last recorded transaction so the exact amount paid is stored
+                if ($lastTransaction) {
+                    $lastTransaction->amount += $remaining;
+                    $lastTransaction->is_gift = $giftSurplus;
+                    $lastTransaction->save();
                 }
 
-                $credit = MemberCredit::create([
-                    'user_id'            => $user->id,
-                    'amount'             => round($remaining, 2),
-                    'remaining'          => round($remaining, 2),
-                    'source_type'        => 'overpayment',
-                    'source_payment_id'  => $lastObligation?->id,
-                    'created_by'         => $recordedBy,
-                    'note'               => "Bulk overpayment surplus ({$fromYear}/{$fromMonth}, {$numMonths} months)",
-                ]);
+                if ($giftSurplus) {
+                    \App\Models\SchoolDonation::create([
+                        'user_id'     => $user->id,
+                        'amount'      => round($remaining, 2),
+                        'recorded_by' => $recordedBy,
+                        'payment_id'  => $lastObligation?->id,
+                        'note'        => "Gift/donation surplus on bulk payment ({$fromYear}/{$fromMonth}, {$numMonths} months)",
+                    ]);
+                } else {
+                    $credit = MemberCredit::create([
+                        'user_id'            => $user->id,
+                        'amount'             => round($remaining, 2),
+                        'remaining'          => round($remaining, 2),
+                        'source_type'        => 'overpayment',
+                        'source_payment_id'  => $lastObligation?->id,
+                        'created_by'         => $recordedBy,
+                        'note'               => "Bulk overpayment surplus ({$fromYear}/{$fromMonth}, {$numMonths} months)",
+                    ]);
 
-                $this->applyPendingCredits($user->id, $recordedBy);
+                    $this->applyPendingCredits($user->id, $recordedBy);
+                }
             }
 
             return [
@@ -513,13 +606,35 @@ class PaymentService
             ->sum('remaining');
     }
 
+    public function ensureObligationsGenerated(int $year, int $month): void
+    {
+        $settings = $this->getSettings();
+        $users = User::whereHas('senbetMembership', function ($q) {
+            $q->whereNull('deleted_at');
+        })->get();
+
+        foreach ($users as $user) {
+            if ($this->isBeforeRegistrationDate($user, $year, $month)) {
+                $user->payments()->where('for_year', $year)->where('for_month', $month)->delete();
+                continue;
+            }
+            $this->getOrGenerateObligation($user, $year, $month, $settings);
+        }
+    }
+
     // ─────────────────────────────────────────────────────────────────────────
     // Statistics
     // ─────────────────────────────────────────────────────────────────────────
 
     public function getStatistics(int $year, int $month): array
     {
-        $base = Payment::where('for_year', $year)->where('for_month', $month);
+        $this->ensureObligationsGenerated($year, $month);
+
+        $base = Payment::where('for_year', $year)
+            ->where('for_month', $month)
+            ->whereHas('user.senbetMembership', function($q) {
+                $q->whereNull('deleted_at');
+            });
 
         $statusCounts = (clone $base)->select('status', DB::raw('count(*) as count'))
             ->groupBy('status')
@@ -532,16 +647,35 @@ class PaymentService
             DB::raw('COALESCE(SUM(fine_amount), 0) as fines'),
         ])->first();
 
+        // Member credit aggregations
+        $totalCreditsHeld = (float) MemberCredit::where('remaining', '>', 0)->sum('remaining');
+        $totalCreditsUsed = (float) MemberCreditApplication::sum('amount_applied');
+        $membersWithCreditCount = MemberCredit::where('remaining', '>', 0)->distinct('user_id')->count('user_id');
+
+        // School financial statistics
+        $totalDonations = (float) \App\Models\SchoolDonation::sum('amount');
+        $totalPaymentIncome = (float) PaymentTransaction::sum('amount');
+        $totalSchoolAssets = $totalPaymentIncome + $totalDonations;
+
         return [
-            'eligible'    => array_sum(array_filter($statusCounts, fn($k) => $k !== 'exempt', ARRAY_FILTER_USE_KEY)),
-            'paid'        => $statusCounts['paid']    ?? 0,
-            'pending'     => $statusCounts['pending'] ?? 0,
-            'partial'     => $statusCounts['partial'] ?? 0,
-            'late'        => $statusCounts['late']    ?? 0,
-            'exempt'      => $statusCounts['exempt']  ?? 0,
-            'collected'   => round((float) $totals->collected,   2),
-            'outstanding' => round((float) $totals->outstanding, 2),
-            'fines'       => round((float) $totals->fines,       2),
+            // Member statistics
+            'eligible'               => array_sum(array_filter($statusCounts, fn($k) => $k !== 'exempt', ARRAY_FILTER_USE_KEY)),
+            'paid'                   => $statusCounts['paid']    ?? 0,
+            'pending'                => $statusCounts['pending'] ?? 0,
+            'partial'                => $statusCounts['partial'] ?? 0,
+            'late'                   => $statusCounts['late']    ?? 0,
+            'exempt'                 => $statusCounts['exempt']  ?? 0,
+            'collected'              => round((float) $totals->collected,   2),
+            'outstanding'            => round((float) $totals->outstanding, 2),
+            'fines'                  => round((float) $totals->fines,       2),
+            'total_credits_held'     => round($totalCreditsHeld, 2),
+            'total_credits_used'     => round($totalCreditsUsed, 2),
+            'members_with_credit'    => $membersWithCreditCount,
+
+            // School financial statistics
+            'total_donations'        => round($totalDonations, 2),
+            'total_payment_income'   => round($totalPaymentIncome, 2),
+            'total_school_assets'    => round($totalSchoolAssets, 2),
         ];
     }
 
@@ -556,14 +690,24 @@ class PaymentService
             : $settings['student_amount'];
     }
 
-    /**
-     * Approximate Gregorian deadline date for Ethiopian year/month.
-     */
-    private function ethDeadlineDate(int $ethYear, int $ethMonth, int $deadlineDay): Carbon
+    public function currentEthiopianDate(): array
     {
-        $gregYear   = $ethYear + 7;
-        $monthStart = Carbon::create($gregYear, 9, 11)->addDays(($ethMonth - 1) * 30);
-        return $monthStart->addDays($deadlineDay - 1);
+        $gregorian = Carbon::now();
+        $jdn = cal_to_jd(CAL_GREGORIAN, $gregorian->month, $gregorian->day, $gregorian->year);
+        $jdnEth = $jdn - 1723856;
+        $r = $jdnEth % 1461;
+        $n = ($r % 365) + 365 * (int)($r / 1460);
+        $ethYear = 4 * (int)($jdnEth / 1461) + (int)($r / 365) - (int)($r / 1460);
+        $ethMonth = (int)($n / 30) + 1;
+        $ethDay = ($n % 30) + 1;
+        return [(int)$ethYear, (int)$ethMonth, (int)$ethDay];
+    }
+
+    public function ethToTotalDays(int $year, int $month, int $day): int
+    {
+        $yearsPassed = $year - 1;
+        $leapYearsPassed = (int)(($yearsPassed + 1) / 4);
+        return $yearsPassed * 365 + $leapYearsPassed + ($month - 1) * 30 + $day;
     }
 
     /**
@@ -575,8 +719,13 @@ class PaymentService
         $year   = $fromYear;
         $month  = $fromMonth;
 
-        for ($i = 0; $i < $count; $i++) {
+        for ($i = 0; $i < $count; ) {
             $result[] = [$year, $month];
+            
+            if ($month !== 13) {
+                $i++;
+            }
+            
             $month++;
             if ($month > 13) {
                 $month = 1;
@@ -622,5 +771,16 @@ class PaymentService
             'amount_paid'      => 0,
             'status'           => $status,
         ]);
+    }
+    public function gregToEth(Carbon $date): array
+    {
+        $jdn = cal_to_jd(CAL_GREGORIAN, $date->month, $date->day, $date->year);
+        $jdnEth = $jdn - 1723856;
+        $r = $jdnEth % 1461;
+        $n = ($r % 365) + 365 * (int)($r / 1460);
+        $ethYear = 4 * (int)($jdnEth / 1461) + (int)($r / 365) - (int)($r / 1460);
+        $ethMonth = (int)($n / 30) + 1;
+        $ethDay = ($n % 30) + 1;
+        return [(int)$ethYear, (int)$ethMonth, (int)$ethDay];
     }
 }

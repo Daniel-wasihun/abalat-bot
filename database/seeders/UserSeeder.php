@@ -26,11 +26,11 @@ class UserSeeder extends Seeder
             return;
         }
 
-        $createFullUser = function ($email, $nameEn, $nameAm, $password, $roleSlug, $assignerId = null, $userType = 'staff') use ($roles) {
+        $createFullUser = function ($email, $first, $father, $password, $roleSlug, $assignerId = null, $userType = 'staff') use ($roles) {
             $user = User::updateOrCreate(
                 ['email' => $email],
                 [
-                    'name'      => ['en' => $nameEn, 'am' => $nameAm],
+                    'name'      => $first,
                     'password'  => Hash::make($password),
                     'is_active' => true,
                 ]
@@ -54,10 +54,10 @@ class UserSeeder extends Seeder
                 [
                     'registration_id'       => UserInfo::generateNextRegistrationId(),
                     'gender'                => collect(['male', 'female'])->random(),
-                    'phone_number'          => '+251' . collect(['7', '9'])->random() . str_pad(rand(0, 99999999), 8, '0', STR_PAD_LEFT),
-                    'father_name'           => 'Father of ' . $nameEn,
-                    'grandfather_name'      => 'Grandfather ' . $nameEn,
-                    'christian_name'        => 'Woldemariam ' . $nameEn,
+                    'phone_number'          => collect(['7', '9'])->random() . str_pad(rand(0, 99999999), 8, '0', STR_PAD_LEFT),
+                    'father_name'           => $father,
+                    'grandfather_name'      => 'Alemu',
+                    'christian_name'        => 'Woldemariam',
                     'spiritual_father_name' => 'Aba Gebre Selassie',
                     'sub_city'              => collect(['Bole', 'Kirkos', 'Yeka', 'Arada', 'Nifas Silk', 'Gulele', 'Lideta', 'Kolfe Keranio'])->random(),
                     'woreda'                => str_pad(rand(1, 15), 2, '0', STR_PAD_LEFT),
@@ -72,8 +72,8 @@ class UserSeeder extends Seeder
         // Create Super Admin User
         $createFullUser(
             'superadmin@lms.com',
-            'Super Administrator (Yared)',
-            'ሱፐር አድሚን (ያሬድ)',
+            'Yared',
+            'Alemayehu',
             'password123',
             'super-admin',
             null,
@@ -83,8 +83,8 @@ class UserSeeder extends Seeder
         // Create Admin User
         $createFullUser(
             'admin@lms.com',
-            'School Administrator (Teklehaimanot)',
-            'አስተዳዳሪ (ተክለሃይማኖት)',
+            'Teklehaimanot',
+            'Belay',
             'password123',
             'admin',
             null,
@@ -92,14 +92,14 @@ class UserSeeder extends Seeder
         );
 
         // Additional Admins
-        $createFullUser('admin2@lms.com', 'Admin Fasil', 'አድሚን ፋሲል', 'password123', 'admin', null, 'staff');
-        $createFullUser('admin3@lms.com', 'Admin Mahlet', 'አድሚን ማህሌት', 'password123', 'admin', null, 'staff');
+        $createFullUser('admin2@lms.com', 'Fasil', 'Kebede', 'password123', 'admin', null, 'staff');
+        $createFullUser('admin3@lms.com', 'Mahlet', 'Tadesse', 'password123', 'admin', null, 'staff');
 
         // General fallback teacher and student
         $createFullUser(
             'teacher@lms.com',
-            'Teacher (Kidanemariam)',
-            'መምህር (ኪዳነማርያም)',
+            'Kidanemariam',
+            'Zewde',
             'password123',
             'teacher',
             null,
@@ -108,8 +108,8 @@ class UserSeeder extends Seeder
 
         $createFullUser(
             'student@lms.com',
-            'Student (Gebre Meskel)',
-            'ተማሪ (ገብረ መስቀል)',
+            'Gebremeskel',
+            'Tessema',
             'password123',
             'student',
             null,
@@ -119,8 +119,8 @@ class UserSeeder extends Seeder
         // A user with MULTIPLE roles (Admin + Teacher)
         $multiUser = $createFullUser(
             'multi@lms.com',
-            'Memhir Admin (Zena Markos)',
-            'መምህር አድሚን (ዜና ማርቆስ)',
+            'Zenamarkos',
+            'Abebe',
             'password123',
             'admin', // primary
             null,
@@ -140,8 +140,8 @@ class UserSeeder extends Seeder
         // A user with MULTIPLE roles (Student + Teacher)
         $multiUser2 = $createFullUser(
             'student.teacher@lms.com',
-            'Student Teacher (Ephrem)',
-            'ተማሪ መምህር (ኤፍሬም)',
+            'Ephrem',
+            'Haile',
             'password123',
             'student', // primary
             null,

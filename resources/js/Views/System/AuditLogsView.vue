@@ -1,5 +1,5 @@
 <template>
-  <div class="h-full flex flex-col p-4 md:p-6 lg:p-8 max-w-7xl mx-auto w-full">
+  <div class="h-full flex flex-col p-4 md:p-6 overflow-hidden bg-main-bg w-full">
     <!-- Header -->
     <div class="flex items-center justify-between shrink-0 pb-6 border-b border-card-border/60">
       <div>
@@ -12,7 +12,7 @@
     </div>
 
     <!-- Toolbar -->
-    <div class="mt-6 flex flex-col sm:flex-row gap-3 mb-4">
+    <div class="mt-4 flex flex-col sm:flex-row gap-3 shrink-0">
       <FormSelect
         v-model="filters.event"
         :options="eventOptions"
@@ -28,7 +28,7 @@
     </div>
 
     <!-- Table container -->
-    <div class="bg-card-bg border border-card-border/60 rounded-2xl overflow-hidden shadow-sm flex flex-col">
+    <div class="bg-card-bg border border-card-border/60 rounded-2xl overflow-hidden shadow-sm flex flex-col flex-1 min-h-0 mt-4">
 
       <!-- Table when loaded -->
       <DataTable
@@ -40,7 +40,7 @@
           { key: 'user', label: $tr('audit.causer', 'User') },
           { key: 'resource', label: $tr('audit.resource', 'Resource') },
           { key: 'changes', label: $tr('audit.changes', 'Changes') },
-          { key: 'actions', label: '', align: 'right' }
+          { key: 'actions', label: $tr('common.actions', 'Actions'), align: 'right' }
         ]"
         :empty-title="$tr('audit.no_logs_title', 'No audit logs found')"
         :empty-desc="$tr('audit.no_logs_desc', 'There are no recorded actions matching your filters.')"
@@ -53,16 +53,36 @@
         </template>
 
         <template #cell-action="{ item }">
-          <span :class="eventConfig(item.event).badge" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border">
-            <component :is="eventConfig(item.event).icon" class="w-3 h-3" />
-            {{ eventLabel(item.event) }}
-          </span>
+          <div class="flex flex-col items-start gap-1">
+            <span :class="eventConfig(item.event).badge" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border">
+              <component :is="eventConfig(item.event).icon" class="w-3 h-3" />
+              {{ eventLabel(item.event) }}
+            </span>
+            <!-- Rolled-back indicator -->
+            <span v-if="item.is_rolled_back" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-main-text/5 text-main-text/40 border border-main-text/10">
+              <component :is="RotateCcw" class="w-2.5 h-2.5" />
+              {{ $tr('audit.rolled_back', 'Rolled Back') }}
+            </span>
+            <!-- Rollback indicator badge -->
+            <span v-if="item.is_rollback" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-purple-500/10 text-purple-500 border border-purple-500/20">
+              <component :is="RotateCcw" class="w-2.5 h-2.5" />
+              {{ $tr('audit.is_rollback', 'Rollback Action') }}
+            </span>
+          </div>
         </template>
 
         <template #cell-user="{ item }">
-          <span class="text-sm text-main-text/80 truncate" :title="item.causer_name">
-            {{ item.causer_name || '—' }}
-          </span>
+          <div class="flex flex-col min-w-0">
+            <span class="text-sm text-main-text/80 truncate font-medium" :title="item.causer_name">
+              <router-link v-if="item.causer_id" :to="`/dashboard/system/user-management/users?search=${item.causer_registration_id || item.causer_name}`" class="hover:text-brand-blue hover:underline">
+                {{ item.causer_name || '—' }}
+              </router-link>
+              <span v-else>{{ item.causer_name || '—' }}</span>
+            </span>
+            <span v-if="item.causer_registration_id" class="text-[11px] text-main-text/50 truncate">
+              {{ item.causer_registration_id }}
+            </span>
+          </div>
         </template>
 
         <template #cell-resource="{ item }">
@@ -149,59 +169,84 @@
       @confirm="executeRollback"
     />
     <!-- View Details Modal -->
-    <Modal :show="showViewModal" max-width="3xl" @close="closeViewModal">
-      <div class="p-6">
-        <div class="flex items-center justify-between mb-6">
-          <h2 class="text-lg font-bold text-main-text">Audit Details</h2>
-          <Button variant="ghost" class="w-8 h-8 p-0" @click="closeViewModal">✕</Button>
-        </div>
-        
-        <div v-if="viewItem" class="space-y-6">
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 bg-main-bg p-4 rounded-xl border border-card-border/60">
-            <div>
-              <div class="text-xs text-main-text/50 font-medium">Event</div>
-              <div class="text-sm font-semibold mt-1" :class="eventConfig(viewItem.event).badge.split(' ')[1]">{{ eventLabel(viewItem.event) }}</div>
-            </div>
-            <div>
-              <div class="text-xs text-main-text/50 font-medium">Causer</div>
-              <div class="text-sm font-medium mt-1">{{ viewItem.causer_name || 'System' }}</div>
-            </div>
-            <div>
-              <div class="text-xs text-main-text/50 font-medium">Resource</div>
-              <div class="text-sm font-medium mt-1">{{ friendlyModel(viewItem.model_type) }} #{{ viewItem.model_id }}</div>
-            </div>
-            <div>
-              <div class="text-xs text-main-text/50 font-medium">Date & Time</div>
-              <div class="text-sm font-medium mt-1">{{ formatDate(viewItem.created_at) }} {{ formatTime(viewItem.created_at) }}</div>
+    <Modal
+      :show="showViewModal"
+      size="xl"
+      :title="$tr('audit.view_details_title', 'Audit Details')"
+      @close="closeViewModal"
+    >
+      <div v-if="viewItem" class="space-y-4 pt-2">
+        <!-- Meta info row -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 bg-main-bg p-3 rounded-xl border border-card-border/60">
+          <div>
+            <div class="text-xs text-main-text/70 font-medium mb-1">{{ $tr('common.event', 'Event') }} <span class="text-[10px] text-main-text/60 font-mono ml-1">#{{ viewItem.id }}</span></div>
+            <span :class="eventConfig(viewItem.event).badge" class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-semibold border">
+              <component :is="eventConfig(viewItem.event).icon" class="w-3 h-3" />
+              {{ eventLabel(viewItem.event) }}
+            </span>
+          </div>
+          <div class="min-w-0">
+            <div class="text-xs text-main-text/70 font-medium mb-1">{{ $tr('audit.causer', 'Causer') }}</div>
+            <div class="flex flex-col min-w-0">
+              <div class="text-sm font-medium text-main-text truncate" :title="viewItem.causer_name || $tr('common.system', 'System')">{{ viewItem.causer_name || $tr('common.system', 'System') }}</div>
+              <div v-if="viewItem.causer_registration_id" class="text-[11px] text-main-text/40 font-mono truncate">{{ viewItem.causer_registration_id }}</div>
             </div>
           </div>
-
+          <div class="min-w-0">
+            <div class="text-xs text-main-text/70 font-medium mb-1">{{ $tr('audit.resource', 'Resource') }} <span class="text-[10px] text-main-text/60 font-mono ml-1">#{{ viewItem.model_id }}</span></div>
+            <div class="flex flex-col min-w-0">
+              <div class="text-sm font-medium text-main-text truncate">{{ friendlyModel(viewItem.model_type) }}</div>
+              <div v-if="viewItem.resource_registration_id" class="text-[11px] text-main-text/40 font-mono truncate">{{ viewItem.resource_registration_id }}</div>
+            </div>
+          </div>
           <div>
-            <h3 class="text-sm font-bold text-main-text mb-3">Changes</h3>
-            <div class="bg-card-bg border border-card-border/60 rounded-xl overflow-hidden">
-              <div class="grid grid-cols-12 bg-main-bg/50 px-4 py-2 border-b border-card-border/60 text-xs font-semibold text-main-text/40">
-                <div class="col-span-3">Property</div>
-                <div class="col-span-4" v-if="viewItem.event?.toLowerCase() !== 'created'">Old Value</div>
-                <div class="col-span-1" v-if="viewItem.event?.toLowerCase() === 'updated'"></div>
-                <div class="col-span-4" v-if="viewItem.event?.toLowerCase() !== 'deleted'" :class="{'col-span-8': viewItem.event?.toLowerCase() === 'created'}">New Value</div>
+            <div class="text-xs text-main-text/70 font-medium mb-1">{{ $tr('common.date_time', 'Date & Time') }}</div>
+            <div class="text-sm font-medium text-main-text">{{ formatDate(viewItem.created_at) }} {{ formatTime(viewItem.created_at) }}</div>
+          </div>
+        </div>
+
+        <!-- Changes table -->
+        <div>
+          <h3 class="text-sm font-bold text-main-text mb-2">{{ $tr('audit.changes', 'Changes') }}</h3>
+          <div class="bg-card-bg border border-card-border/60 rounded-xl overflow-hidden">
+            <div class="grid grid-cols-12 bg-main-bg/50 px-4 py-2 border-b border-card-border/60 text-xs font-semibold text-main-text/70 capitalize tracking-wide">
+              <div class="col-span-3">{{ $tr('common.property', 'Property') }}</div>
+              <div class="col-span-4" v-if="viewItem.event?.toLowerCase() !== 'created'">{{ $tr('audit.old_value', 'Old Value') }}</div>
+              <div class="col-span-1" v-if="viewItem.event?.toLowerCase() === 'updated'"></div>
+              <div
+                v-if="viewItem.event?.toLowerCase() !== 'deleted'"
+                :class="viewItem.event?.toLowerCase() === 'created' ? 'col-span-9' : 'col-span-4'"
+              >{{ $tr('audit.new_value', 'New Value') }}</div>
+            </div>
+            <div class="divide-y divide-card-border/40 max-h-[50vh] overflow-y-auto custom-scrollbar">
+              <div
+                v-for="(pair, i) in diffPairs(viewItem.old_values, viewItem.new_values)"
+                :key="i"
+                class="grid grid-cols-12 px-4 py-2 text-sm font-mono items-center hover:bg-main-bg/30 gap-x-1"
+              >
+                <div class="col-span-3 text-main-text/80 font-semibold truncate text-xs" :title="formatPropertyKey(pair.key)">{{ formatPropertyKey(pair.key) }}</div>
+
+                <div
+                  v-if="viewItem.event?.toLowerCase() !== 'created'"
+                  class="col-span-4 truncate text-rose-500 bg-rose-500/5 px-2 py-1 rounded border border-rose-500/10 text-xs"
+                  :title="String(formatDiffValue(pair.old, true))"
+                >
+                  {{ formatDiffValue(pair.old, false) }}
+                </div>
+
+                <div class="col-span-1 flex justify-center text-main-text/20 text-xs" v-if="viewItem.event?.toLowerCase() === 'updated'">→</div>
+
+                <div
+                  v-if="viewItem.event?.toLowerCase() !== 'deleted'"
+                  :class="viewItem.event?.toLowerCase() === 'created' ? 'col-span-9' : 'col-span-4'"
+                  class="truncate text-emerald-600 bg-emerald-500/5 px-2 py-1 rounded border border-emerald-500/10 text-xs"
+                  :title="String(formatDiffValue(pair.new, true))"
+                >
+                  {{ formatDiffValue(pair.new, false) }}
+                </div>
               </div>
-              <div class="divide-y divide-card-border/40 max-h-[400px] overflow-y-auto custom-scrollbar">
-                <div v-for="(pair, i) in diffPairs(viewItem.old_values, viewItem.new_values)" :key="i" class="grid grid-cols-12 px-4 py-3 text-sm font-mono items-center hover:bg-main-bg/30">
-                  <div class="col-span-3 text-main-text/60 font-semibold pr-2 break-all">{{ pair.key }}</div>
-                  
-                  <div class="col-span-4 break-all text-rose-500 bg-rose-500/5 p-2 rounded-lg border border-rose-500/10 max-h-48 overflow-y-auto custom-scrollbar" v-if="viewItem.event?.toLowerCase() !== 'created'">
-                    {{ formatDiffValue(pair.old, true) }}
-                  </div>
-                  
-                  <div class="col-span-1 flex justify-center text-main-text/20" v-if="viewItem.event?.toLowerCase() === 'updated'">→</div>
-                  
-                  <div class="col-span-4 break-all text-emerald-600 bg-emerald-500/5 p-2 rounded-lg border border-emerald-500/10 max-h-48 overflow-y-auto custom-scrollbar" v-if="viewItem.event?.toLowerCase() !== 'deleted'" :class="{'col-span-9': viewItem.event?.toLowerCase() === 'created'}">
-                    {{ formatDiffValue(pair.new, true) }}
-                  </div>
-                </div>
-                <div v-if="diffPairs(viewItem.old_values, viewItem.new_values).length === 0" class="px-4 py-8 text-center text-main-text/40 italic text-sm">
-                  No property changes recorded.
-                </div>
+              <div v-if="diffPairs(viewItem.old_values, viewItem.new_values).length === 0" class="px-4 py-8 text-center text-main-text/40 italic text-sm">
+                {{ $tr('audit.no_changes', 'No property changes recorded.') }}
               </div>
             </div>
           </div>
@@ -218,6 +263,34 @@ import { useToastStore } from '@/stores/toast';
 import apiClient from '@/api/apiClient';
 import { formatDate as utilFormatDate, formatTime as utilFormatTime, localize } from '@/utils/format';
 
+const formatPropertyKey = (key: string) => {
+  const map: Record<string, string> = {
+    'fine_paid': 'Fine Paid',
+    'is_gift': 'Is Gift / Donation',
+    'payment_method': 'Payment Method',
+    'amount': 'Amount',
+    'reference_number': 'Reference Number',
+    'paid_at': 'Date Paid',
+    'payer_name': 'Payer Name',
+    'payment_period': 'Payment Period',
+    'for_year': 'For Year',
+    'for_month': 'For Month',
+    'work_status': 'Work Status',
+    'base_amount': 'Base Amount',
+    'fine_amount': 'Fine Amount',
+    'total_amount_due': 'Total Due',
+    'amount_paid': 'Amount Paid',
+    'status': 'Status',
+    'member_name': 'Member Name',
+    'donor_name': 'Donor Name',
+    'created_at': 'Created At',
+    'updated_at': 'Updated At',
+    'deleted_at': 'Deleted At'
+  };
+  if (map[key]) return map[key];
+  return key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+};
+
 import Button from '@/components/common/Button.vue';
 import TablePagination from '@/components/common/TablePagination.vue';
 import DataTable from '@/components/common/DataTable.vue';
@@ -228,7 +301,7 @@ import Modal from '@/components/common/Modal.vue';
 import { useLanguageStore } from '@/stores/languageStore';
 
 const langStore = useLanguageStore();
-const $tr = (key: string, defaultText: string) => langStore.translate(key) || defaultText;
+const $tr = (key: string, defaultText = '', params?: Record<string, any>) => langStore.translate(key, params) || defaultText;
 
 const toast = useToastStore();
 const loading = ref(true);
@@ -367,11 +440,13 @@ const getAuditActions = (item: any) => {
     }
   ];
 
-  if (item.event?.toLowerCase() !== 'created') {
+  // Use the server-side can_rollback flag — only show when reversible
+  if (item.can_rollback) {
     actions.push({
       label: $tr('audit.rollback', 'Rollback'),
       icon: RotateCcw,
-      colorClass: 'text-rose-500 hover:bg-rose-50',
+      colorClass: 'text-rose-500',
+      hoverClass: 'hover:!bg-rose-500 hover:!text-white',
       onClick: (log: any) => confirmRollback(log),
     });
   }
@@ -442,6 +517,7 @@ const diffPairs = (oldValues: any, newValues: any) => {
     old: oldV[key],
     new: newV[key]
   })).filter(pair => {
+    if (pair.key === 'id') return false;
     // If objects, compare stringified to catch inner changes
     if (typeof pair.old === 'object' || typeof pair.new === 'object') {
       return JSON.stringify(pair.old) !== JSON.stringify(pair.new);

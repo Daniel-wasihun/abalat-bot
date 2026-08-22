@@ -9,7 +9,7 @@ const optionalLetters = z
     .string().nullable().optional().or(z.literal(""))
     .refine((v) => !v || LETTERS_ONLY.test(v), { message: "validation.letters_only" });
 
-export const createProfileSchema = () =>
+export const createProfileSchema = (formValues?: Record<string, any>) =>
     z.object({
         name: z.string()
             .min(2, "validation.min_length")
@@ -35,6 +35,15 @@ export const createProfileSchema = () =>
             .refine((v) => !v || SENBET_CLASSES.includes(v), { message: "Invalid Senbet class" }),
 
         roles: z.array(z.string()).min(1, "validation.required"),
+
+        // Emergency fields — required only when the user is a member
+        emergency_name: formValues?.is_member
+            ? z.string().min(1, "validation.required")
+            : z.string().optional().or(z.literal("")),
+
+        emergency_phone: formValues?.is_member
+            ? z.string().min(1, "validation.required")
+            : z.string().optional().or(z.literal("")),
     });
 
 export const roleSchema = z.object({

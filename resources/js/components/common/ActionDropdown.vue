@@ -24,6 +24,7 @@ interface Action {
  label: string;
  icon: any;
  colorClass?: string;
+ hoverClass?: string;
  onClick: (item: any) => void;
  disabled?: boolean;
  tooltip?: string;
@@ -230,6 +231,7 @@ onUnmounted(() => {
  class="w-full flex items-center justify-start gap-3 px-4 py-3 text-sm font-normal rounded-xl transition-all hover:bg-card-hover group/action cursor-pointer whitespace-nowrap"
  :class="[
  action.colorClass || 'text-main-text/70',
+ action.hoverClass || '',
  {
  'opacity-50 cursor-not-allowed grayscale pointer-events-none':
  action.disabled,

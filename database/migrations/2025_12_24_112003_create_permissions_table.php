@@ -12,10 +12,10 @@ return new class extends Migration {
         Schema::create('permissions', function (Blueprint $table) {
             $table->id();
             $table->string('slug')->unique();
-            $table->jsonb('name')->unique(); // Bilingual support
+            $table->string('name')->unique();
             $table->string('module');
             $table->string('action');
-            $table->jsonb('description')->nullable(); // Bilingual support
+            $table->string('description')->nullable();
             $table->boolean('is_system_level')->default(true);
             $table->boolean('is_active')->default(true);
             $table->timestamps();

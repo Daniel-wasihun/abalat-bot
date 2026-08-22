@@ -91,6 +91,62 @@
         </div>
       </div>
 
+      <!-- ── Payment Financial Summary ─────────────────────────────────── -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+
+        <!-- Total Payment Income -->
+        <div class="premium-card p-5 flex items-center gap-4 transition-all duration-300 hover:border-emerald-500/30 group">
+          <div class="w-11 h-11 rounded-xl flex items-center justify-center bg-emerald-500/10 border border-emerald-500/20 shrink-0 transition-all duration-300">
+            <TrendingUp class="w-5 h-5 text-emerald-600 transition-transform duration-300 group-hover:scale-110" :stroke-width="1.5" />
+          </div>
+          <div class="min-w-0 flex-1">
+            <p class="text-xl font-black text-emerald-600 font-mono tracking-tight leading-none">
+              {{ fmtEtb(paymentStats.total_payment_income) }}
+              <span class="text-xs font-semibold text-emerald-500/60 ml-1">{{ t('payments.currency', 'ETB') }}</span>
+            </p>
+            <span class="text-[10px] font-bold text-main-text/40 capitalize tracking-widest block mt-1 truncate">
+              {{ t('payments.stats.payment_income', 'Total Payment Income') }}
+            </span>
+            <span class="text-[10px] text-main-text/30 block">{{ t('payments.stats.payment_income_desc', 'From member monthly obligations') }}</span>
+          </div>
+        </div>
+
+        <!-- Total Gifts / Donations -->
+        <div class="premium-card p-5 flex items-center gap-4 transition-all duration-300 hover:border-pink-500/30 group">
+          <div class="w-11 h-11 rounded-xl flex items-center justify-center bg-pink-500/10 border border-pink-500/20 shrink-0 transition-all duration-300">
+            <Gift class="w-5 h-5 text-pink-600 transition-transform duration-300 group-hover:scale-110" :stroke-width="1.5" />
+          </div>
+          <div class="min-w-0 flex-1">
+            <p class="text-xl font-black text-pink-600 font-mono tracking-tight leading-none">
+              {{ fmtEtb(paymentStats.total_donations) }}
+              <span class="text-xs font-semibold text-pink-500/60 ml-1">{{ t('payments.currency', 'ETB') }}</span>
+            </p>
+            <span class="text-[10px] font-bold text-main-text/40 capitalize tracking-widest block mt-1 truncate">
+              {{ t('payments.stats.donations', 'Total Gifts / Donations') }}
+            </span>
+            <span class="text-[10px] text-main-text/30 block">{{ t('payments.stats.donations_desc', 'Senbet School asset income') }}</span>
+          </div>
+        </div>
+
+        <!-- Total School Assets / Receipts -->
+        <div class="premium-card p-5 flex items-center gap-4 transition-all duration-300 hover:border-brand-blue/30 group">
+          <div class="w-11 h-11 rounded-xl flex items-center justify-center bg-brand-blue/10 border border-brand-blue/20 shrink-0 transition-all duration-300">
+            <Landmark class="w-5 h-5 text-brand-blue transition-transform duration-300 group-hover:scale-110" :stroke-width="1.5" />
+          </div>
+          <div class="min-w-0 flex-1">
+            <p class="text-xl font-black text-brand-blue font-mono tracking-tight leading-none">
+              {{ fmtEtb(paymentStats.total_school_assets) }}
+              <span class="text-xs font-semibold text-brand-blue/60 ml-1">{{ t('payments.currency', 'ETB') }}</span>
+            </p>
+            <span class="text-[10px] font-bold text-main-text/40 capitalize tracking-widest block mt-1 truncate">
+              {{ t('payments.stats.school_assets', 'Total School Assets / Receipts') }}
+            </span>
+            <span class="text-[10px] text-main-text/30 block">{{ t('payments.stats.school_assets_desc', 'Income + Gifts combined') }}</span>
+          </div>
+        </div>
+
+      </div>
+
       <!-- Chart + Activity Feed -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
@@ -239,12 +295,25 @@ import {
   CheckCircle2,
   Clock,
   User,
+  TrendingUp,
+  Gift,
+  Landmark,
 } from 'lucide-vue-next';
 
 const languageStore = useLanguageStore();
 const authStore = useAuthStore();
 
-const t = (k: string, p?: Record<string, any>) => languageStore.translate(k, p);
+const t = (k: string, fallbackOrParams?: string | Record<string, any>, params?: Record<string, any>) => {
+  if (fallbackOrParams && typeof fallbackOrParams === 'object') {
+    return languageStore.translate(k, fallbackOrParams);
+  }
+  if (params && typeof params === 'object') {
+    return languageStore.translate(k, params);
+  }
+  const res = languageStore.translate(k);
+  if (res && res !== k) return res;
+  return typeof fallbackOrParams === 'string' ? fallbackOrParams : k;
+};
 
 const localize = (val: any) => {
   if (!val) return "";
@@ -258,6 +327,14 @@ const activities = ref<any[]>([]);
 const chartData  = ref<{ labels: string[]; feedback: number[]; users: number[] }>({
   labels: [], feedback: [], users: [],
 });
+
+const paymentStats = ref({
+  total_payment_income: 0 as number | string,
+  total_donations:      0 as number | string,
+  total_school_assets:  0 as number | string,
+});
+
+const fmtEtb = (v: any) => parseFloat(v ?? 0).toFixed(2);
 
 const stats = ref({
   totalUsers: 0,
@@ -361,12 +438,32 @@ const applyDashboardData = (data: any) => {
   loading.value = false;
 };
 
+// ── Ethiopian year helper (Gregorian → approximate ET year) ─────────────────
+const currentEthYear = () => new Date().getFullYear() - 8;
+
+// ── Fetch payment financial summary ─────────────────────────────────────────
+const fetchPaymentStats = async () => {
+  try {
+    const ethYear  = currentEthYear();
+    const ethMonth = new Date().getMonth() + 1; // close enough for current period
+    const res = await axios.get(`/api/payments/stats?year=${ethYear}&month=${ethMonth}`);
+    const s = res.data?.data ?? res.data ?? {};
+    paymentStats.value = {
+      total_payment_income: s.total_payment_income ?? s.collected ?? 0,
+      total_donations:      s.total_donations ?? 0,
+      total_school_assets:  s.total_school_assets ?? s.collected ?? 0,
+    };
+  } catch { /* silently ignore — dashboard shouldn't crash */ }
+};
+
 let safetyTimer: ReturnType<typeof setTimeout> | null = null;
 
 onMounted(() => {
   axios.get('/bot/dashboard')
     .then(res  => applyDashboardData(res.data))
     .catch(() => { loading.value = false; });
+
+  fetchPaymentStats();
 
   safetyTimer = setTimeout(() => { loading.value = false; }, 5000);
 });

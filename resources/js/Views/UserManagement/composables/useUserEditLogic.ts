@@ -108,8 +108,14 @@ export function useUserEditLogic(props: { user: any }, emit: any, $tr: any) {
             return;
         }
 
+        // Extract only the first name (not full combined name with father/grandfather)
+        // Backend sends combined name e.g. "Yared Alemayehu Alemu", but we only want "Yared"
+        const rawName: string = user.name || "";
+        const firstName = rawName.trim().split(/\s+/)[0] || rawName;
+        const hasDocument = !!(user.senbetMembership?.previous_participation_document);
+
         profileForm.value = {
-            name: localize(user.name, languageStore.currentLanguage) || "",
+            name: firstName,
             email: user.email || "",
             registration_id: user.info?.registration_id || "",
             phone_number: user.info?.phone_number || "",
@@ -136,7 +142,8 @@ export function useUserEditLogic(props: { user: any }, emit: any, $tr: any) {
             emergency_address: user.senbetMembership?.emergency_address || "",
             senbet_class: user.senbetMembership?.senbet_class || "",
             section: user.senbetMembership?.section || "",
-            previous_participation: !!user.senbetMembership?.previous_participation,
+            // previous_participation only active if there is an existing document
+            previous_participation: !!user.senbetMembership?.previous_participation && hasDocument,
             previous_participation_document: null, // Don't load file objects from string path
         };
 
@@ -172,12 +179,30 @@ export function useUserEditLogic(props: { user: any }, emit: any, $tr: any) {
     // ─── Submit flow ──────────────────────────────────────────────────────────
 
     const openConfirm = (type: "profile" | "role" | "permissions") => {
-        if (type === "profile" && !validate(createProfileSchema(), profileForm.value)) return;
-        if (type === "role" && !validate(roleSchema, {
+        let isValid = true;
+
+        if (type === "profile" && !validate(createProfileSchema(profileForm.value), profileForm.value)) {
+            isValid = false;
+        } else if (type === "role" && !validate(roleSchema, {
             roles: selectedRoles.value,
             startDate: roleStartDate.value,
             endDate: roleEndDate.value,
-        })) return;
+        })) {
+            isValid = false;
+        }
+
+        if (!isValid) {
+            toast.error($tr("common.fix_validation_errors") || "Please fix the validation errors before saving.");
+            
+            // Scroll to the top of the modal body to ensure errors are visible
+            setTimeout(() => {
+                const modalBody = document.querySelector('.custom-scrollbar');
+                if (modalBody) {
+                    modalBody.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            }, 100);
+            return;
+        }
 
         // Skip confirmation dialog when creating a new user
         if (type === "profile" && !props.user) {
@@ -358,10 +383,15 @@ export function useUserEditLogic(props: { user: any }, emit: any, $tr: any) {
             res.description = $tr("user.review_profile_changes") || "Review the changes to this user's information.";
             res.icon = UserCircle2;
 
-            const originalName = props.user ? localize(props.user.name, languageStore.currentLanguage) : "";
-            if (profileForm.value.name !== originalName)
-                res.summary.push({ label: $tr("field.full_name") || "Full Name", value: profileForm.value.name });
-            if (profileForm.value.email !== (props.user?.email || ""))
+            // Build full name from first + father + grandfather for the confirm modal
+            const fullName = [
+                profileForm.value.name,
+                profileForm.value.father_name,
+                profileForm.value.grandfather_name,
+            ].filter(Boolean).join(" ");
+
+            res.summary.push({ label: $tr("field.full_name") || "Full Name", value: fullName || profileForm.value.name });
+            if (profileForm.value.email)
                 res.summary.push({ label: $tr("field.email_address") || "Email", value: profileForm.value.email });
             if (profilePictureFile.value)
                 res.summary.push({ label: $tr("field.profile_picture") || "Avatar", value: $tr("common.new_avatar_selected") || "New avatar selected" });

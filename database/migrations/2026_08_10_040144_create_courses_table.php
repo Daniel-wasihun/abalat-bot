@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('courses', function (Blueprint $table) {
             $table->id();
-            $table->json('name');
+            $table->string('name');
             $table->string('code')->unique();
             $table->text('description')->nullable();
             $table->integer('credit_hours')->default(1);

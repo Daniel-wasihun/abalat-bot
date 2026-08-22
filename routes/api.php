@@ -144,6 +144,12 @@ Route::middleware(['auth:api', 'active', \App\Http\Middleware\TrackUserDevice::c
     });
 
     // Payments
+    Route::get('/payments/export-csv', [\App\Http\Controllers\PaymentController::class, 'exportCsv'])
+        ->middleware('permission:academic_courses.view');
+    Route::get('/payments/export-excel', [\App\Http\Controllers\PaymentController::class, 'exportExcel'])
+        ->middleware('permission:academic_courses.view');
+    Route::get('/payments/export-pdf', [\App\Http\Controllers\PaymentController::class, 'exportPdf'])
+        ->middleware('permission:academic_courses.view');
     Route::get('/payments/statistics', [\App\Http\Controllers\PaymentController::class, 'statistics'])
         ->middleware('permission:academic_courses.view');
     Route::get('/payments/preview-bulk', [\App\Http\Controllers\PaymentController::class, 'previewBulk'])

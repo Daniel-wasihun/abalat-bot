@@ -66,6 +66,15 @@ export function useValidation() {
                     let fieldKey = `field.${path}`;
                     let fieldName = lang.translate(fieldKey);
 
+                    // If not found in 'field.', try 'user.form.' as a fallback
+                    if (fieldName === fieldKey) {
+                        let userFormKey = `user.form.${path}`;
+                        let userFormName = lang.translate(userFormKey);
+                        if (userFormName !== userFormKey) {
+                            fieldName = userFormName;
+                        }
+                    }
+
                     // Handle nested localized fields (e.g. name.en -> campus_name if we specify it)
                     if (fieldName === fieldKey && path.includes(".")) {
                         const parts = path.split(".");

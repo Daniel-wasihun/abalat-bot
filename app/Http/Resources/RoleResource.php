@@ -16,14 +16,10 @@ class RoleResource extends ApiResource {
     public function toArray($request): array {
         return [
             'id' => $this->id,
-            'name' => $this->name__localized,
+            'name' => $this->name__localized ?? $this->name,
             'slug' => $this->slug,
-            'description' => $this->description__localized,
-            'permissions' => $this->permissions->map(fn($p) => [
-                'id' => $p->id,
-                'name' => $p->name__localized,
-                'slug' => $p->slug,
-            ])->toArray(),
+            'description' => $this->description__localized ?? $this->description ?? "",
+            'permissions' => $this->permissions->map(fn($p) => PermissionResource::make($p)->resolve()),
             'users_count' => $this->users()->count(),
             'hierarchy_level' => $this->hierarchy_level,
             'is_system_level' => (bool) $this->is_system_level,

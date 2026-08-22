@@ -11,7 +11,7 @@ use OwenIt\Auditing\Contracts\Auditable;
 
 class Role extends Model implements Auditable {
 
-    use HasSlug, Localizable, SoftDeletes, \App\Traits\HasSorting, \OwenIt\Auditing\Auditable;
+    use HasSlug, SoftDeletes, \App\Traits\HasSorting, \OwenIt\Auditing\Auditable;
 
     protected $fillable = [
         'name',
@@ -23,8 +23,6 @@ class Role extends Model implements Auditable {
     ];
 
     protected $casts = [
-        'name' => 'array',
-        'description' => 'array',
         'is_system_level' => 'boolean',
         'is_active' => 'boolean',
     ];
@@ -49,12 +47,10 @@ class Role extends Model implements Auditable {
         return $this->belongsToMany(User::class, 'user_role');
     }
 
-    protected function localizable(): array {
-        return ['name', 'description'];
-    }
+
 
     public function sortByName($query, $sortOrder) {
-        return $query->orderByRaw("name->>'en' {$sortOrder}");
+        return $query->orderBy('name', $sortOrder);
     }
 
     public function sortByUsersCount($query, $sortOrder) {

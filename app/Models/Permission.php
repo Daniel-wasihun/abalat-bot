@@ -11,12 +11,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Permission extends Model {
-    use SoftDeletes, Localizable, HasSlug;
+    use SoftDeletes, HasSlug;
     protected $fillable = ['name', 'slug', 'module', 'action', 'description', 'is_system_level', 'is_active'];
 
     protected $casts = [
-        'name' => 'array',
-        'description' => 'array',
         'is_system_level' => 'boolean',
         'is_active' => 'boolean',
     ];
@@ -44,38 +42,19 @@ class Permission extends Model {
             // Force slug generation
             $permission->generateSlug();
 
-            // Ensure name is sentence case (Only first letter Capital)
-            $names = [];
-            foreach (\App\Services\FrontLang::getAvailableLangKeys() as $lang) {
-                $translations = \App\Services\FrontLang::getTranslations($lang);
-
-                $actionLabel = $translations["action.{$permission->action}"] ?? ucfirst($permission->action);
+            $translations = \App\Services\FrontLang::getTranslations('en');
+            $actionLabel = $translations["action.{$permission->action}"] ?? ucfirst($permission->action);
                 $moduleLabel = $translations["module.{$permission->module}"] ?? ucfirst($permission->module);
+                $raw = "{$actionLabel} {$moduleLabel}";
 
-                if ($lang === 'am') {
-                    if ($permission->action === \App\Constants\Action::MANAGE) {
-                        $raw = "ሁሉንም {$moduleLabel} አስተዳድር";
-                    } else {
-                        $raw = "{$moduleLabel} {$actionLabel}";
-                    }
-                } else {
-                    $raw = "{$actionLabel} {$moduleLabel}";
-                }
-
-            // Force ONLY first letter capital, rest lower
-            $names[$lang] = mb_strtoupper(mb_substr($raw, 0, 1, "UTF-8"), "UTF-8") .
-                mb_strtolower(mb_substr($raw, 1, null, "UTF-8"), "UTF-8");
-        }
-        $permission->attributes['name'] = json_encode($names, JSON_UNESCAPED_UNICODE);
-    });
-}
+                // Force ONLY first letter capital, rest lower
+                $permission->name = mb_strtoupper(mb_substr($raw, 0, 1, "UTF-8"), "UTF-8") .
+                    mb_strtolower(mb_substr($raw, 1, null, "UTF-8"), "UTF-8");
+        });
+    }
 
 
     public function roles(): BelongsToMany {
         return $this->belongsToMany(Role::class);
-    }
-
-    protected function localizable(): array {
-        return ['name', 'description'];
     }
 }

@@ -36,10 +36,9 @@ class UserFactory extends Factory {
     public function configure(): static {
         return $this->afterCreating(function (\App\Models\User $user) {
             \App\Models\UserInfo::create([
-                'user_id' => $user->id,
-                'user_university_id' => 'TEST-' . Str::upper(Str::random(8)),
-                'user_type' => 'student',
-                'gender' => 'male',
+                'user_id'         => $user->id,
+                'registration_id' => \App\Models\UserInfo::generateNextRegistrationId(),
+                'gender'          => 'male',
             ]);
         });
     }

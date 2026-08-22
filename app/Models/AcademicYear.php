@@ -20,7 +20,6 @@ class AcademicYear extends Model
     ];
 
     protected $casts = [
-        'name'       => 'array',
         'is_current' => 'boolean',
         'is_active'  => 'boolean',
         'start_date' => 'date',

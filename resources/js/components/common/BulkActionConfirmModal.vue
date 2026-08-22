@@ -10,6 +10,7 @@ import {
 import Modal from "@/components/common/Modal.vue";
 import Button from "@/components/common/Button.vue";
 import InlineAlert from "@/components/common/InlineAlert.vue";
+import { onUnmounted, watch } from "vue";
 
 interface Props {
  show: boolean;
@@ -22,6 +23,25 @@ interface Props {
 
 const props = defineProps<Props>();
 const emit = defineEmits(["close", "confirm"]);
+
+const handleKeydown = (e: KeyboardEvent) => {
+    if (props.show && e.key === 'Enter' && !props.loading) {
+        e.preventDefault();
+        emit('confirm');
+    }
+};
+
+watch(() => props.show, (newVal) => {
+    if (newVal) {
+        document.addEventListener('keydown', handleKeydown);
+    } else {
+        document.removeEventListener('keydown', handleKeydown);
+    }
+}, { immediate: true });
+
+onUnmounted(() => {
+    document.removeEventListener('keydown', handleKeydown);
+});
 
 const getActionIcon = () => {
  switch (props.action) {

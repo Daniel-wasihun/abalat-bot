@@ -12,8 +12,8 @@ return new class extends Migration {
         Schema::create('roles', function (Blueprint $table) {
             $table->id();
             $table->string('slug')->unique();
-            $table->jsonb('name')->unique(); // Bilingual support
-            $table->jsonb('description')->nullable(); // Bilingual support
+            $table->string('name')->unique();
+            $table->string('description')->nullable();
             $table->integer('hierarchy_level')->default(1); // Higher number = higher power
             $table->boolean('is_system_level')->default(false);
             $table->boolean('is_active')->default(true);

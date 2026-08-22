@@ -28,72 +28,80 @@ class TeacherSeeder extends Seeder
         $teachers = [
             [
                 'email'    => 'habte.mariam@school.com',
-                'name_en'  => 'Habte Mariam',
+                'first'    => 'Habte',
+                'father'   => 'Mariam',
                 'name_am'  => 'ሀብተ ማርያም',
-                'phone'    => '+251911234501',
+                'phone'    => '911234501',
                 'gender'   => 'male',
                 'sub_city' => 'Bole',
                 'woreda'   => '05',
             ],
             [
                 'email'    => 'winta.selassie@school.com',
-                'name_en'  => 'Winta Selassie',
+                'first'    => 'Winta',
+                'father'   => 'Selassie',
                 'name_am'  => 'ዊንታ ሥላሴ',
-                'phone'    => '+251922345602',
+                'phone'    => '922345602',
                 'gender'   => 'female',
                 'sub_city' => 'Kirkos',
                 'woreda'   => '08',
             ],
             [
                 'email'    => 'kidane.wold@school.com',
-                'name_en'  => 'Kidane Wold',
+                'first'    => 'Kidane',
+                'father'   => 'Wold',
                 'name_am'  => 'ኪዳነ ወልድ',
-                'phone'    => '+251933456703',
+                'phone'    => '933456703',
                 'gender'   => 'male',
                 'sub_city' => 'Yeka',
                 'woreda'   => '11',
             ],
             [
                 'email'    => 'amete.mikael@school.com',
-                'name_en'  => 'Amete Mikael',
+                'first'    => 'Amete',
+                'father'   => 'Mikael',
                 'name_am'  => 'አመተ ሚካኤል',
-                'phone'    => '+251944567804',
+                'phone'    => '944567804',
                 'gender'   => 'female',
                 'sub_city' => 'Arada',
                 'woreda'   => '02',
             ],
             [
                 'email'    => 'gebre.kidan@school.com',
-                'name_en'  => 'Gebre Kidan',
+                'first'    => 'Gebre',
+                'father'   => 'Kidan',
                 'name_am'  => 'ገብረ ኪዳን',
-                'phone'    => '+251955678905',
+                'phone'    => '955678905',
                 'gender'   => 'male',
                 'sub_city' => 'Nifas Silk',
                 'woreda'   => '07',
             ],
             [
                 'email'    => 'mahlet.tsion@school.com',
-                'name_en'  => 'Mahlet Tsion',
+                'first'    => 'Mahlet',
+                'father'   => 'Tsion',
                 'name_am'  => 'ማህሌተ ጽዮን',
-                'phone'    => '+251966789006',
+                'phone'    => '966789006',
                 'gender'   => 'female',
                 'sub_city' => 'Gulele',
                 'woreda'   => '04',
             ],
             [
                 'email'    => 'yared.tewabe@school.com',
-                'name_en'  => 'Yared Tewabe',
+                'first'    => 'Yared',
+                'father'   => 'Tewabe',
                 'name_am'  => 'ያሬድ ተዋበ',
-                'phone'    => '+251977890107',
+                'phone'    => '977890107',
                 'gender'   => 'male',
                 'sub_city' => 'Lideta',
                 'woreda'   => '06',
             ],
             [
                 'email'    => 'fikerte.mariam@school.com',
-                'name_en'  => 'Fikerte Mariam',
+                'first'    => 'Fikerte',
+                'father'   => 'Mariam',
                 'name_am'  => 'ፍቅርተ ማርያም',
-                'phone'    => '+251988901208',
+                'phone'    => '988901208',
                 'gender'   => 'female',
                 'sub_city' => 'Kolfe Keranio',
                 'woreda'   => '10',
@@ -104,7 +112,7 @@ class TeacherSeeder extends Seeder
             $user = User::updateOrCreate(
                 ['email' => $data['email']],
                 [
-                    'name'      => ['en' => $data['name_en'], 'am' => $data['name_am']],
+                    'name'      => $data['first'],
                     'password'  => Hash::make('password123'),
                     'is_active' => true,
                 ]
@@ -127,10 +135,10 @@ class TeacherSeeder extends Seeder
                     'registration_id'       => UserInfo::generateNextRegistrationId(),
                     'gender'                => $data['gender'],
                     'phone_number'          => $data['phone'],
-                    'father_name'           => 'Father of ' . $data['name_en'],
-                    'grandfather_name'      => 'Grandfather ' . $data['name_en'],
-                    'christian_name'        => $data['name_en'], // Already spiritual
-                    'spiritual_father_name' => 'Aba ' . explode(' ', $data['name_en'])[0],
+                    'father_name'           => $data['father'],
+                    'grandfather_name'      => 'Alemu',
+                    'christian_name'        => $data['first'], // Already spiritual
+                    'spiritual_father_name' => 'Aba Gebre Selassie',
                     'sub_city'              => $data['sub_city'],
                     'woreda'                => $data['woreda'],
                     'house_number'          => (string)rand(100, 999),
@@ -138,7 +146,7 @@ class TeacherSeeder extends Seeder
                 ]
             );
 
-            $this->command->line('  ✓ ' . $data['name_en'] . ' <' . $data['email'] . '>');
+            $this->command->line('  ✓ ' . $data['first'] . ' ' . $data['father'] . ' <' . $data['email'] . '>');
         }
 
         $this->command->info(count($teachers) . ' spiritual teacher users seeded. Default password: password123');

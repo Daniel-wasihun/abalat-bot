@@ -2,7 +2,17 @@
 
 namespace App\Http\Controllers;
 
-abstract class Controller
+use Illuminate\Routing\Controllers\HasMiddleware;
+
+abstract class Controller implements HasMiddleware
 {
-    // Base Controller
+    /**
+     * Get the middleware that should be assigned to the controller.
+     * 
+     * @return array
+     */
+    public static function middleware(): array
+    {
+        return [];
+    }
 }

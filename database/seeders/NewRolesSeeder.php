@@ -31,14 +31,8 @@ class NewRolesSeeder extends Seeder
             Role::firstOrCreate(
                 ['slug' => $roleData['slug']],
                 [
-                    'name' => [
-                        'en' => $roleData['name_en'],
-                        'am' => $roleData['name_en'], // Defaulting to english name if translation isn't provided
-                    ],
-                    'description' => [
-                        'en' => $roleData['name_en'] . ' Role',
-                        'am' => $roleData['name_en'] . ' Role',
-                    ],
+                    'name' => $roleData['name_en'],
+                    'description' => $roleData['name_en'] . ' Role',
                     'hierarchy_level' => $level,
                     'is_system_level' => false,
                     'is_active' => true,

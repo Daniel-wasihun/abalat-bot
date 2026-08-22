@@ -135,8 +135,8 @@ const isStudentOnly = computed(() => {
                 <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 text-left w-full">
                     <FormField
                         v-model="profileForm.name"
-                        :label="$tr('user.form.full_name') || 'Full Name'"
-                        :placeholder="$tr('user.form.full_name_placeholder') || 'e.g. Daniel Aklilu'"
+                        :label="$tr('user.form.first_name') || 'First Name'"
+                        :placeholder="$tr('user.form.first_name_placeholder') || 'e.g. Daniel'"
                         required :icon="User" :error="errors.name" @input="clearFieldError('name')" />
 
                     <FormField
@@ -366,13 +366,13 @@ const isStudentOnly = computed(() => {
                             v-model="profileForm.emergency_name"
                             :label="$tr('user.form.emergency_name') || 'Emergency Contact Name'"
                             :placeholder="$tr('user.form.emergency_name_placeholder') || 'Full name of contact person'"
-                            :icon="User" :error="errors.emergency_name" @input="clearFieldError('emergency_name')" />
+                            required :icon="User" :error="errors.emergency_name" @input="clearFieldError('emergency_name')" />
 
                         <FormField
                             v-model="profileForm.emergency_phone"
                             :label="$tr('user.form.emergency_phone') || 'Emergency Phone'"
                             :placeholder="$tr('user.form.emergency_phone_placeholder') || 'e.g. +251911000000'"
-                            :icon="Phone" :error="errors.emergency_phone" @input="clearFieldError('emergency_phone')" />
+                            required :icon="Phone" :error="errors.emergency_phone" @input="clearFieldError('emergency_phone')" />
                     </div>
                 </div>
 

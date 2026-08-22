@@ -426,20 +426,20 @@
                 <p class="text-xs text-main-text/50 mt-0.5 mb-4">{{ $tr('payments.config.rates_desc', 'Set the monthly amounts for students and workers.') }}</p>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label class="block text-xs font-semibold text-main-text/60 capitalize tracking-widest mb-1.5">{{ $tr('payments.config.student_amount', 'Student Amount (ETB)') }}</label>
+                    <label class="block text-xs font-semibold text-main-text/60 capitalize tracking-widest mb-1.5">{{ $tr('payments.config.student_amount', 'Student Amount') }} ({{ $tr('payments.currency', 'ETB') }})</label>
                     <input v-model.number="paymentForm['payment.student_amount']" type="number" min="0" class="w-full px-4 h-11 rounded-xl border text-sm bg-input-bg text-main-text border-input-border focus:ring-2 focus:ring-brand-blue/30 outline-none transition-all" />
                   </div>
                   <div>
-                    <label class="block text-xs font-semibold text-main-text/60 capitalize tracking-widest mb-1.5">{{ $tr('payments.config.worker_amount', 'Worker Amount (ETB)') }}</label>
+                    <label class="block text-xs font-semibold text-main-text/60 capitalize tracking-widest mb-1.5">{{ $tr('payments.config.worker_amount', 'Worker Amount') }} ({{ $tr('payments.currency', 'ETB') }})</label>
                     <input v-model.number="paymentForm['payment.worker_amount']" type="number" min="0" class="w-full px-4 h-11 rounded-xl border text-sm bg-input-bg text-main-text border-input-border focus:ring-2 focus:ring-brand-blue/30 outline-none transition-all" />
                   </div>
                   <div>
-                    <label class="block text-xs font-semibold text-main-text/60 capitalize tracking-widest mb-1.5">{{ $tr('payments.config.student_fine', 'Student Late Fine / Month (ETB)') }}</label>
+                    <label class="block text-xs font-semibold text-main-text/60 capitalize tracking-widest mb-1.5">{{ $tr('payments.config.student_fine', 'Student Late Fine / Month') }} ({{ $tr('payments.currency', 'ETB') }})</label>
                     <input v-model.number="paymentForm['payment.student_fine_per_month']" type="number" min="0" class="w-full px-4 h-11 rounded-xl border text-sm bg-input-bg text-main-text border-input-border focus:ring-2 focus:ring-brand-blue/30 outline-none transition-all" />
                     <p class="text-xs text-main-text/40 mt-1">Fine applied to students per overdue month</p>
                   </div>
                   <div>
-                    <label class="block text-xs font-semibold text-main-text/60 capitalize tracking-widest mb-1.5">{{ $tr('payments.config.worker_fine', 'Worker Late Fine / Month (ETB)') }}</label>
+                    <label class="block text-xs font-semibold text-main-text/60 capitalize tracking-widest mb-1.5">{{ $tr('payments.config.worker_fine', 'Worker Late Fine / Month') }} ({{ $tr('payments.currency', 'ETB') }})</label>
                     <input v-model.number="paymentForm['payment.worker_fine_per_month']" type="number" min="0" class="w-full px-4 h-11 rounded-xl border text-sm bg-input-bg text-main-text border-input-border focus:ring-2 focus:ring-brand-blue/30 outline-none transition-all" />
                     <p class="text-xs text-main-text/40 mt-1">Fine applied to workers per overdue month</p>
                   </div>
@@ -470,9 +470,17 @@
                 <p class="text-xs text-main-text/50 mt-0.5 mb-4">{{ $tr('payments.config.timing_desc', 'Configure when payments are due.') }}</p>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
+                    <label class="block text-xs font-semibold text-main-text/60 capitalize tracking-widest mb-1.5">{{ $tr('payments.config.deadline_type', 'Deadline Type') }}</label>
+                    <select v-model="paymentForm['payment.deadline_type']" class="w-full px-4 h-11 rounded-xl border text-sm bg-input-bg text-main-text border-input-border focus:ring-2 focus:ring-brand-blue/30 outline-none transition-all">
+                      <option value="defined_days">{{ $tr('payments.config.defined_days', 'Defined Days') }}</option>
+                      <option value="end_of_month">{{ $tr('payments.config.end_of_month', 'End of Month') }}</option>
+                    </select>
+                  </div>
+                  <div v-if="paymentForm['payment.deadline_type'] === 'defined_days'">
                     <label class="block text-xs font-semibold text-main-text/60 capitalize tracking-widest mb-1.5">{{ $tr('payments.config.deadline_day', 'Monthly Deadline Day') }}</label>
                     <input v-model.number="paymentForm['payment.deadline_day']" type="number" min="1" max="30" class="w-full px-4 h-11 rounded-xl border text-sm bg-input-bg text-main-text border-input-border focus:ring-2 focus:ring-brand-blue/30 outline-none transition-all" />
                   </div>
+                  <div v-else></div> <!-- Placeholder for grid -->
                   <div>
                     <label class="block text-xs font-semibold text-main-text/60 capitalize tracking-widest mb-1.5">{{ $tr('payments.config.calendar_type', 'Calendar System') }}</label>
                     <select v-model="paymentForm['payment.calendar_type']" class="w-full px-4 h-11 rounded-xl border text-sm bg-input-bg text-main-text border-input-border focus:ring-2 focus:ring-brand-blue/30 outline-none transition-all">
@@ -806,6 +814,7 @@ const paymentForm = ref<Record<string, any>>({
   'payment.worker_fine_per_month': 20,
   'payment.minimum_grade_level': 3,
   'payment.minimum_age': 18,
+  'payment.deadline_type': 'defined_days',
   'payment.deadline_day': 10,
   'payment.calendar_type': 'ethiopian',
   'payment.is_enabled': true,

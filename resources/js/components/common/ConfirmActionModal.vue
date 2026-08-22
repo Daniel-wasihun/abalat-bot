@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { Save, AlertCircle, type LucideIcon } from "lucide-vue-next";
+import { Save } from "lucide-vue-next";
 import Modal from "@/components/common/Modal.vue";
 import Button from "@/components/common/Button.vue";
+import { getCurrentInstance } from "vue";
 
 interface SummaryItem {
  label: string;
@@ -14,7 +15,7 @@ withDefaults(
  title: string;
  description: string;
  summary: SummaryItem[];
- icon?: LucideIcon;
+ icon?: any;
  loading?: boolean;
  }>(),
  {
@@ -24,93 +25,76 @@ withDefaults(
 );
 
 const emit = defineEmits(["close", "confirm"]);
+const { proxy } = getCurrentInstance() as any;
+const $tr = proxy.$tr;
 </script>
 
 <template>
- <Modal
- :show="show"
- size="confirm"
- :hide-header="true"
- @close="emit('close')">
- <div
- class="flex flex-col bg-card-bg w-full font-sans text-left relative overflow-hidden rounded-[40px]">
- <!-- Decorative Gradient -->
- <div
- class="absolute inset-x-0 top-0 h-48 bg-gradient-to-b from-brand-blue/5 to-transparent pointer-events-none"></div>
+  <Modal
+    :show="show"
+    size="sm"
+    hideHeader
+    @close="!loading && emit('close')"
+  >
+    <!-- Modal body -->
+    <div class="px-6 py-8 flex flex-col items-center text-center">
+      <div 
+        class="w-16 h-16 rounded-full flex items-center justify-center mb-5 shrink-0 bg-brand-blue/10"
+      >
+        <component :is="icon" class="w-8 h-8 text-brand-blue" stroke-width="1.5" />
+      </div>
+      
+      <h3 class="text-xl font-bold text-main-text tracking-tight mb-2">
+        {{ title }}
+      </h3>
+      
+      <p class="text-[15px] leading-relaxed text-main-text/60 mb-6">
+        {{ description }}
+      </p>
 
- <div class="px-10 pb-12 pt-12 space-y-10 relative z-10 text-center">
- <!-- Icon & Header -->
- <div class="flex flex-col items-center gap-6">
- <div
- class="w-24 h-24 rounded-[32px] bg-brand-blue/5 flex items-center justify-center text-brand-blue border-2 border-brand-blue/10 shadow-2xl transition-all hover:scale-110 duration-700">
- <component :is="icon" class="w-10 h-10" />
- </div>
- <div class="space-y-3">
- <h4
- class="text-2xl font-black text-main-text capitalize tracking-tight">
- {{ title }}
- </h4>
- <p
- class="text-[13px] text-main-text/40 font-bold capitalize tracking-widest leading-relaxed max-w-[320px] mx-auto opacity-70">
- {{ description }}
- </p>
- </div>
- </div>
+      <!-- Summary Grid -->
+      <div
+        v-if="summary && summary.length"
+        class="w-full bg-card-bg/40 border border-card-border/60 rounded-xl overflow-hidden shadow-sm"
+      >
+        <div
+          v-for="(item, index) in summary"
+          :key="item.label"
+          :class="[
+            'flex justify-between items-center px-4 py-3 transition-colors',
+            index !== summary.length - 1 ? 'border-b border-card-border/40' : '',
+          ]"
+        >
+          <span class="text-xs font-semibold text-main-text/60">
+            {{ item.label }}
+          </span>
+          <span class="text-sm font-bold text-main-text truncate bg-main-bg/30 px-3 py-1 rounded-md border border-card-border/30">
+            {{ item.value }}
+          </span>
+        </div>
+      </div>
+    </div>
 
- <!-- Summary Grid -->
- <div
- v-if="summary && summary.length"
- class="bg-card-bg/40 border-2 border-card-border/40 rounded-[32px] overflow-hidden shadow-inner translate-y-2">
- <div
- v-for="(item, index) in summary"
- :key="item.label"
- :class="[
- 'flex justify-between items-center px-8 py-5 transition-colors',
- index !== summary.length - 1
- ? 'border-b border-card-border/20'
- : '',
- ]">
- <span
- class="text-[10px] font-black text-main-text/30 capitalize tracking-[0.2em]">
- {{ item.label }}
- </span>
- <span
- class="text-[13px] font-black text-main-text truncate bg-main-bg/5 px-4 py-1.5 rounded-xl border border-card-border/30 capitalize tracking-tight">
- {{ item.value }}
- </span>
- </div>
- </div>
+    <template #footer>
+      <div class="px-6 py-5 bg-card-bg/50 border-t border-card-border/40 flex items-center gap-3 w-full justify-center rounded-b-[inherit]">
+        <Button 
+          variant="secondary"
+          class="flex-1 font-semibold tracking-tight !h-11"
+          :disabled="loading"
+          @click="emit('close')"
+        >
+          {{ $tr('common.abort') || 'Cancel' }}
+        </Button>
 
- <!-- Actions -->
- <div class="flex gap-4 pt-4">
- <Button
- variant="secondary"
- size="md"
- class="!flex-1 !h-14 !rounded-2xl !bg-main-bg/5 !border-none !text-main-text/40 !font-black capitalize tracking-widest hover:!bg-rose-500 hover:!text-white transition-all shadow-none"
- @click="emit('close')">
- {{ $tr("common.abort") }}
- </Button>
- <Button
- variant="accent"
- size="md"
- class="!flex-1 !h-14 !rounded-2xl !font-black capitalize tracking-widest "
- :loading="loading"
- @click="emit('confirm')">
- {{
- loading
- ? $tr("common.processing")
- : $tr("common.confirm")
- }}
- </Button>
- </div>
- </div>
-
- <!-- Animated Status Loader -->
- <div class="h-1.5 w-full bg-main-bg/5 relative">
- <div
- v-if="loading"
- class="absolute inset-0 bg-brand-blue/40 animate-pulse"></div>
- </div>
- </div>
- </Modal>
+        <Button
+          variant="primary"
+          :loading="loading"
+          class="flex-1 font-semibold tracking-tight !h-11"
+          @click="emit('confirm')"
+        >
+          {{ loading ? ($tr('common.processing') || 'Processing...') : ($tr('common.confirm') || 'Confirm') }}
+        </Button>
+      </div>
+    </template>
+  </Modal>
 </template>

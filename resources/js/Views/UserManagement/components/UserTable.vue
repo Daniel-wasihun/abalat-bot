@@ -160,7 +160,7 @@ const getRoleStyles = (role: any) => {
  <TableColumn field="registration_id" :header="$tr('user.info.registration_no') || 'Reg. No.'" width="160px" sortable>
  <template #default="{ row: user }">
  <span
- class="px-3 py-1.5 rounded-xl bg-brand-blue/5 text-brand-blue text-[13px] font-normal border border-brand-blue/10 tracking-wide font-mono shrink-0 whitespace-nowrap">
+ class="text-sm md:text-base font-normal text-main-text group-hover:text-accent transition-colors tracking-wide font-mono shrink-0 whitespace-nowrap">
  #{{
  user.info?.registration_id ||
  user.id_number ||
@@ -252,7 +252,7 @@ const getRoleStyles = (role: any) => {
  </template>
  </TableColumn>
 
- <TableColumn header="" align="right">
+ <TableColumn :header="$tr('common.actions', 'Actions')" align="right">
  <template #default="{ row: user, index }">
  <div class="flex justify-end p-1">
  <ActionDropdown

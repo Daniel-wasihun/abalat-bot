@@ -20,7 +20,7 @@ return new class extends Migration
 
             $table->bigIncrements('id');
             $table->string($morphPrefix . '_type')->nullable();
-            $table->unsignedBigInteger($morphPrefix . '_id')->nullable();
+            $table->string($morphPrefix . '_id', 255)->nullable();
             $table->string('event');
             $table->morphs('auditable');
             $table->text('old_values')->nullable();
@@ -29,6 +29,10 @@ return new class extends Migration
             $table->ipAddress('ip_address')->nullable();
             $table->string('user_agent', 1023)->nullable();
             $table->string('tags')->nullable();
+            $table->timestamp('rolled_back_at')->nullable();
+            $table->unsignedBigInteger('rolled_back_by_audit_id')->nullable();
+            $table->boolean('is_rollback')->default(false);
+            $table->unsignedBigInteger('source_audit_id')->nullable();
             $table->timestamps();
 
             $table->index([$morphPrefix . '_id', $morphPrefix . '_type']);

@@ -17,7 +17,7 @@ class CourseSeeder extends Seeder
         $academicYear = AcademicYear::firstOrCreate(
             ['year' => '2026/2027'],
             [
-                'name'       => ['en' => '2026/2027 Academic Year', 'am' => '2026/2027 የትምህርት ዘመን'],
+                'name' => '2026/2027 Academic Year',
                 'start_date' => '2026-09-01',
                 'end_date'   => '2027-06-30',
                 'is_current' => true,
@@ -31,7 +31,7 @@ class CourseSeeder extends Seeder
 
             // ── Orthodox Faith & Theology ─────────────────────────────────────────
             [
-                'name'         => ['en' => 'Introduction to the Orthodox Faith', 'am' => 'ወደ ኦርቶዶክስ እምነት መግቢያ'],
+                'name' => 'Introduction to the Orthodox Faith',
                 'code'         => 'FAIT-101',
                 'description'  => 'Foundational principles of Ethiopian Orthodox Tewahedo Christianity for young learners.',
                 'credit_hours' => 2,
@@ -39,7 +39,7 @@ class CourseSeeder extends Seeder
                 'classes'      => ['child', '1'],
             ],
             [
-                'name'         => ['en' => 'Orthodox Theology & Doctrine', 'am' => 'ኦርቶዶክሳዊ ሃይማኖትና ትምህርት'],
+                'name' => 'Orthodox Theology & Doctrine',
                 'code'         => 'THEO-201',
                 'description'  => 'Study of Orthodox doctrines including the Trinity, incarnation, and salvation.',
                 'credit_hours' => 3,
@@ -47,7 +47,7 @@ class CourseSeeder extends Seeder
                 'classes'      => ['4', '5', '6'],
             ],
             [
-                'name'         => ['en' => 'Advanced Orthodox Theology', 'am' => 'ከፍተኛ ኦርቶዶክሳዊ ሃይማኖት'],
+                'name' => 'Advanced Orthodox Theology',
                 'code'         => 'THEO-301',
                 'description'  => 'In-depth theology covering patristic writings, councils, and Orthodox creeds.',
                 'credit_hours' => 3,
@@ -58,7 +58,7 @@ class CourseSeeder extends Seeder
 
             // ── Church History ────────────────────────────────────────────────────
             [
-                'name'         => ['en' => 'History of the Ethiopian Orthodox Church', 'am' => 'የኢትዮጵያ ኦርቶዶክስ ቤተ ክርስቲያን ታሪክ'],
+                'name' => 'History of the Ethiopian Orthodox Church',
                 'code'         => 'HIST-101',
                 'description'  => 'Overview of the founding and growth of the Ethiopian Orthodox Tewahedo Church.',
                 'credit_hours' => 2,
@@ -66,7 +66,7 @@ class CourseSeeder extends Seeder
                 'classes'      => ['2', '3'],
             ],
             [
-                'name'         => ['en' => 'History of the Universal Church', 'am' => 'የዓለም አቀፍ ቤተ ክርስቲያን ታሪክ'],
+                'name' => 'History of the Universal Church',
                 'code'         => 'HIST-201',
                 'description'  => 'Comprehensive history of Christianity from apostolic times to modern era.',
                 'credit_hours' => 2,
@@ -74,7 +74,7 @@ class CourseSeeder extends Seeder
                 'classes'      => ['5', '6'],
             ],
             [
-                'name'         => ['en' => 'Martyrs & Saints of the Church', 'am' => 'የቤተ ክርስቲያን ሰማዕታትና ቅዱሳን'],
+                'name' => 'Martyrs & Saints of the Church',
                 'code'         => 'HIST-301',
                 'description'  => 'Lives and sacrifices of Ethiopian and universal Orthodox saints and martyrs.',
                 'credit_hours' => 2,
@@ -84,7 +84,7 @@ class CourseSeeder extends Seeder
 
             // ── Scripture & Bible ─────────────────────────────────────────────────
             [
-                'name'         => ['en' => 'Biblical Studies — Old Testament', 'am' => 'የብሉይ ኪዳን ጥናት'],
+                'name' => 'Biblical Studies — Old Testament',
                 'code'         => 'BIBL-101',
                 'description'  => 'Study of the Old Testament scriptures with Ethiopian Orthodox interpretation.',
                 'credit_hours' => 3,
@@ -92,7 +92,7 @@ class CourseSeeder extends Seeder
                 'classes'      => ['1', '2', '3'],
             ],
             [
-                'name'         => ['en' => 'Biblical Studies — New Testament', 'am' => 'የሐዲስ ኪዳን ጥናት'],
+                'name' => 'Biblical Studies — New Testament',
                 'code'         => 'BIBL-201',
                 'description'  => 'Systematic study of the Gospels, Acts, Epistles, and Revelation.',
                 'credit_hours' => 3,
@@ -101,7 +101,7 @@ class CourseSeeder extends Seeder
                 'classes'      => ['4', '5', '6'],
             ],
             [
-                'name'         => ['en' => 'Prophets & Epistles', 'am' => 'ነቢያትና መልእክቶች'],
+                'name' => 'Prophets & Epistles',
                 'code'         => 'BIBL-301',
                 'description'  => 'Deep study of the major prophets and New Testament epistles with patristic commentary.',
                 'credit_hours' => 3,
@@ -112,7 +112,7 @@ class CourseSeeder extends Seeder
 
             // ── Geez Language & Liturgy ───────────────────────────────────────────
             [
-                'name'         => ['en' => 'Geez Language & Script', 'am' => 'ግዕዝ ቋንቋ እና ፊደል'],
+                'name' => 'Geez Language & Script',
                 'code'         => 'GEEZ-101',
                 'description'  => 'Introduction to the Geez alphabet, pronunciation, and basic reading of liturgical texts.',
                 'credit_hours' => 2,
@@ -120,7 +120,7 @@ class CourseSeeder extends Seeder
                 'classes'      => ['3', '4'],
             ],
             [
-                'name'         => ['en' => 'Geez Literature & Liturgy', 'am' => 'ግዕዝ ሥነ ጽሑፍ እና ቅዳሴ'],
+                'name' => 'Geez Literature & Liturgy',
                 'code'         => 'GEEZ-201',
                 'description'  => 'Reading and interpretation of classical Geez liturgical texts and sacred literature.',
                 'credit_hours' => 2,
@@ -129,7 +129,7 @@ class CourseSeeder extends Seeder
                 'classes'      => ['5', '6'],
             ],
             [
-                'name'         => ['en' => 'Advanced Geez & Hymnody', 'am' => 'ከፍተኛ ግዕዝ እና መዝሙር'],
+                'name' => 'Advanced Geez & Hymnody',
                 'code'         => 'GEEZ-301',
                 'description'  => 'Advanced Geez scripture analysis, debtara traditions, and zema (sacred chant) composition.',
                 'credit_hours' => 3,
@@ -140,7 +140,7 @@ class CourseSeeder extends Seeder
 
             // ── Sacraments & Liturgical Practice ─────────────────────────────────
             [
-                'name'         => ['en' => 'The Sacraments of the Church', 'am' => 'ምሥጢረ ቤተ ክርስቲያን'],
+                'name' => 'The Sacraments of the Church',
                 'code'         => 'SACR-201',
                 'description'  => 'Study of the seven sacraments: Baptism, Confirmation, Eucharist, Penance, Unction, Holy Orders, and Matrimony.',
                 'credit_hours' => 3,
@@ -148,7 +148,7 @@ class CourseSeeder extends Seeder
                 'classes'      => ['5', '6', '7'],
             ],
             [
-                'name'         => ['en' => 'The Holy Eucharist & Divine Liturgy', 'am' => 'ቅዱስ ቁርባን እና ቅዳሴ'],
+                'name' => 'The Holy Eucharist & Divine Liturgy',
                 'code'         => 'SACR-301',
                 'description'  => 'Theological and practical study of the Divine Liturgy and the Holy Eucharist.',
                 'credit_hours' => 3,
@@ -159,7 +159,7 @@ class CourseSeeder extends Seeder
 
             // ── Fasting, Prayer & Spiritual Disciplines ───────────────────────────
             [
-                'name'         => ['en' => 'Fasting & Prayer Practices', 'am' => 'ጾምና ጸሎት'],
+                'name' => 'Fasting & Prayer Practices',
                 'code'         => 'FAST-101',
                 'description'  => 'Orthodox fasting calendar, theology of prayer, and practical spiritual discipline.',
                 'credit_hours' => 2,
@@ -167,7 +167,7 @@ class CourseSeeder extends Seeder
                 'classes'      => ['2', '3', '4'],
             ],
             [
-                'name'         => ['en' => 'Spiritual Warfare & Repentance', 'am' => 'መንፈሳዊ ትግልና ንስሐ'],
+                'name' => 'Spiritual Warfare & Repentance',
                 'code'         => 'FAST-201',
                 'description'  => 'Theology of repentance, spiritual watchfulness, and the Orthodox path to holiness.',
                 'credit_hours' => 2,
@@ -177,7 +177,7 @@ class CourseSeeder extends Seeder
 
             // ── Church Music & Mezmur ─────────────────────────────────────────────
             [
-                'name'         => ['en' => 'Church Music & Mezmur', 'am' => 'የቤተ ክርስቲያን ዜማ (መዝሙር)'],
+                'name' => 'Church Music & Mezmur',
                 'code'         => 'MUZQ-101',
                 'description'  => 'Traditional Ethiopian Orthodox church music, Mezmur, and liturgical chanting.',
                 'credit_hours' => 2,
@@ -185,7 +185,7 @@ class CourseSeeder extends Seeder
                 'classes'      => ['2', '3', '4'],
             ],
             [
-                'name'         => ['en' => 'Advanced Liturgical Music — Zema', 'am' => 'ከፍተኛ ዜማ (ሊቃዊ)'],
+                'name' => 'Advanced Liturgical Music — Zema',
                 'code'         => 'MUZQ-201',
                 'description'  => 'Mastery of traditional zema modes, debtara chanting, and sacred choral performance.',
                 'credit_hours' => 2,
@@ -196,7 +196,7 @@ class CourseSeeder extends Seeder
 
             // ── Ethics & Christian Life ───────────────────────────────────────────
             [
-                'name'         => ['en' => 'Christian Moral Education', 'am' => 'ክርስቲያናዊ ሥነ ምግባር ትምህርት'],
+                'name' => 'Christian Moral Education',
                 'code'         => 'MORA-101',
                 'description'  => 'Christian ethics, values, and moral formation rooted in Orthodox teaching.',
                 'credit_hours' => 2,
@@ -204,7 +204,7 @@ class CourseSeeder extends Seeder
                 'classes'      => ['child', '1', '2'],
             ],
             [
-                'name'         => ['en' => 'Orthodox Christian Leadership', 'am' => 'ክርስቲያናዊ አመራር'],
+                'name' => 'Orthodox Christian Leadership',
                 'code'         => 'LEAD-301',
                 'description'  => 'Servant leadership and community responsibility rooted in Orthodox Christian values.',
                 'credit_hours' => 2,
@@ -214,7 +214,7 @@ class CourseSeeder extends Seeder
 
             // ── Amharic Language & Literature ─────────────────────────────────────
             [
-                'name'         => ['en' => 'Amharic Language & Spiritual Literature', 'am' => 'አማርኛ ቋንቋ እና የሃይማኖት ሥነ ጽሑፍ'],
+                'name' => 'Amharic Language & Spiritual Literature',
                 'code'         => 'AMHR-101',
                 'description'  => 'Amharic reading, writing, grammar, and study of Ethiopian spiritual literary works.',
                 'credit_hours' => 2,
@@ -222,7 +222,7 @@ class CourseSeeder extends Seeder
                 'classes'      => ['1', '2', '3'],
             ],
             [
-                'name'         => ['en' => 'Advanced Amharic & Church Literature', 'am' => 'ከፍተኛ አማርኛ እና የቤተ ክርስቲያን ሥነ ጽሑፍ'],
+                'name' => 'Advanced Amharic & Church Literature',
                 'code'         => 'AMHR-201',
                 'description'  => 'Advanced Amharic with focus on Orthodox theological and historical texts.',
                 'credit_hours' => 2,
@@ -233,7 +233,7 @@ class CourseSeeder extends Seeder
 
             // ── Discipleship & Community ──────────────────────────────────────────
             [
-                'name'         => ['en' => 'Discipleship & Evangelism', 'am' => 'ደቀ መዝሙርነትና ስብከተ ወንጌል'],
+                'name' => 'Discipleship & Evangelism',
                 'code'         => 'DSCL-201',
                 'description'  => 'Principles of Orthodox discipleship, witnessing the faith, and sharing the Gospel.',
                 'credit_hours' => 2,
@@ -241,7 +241,7 @@ class CourseSeeder extends Seeder
                 'classes'      => ['4', '5'],
             ],
             [
-                'name'         => ['en' => 'Church Community & Social Service', 'am' => 'የቤተ ክርስቲያን ማህበረሰብና አገልግሎት'],
+                'name' => 'Church Community & Social Service',
                 'code'         => 'COMM-201',
                 'description'  => 'Practicum in community service through the mission and ministry of the Orthodox Church.',
                 'credit_hours' => 2,
@@ -256,14 +256,13 @@ class CourseSeeder extends Seeder
         foreach ($coursesData as $cData) {
             foreach ($cData['classes'] as $class) {
                 $uniqueCode  = $cData['code'] . '-' . $class;
-                $nameEn      = is_array($cData['name']) ? $cData['name']['en'] : $cData['name'];
-                $nameAm      = is_array($cData['name']) ? $cData['name']['am'] : $cData['name'];
+                $nameEn      = $cData['name'];
                 $gradeSuffix = $class === 'child' ? 'Child/KG' : 'Grade ' . $class;
 
                 $course = Course::updateOrCreate(
                     ['code' => $uniqueCode],
                     [
-                        'name'          => ['en' => $nameEn . ' — ' . $gradeSuffix, 'am' => $nameAm . ' — ' . $gradeSuffix],
+                        'name' => $nameEn . ' — ' . $gradeSuffix,
                         'description'   => $cData['description'],
                         'credit_hours'  => $cData['credit_hours'],
                         'senbet_class'  => $class,

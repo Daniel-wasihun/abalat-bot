@@ -18,7 +18,7 @@ use App\Services\BackMessage;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 
-class PermissionController extends Controller implements HasMiddleware {
+class PermissionController extends Controller {
     public static function middleware(): array {
         return [
             new Middleware(function ($request, $next) {
@@ -45,11 +45,8 @@ class PermissionController extends Controller implements HasMiddleware {
 
         $permissions = Permission::when($request->search, function ($query, $search) {
             $query->where(function ($q) use ($search) {
-                $q->whereRaw("(\"name\"::jsonb)->>'en' ilike ?", ["%{$search}%"])
-                    ->orWhereRaw("(\"name\"::jsonb)->>'am' ilike ?", ["%{$search}%"])
-                    ->orWhere('slug', 'ilike', "%{$search}%")
-                    ->orWhereRaw("(\"description\"::jsonb)->>'en' ilike ?", ["%{$search}%"])
-                    ->orWhereRaw("(\"description\"::jsonb)->>'am' ilike ?", ["%{$search}%"]);
+                $q->where('name', 'ilike', "%{$search}%")
+                    ->orWhere('description', 'ilike', "%{$search}%");
             });
         })
             ->when($request->module, function ($query, $module) {
@@ -89,7 +86,7 @@ class PermissionController extends Controller implements HasMiddleware {
         ];
 
         if (isset($data['description'])) {
-            $permissionData['description'] = ['en' => $data['description']];
+            $permissionData['description'] = $data['description'];
         }
 
         $permission = Permission::create($permissionData);
@@ -108,7 +105,7 @@ class PermissionController extends Controller implements HasMiddleware {
         $updateData = [];
 
         if (array_key_exists('description', $data)) {
-            $updateData['description'] = ['en' => $data['description'] ?? ''];
+            $updateData['description'] = $data['description'] ?? '';
         }
 
         if (!empty($updateData)) {

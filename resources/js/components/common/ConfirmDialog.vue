@@ -21,7 +21,7 @@
 import Modal from "./Modal.vue";
 import Button from "./Button.vue";
 import { AlertCircle, Trash2, ShieldAlert } from "lucide-vue-next";
-import { computed } from "vue";
+import { computed, watch, onUnmounted } from "vue";
 
 interface Props {
  show: boolean;
@@ -46,6 +46,25 @@ const emit = defineEmits<{
  (e: "close"): void;
  (e: "confirm"): void;
 }>();
+
+const handleKeydown = (e: KeyboardEvent) => {
+    if (props.show && e.key === 'Enter' && !props.loading) {
+        e.preventDefault();
+        emit('confirm');
+    }
+};
+
+watch(() => props.show, (newVal) => {
+    if (newVal) {
+        document.addEventListener('keydown', handleKeydown);
+    } else {
+        document.removeEventListener('keydown', handleKeydown);
+    }
+}, { immediate: true });
+
+onUnmounted(() => {
+    document.removeEventListener('keydown', handleKeydown);
+});
 
 const config = computed(() => {
  switch (props.variant) {

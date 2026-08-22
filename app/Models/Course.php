@@ -19,7 +19,6 @@ class Course extends Model implements Auditable
     ];
 
     protected $casts = [
-        'name'          => 'array',
         'prerequisites' => 'array',
         'is_active'     => 'boolean',
     ];

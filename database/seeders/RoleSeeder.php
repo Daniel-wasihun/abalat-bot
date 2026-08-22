@@ -100,18 +100,12 @@ class RoleSeeder extends Seeder {
 
             // Find by slug first (most reliable), fall back to name match
             $role = Role::withTrashed()->where('slug', $slug)->first()
-                ?? Role::withTrashed()->whereRaw("name->>'en' = ?", [$enName])->first();
+                ?? Role::withTrashed()->where('name', $enName)->first();
 
             $baseData = [
                 'slug'            => $slug,          // always enforce correct slug
-                'name'            => [
-                    'en' => $enName,
-                    'am' => $enName,
-                ],
-                'description'     => [
-                    'en' => $data['description'],
-                    'am' => $data['description'],
-                ],
+                'name'            => $enName,
+                'description'     => $data['description'],
                 'hierarchy_level' => $data['hierarchy_level'],
                 'is_system_level' => true,
                 'is_active'       => true,

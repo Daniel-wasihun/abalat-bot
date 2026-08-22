@@ -17,7 +17,7 @@ use App\Helpers\Response;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 
-class RoleController extends Controller implements HasMiddleware {
+class RoleController extends Controller {
     public static function middleware(): array {
         return [
             new Middleware(function ($request, $next) {
@@ -45,8 +45,8 @@ class RoleController extends Controller implements HasMiddleware {
             ->where('slug', '!=', 'super-admin')
             ->when($request->search, function ($query, $search) {
                 $query->where(function ($q) use ($search) {
-                    $q->whereRaw("(\"name\"::jsonb)->>'en' ilike ?", ["%{$search}%"])
-                        ->orWhereRaw("(\"name\"::jsonb)->>'am' ilike ?", ["%{$search}%"])
+                    $q->where("name", "ilike", "%{$search}%")
+                        ->orWhere("description", "ilike", "%{$search}%")
                         ->orWhere('slug', 'ilike', "%{$search}%");
                 });
             });
@@ -77,8 +77,8 @@ class RoleController extends Controller implements HasMiddleware {
 
         $locale = app()->getLocale();
         $role = Role::create([
-            'name' => [$locale => $data['name']],
-            'description' => [$locale => $data['description'] ?? ''],
+            'name' => $data['name'],
+            'description' => $data['description'] ?? '',
             'hierarchy_level' => $data['hierarchy_level'] ?? 1,
             'is_system_level' => false,
         ]);
@@ -109,9 +109,7 @@ class RoleController extends Controller implements HasMiddleware {
 
         $locale = app()->getLocale();
         if (isset($data['name'])) {
-            $name = $role->name ?? [];
-            $name[$locale] = $data['name'];
-            $role->name = $name;
+            $role->name = $data['name'];
         }
 
         if (isset($data['hierarchy_level'])) {
@@ -119,9 +117,7 @@ class RoleController extends Controller implements HasMiddleware {
         }
 
         if (array_key_exists('description', $data)) {
-            $description = $role->description ?? [];
-            $description[$locale] = $data['description'] ?? '';
-            $role->description = $description;
+            $role->description = $data['description'] ?? '';
         }
 
         if ($role->isDirty()) {

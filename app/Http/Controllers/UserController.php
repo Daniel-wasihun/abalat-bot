@@ -31,7 +31,7 @@ use Illuminate\Support\Str;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 
-class UserController extends Controller implements HasMiddleware {
+class UserController extends Controller {
     use \App\Traits\InteractsWithCsv;
 
     public static function middleware(): array {
@@ -82,11 +82,12 @@ class UserController extends Controller implements HasMiddleware {
 
         return $query->when($request->search, function ($query, $search) {
             $query->where(function ($q) use ($search) {
-                $q->whereRaw("(\"name\"::jsonb)->>'en' ilike ?", ["%{$search}%"])
-                    ->orWhereRaw("(\"name\"::jsonb)->>'am' ilike ?", ["%{$search}%"])
+                $q->where('name', 'ilike', "%{$search}%")
                     ->orWhere('email', 'ilike', "%{$search}%")
                     ->orWhereHas('info', function ($qi) use ($search) {
-                        $qi->where('registration_id', 'ilike', "%{$search}%");
+                        $qi->where('registration_id', 'ilike', "%{$search}%")
+                           ->orWhere('father_name', 'ilike', "%{$search}%")
+                           ->orWhere('grandfather_name', 'ilike', "%{$search}%");
                     });
             });
         })

@@ -248,9 +248,7 @@ const handlePerPageChange = (val: number) => {
       :title="$tr('user.user_deletion', 'Delete User')"
       :message="
         selectedUser
-          ? $tr('user.delete_warning_desc', {
-              name: `<span class='text-rose-500 font-medium'>${localize(selectedUser.name)}</span>`,
-            })
+          ? $tr('user.delete_warning_desc', 'This action will permanently remove {name} and all their associated data from the system. This cannot be undone.', { name: selectedUser.name })
           : ''
       "
       variant="danger"

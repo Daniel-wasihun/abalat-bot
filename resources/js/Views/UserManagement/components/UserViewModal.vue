@@ -12,7 +12,7 @@
         <div class="relative shrink-0">
           <div class="w-20 h-20 rounded-full overflow-hidden border-4 border-main-bg shadow-sm bg-brand-blue/5 flex items-center justify-center">
             <img v-if="user.profile_picture" :src="user.profile_picture" :alt="localize(user.name)" class="w-full h-full object-cover" />
-            <span v-else class="text-3xl font-semibold text-brand-blue uppercase">{{ localize(user.name).charAt(0) }}</span>
+            <span v-else class="text-3xl font-semibold text-brand-blue capitalize">{{ localize(user.name).charAt(0) }}</span>
           </div>
           <div v-if="user.is_active" class="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-emerald-500 border-2 border-main-bg"></div>
           <div v-else class="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-rose-500 border-2 border-main-bg"></div>

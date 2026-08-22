@@ -78,11 +78,11 @@ const metrics = computed(() => {
             label: "dashboard.metrics.revenue",
             value:
                 o.total_fine_revenue !== undefined
-                    ? `${o.total_fine_revenue.toLocaleString()} ETB`
+                    ? `${o.total_fine_revenue.toLocaleString()} ${$tr('payments.currency', 'ETB')}`
                     : undefined,
             subVal:
                 o.pending_fines !== undefined
-                    ? `${o.pending_fines.toLocaleString()} ETB`
+                    ? `${o.pending_fines.toLocaleString()} ${$tr('payments.currency', 'ETB')}`
                     : undefined,
             subKey: "dashboard.pending",
             trend: null,

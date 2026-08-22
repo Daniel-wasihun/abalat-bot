@@ -32,7 +32,7 @@ class UserResource extends ApiResource {
 
         return [
             'id' => $this->id,
-            'name' => $this->name,
+            'name' => trim(implode(' ', array_filter([$this->name, $this->info?->father_name, $this->info?->grandfather_name]))),
             'email' => $this->email,
             'is_active' => $this->is_active,
             'is_super_admin' => $user->isSuperAdmin(),
@@ -159,8 +159,14 @@ class UserResource extends ApiResource {
         if (isset(static::$userCache[$id])) return static::$userCache[$id];
 
         $u = \App\Models\User::with('info')->find($id);
+        
+        $name = 'System';
+        if ($u) {
+            $name = trim(implode(' ', array_filter([$u->name, $u->info?->father_name, $u->info?->grandfather_name])));
+        }
+        
         $detail = [
-            'name' => $u ? $u->name : ['en' => 'System', 'am' => 'ሲስተም'],
+            'name' => $name,
             'avatar' => ($u && $u->info && $u->info->profile_picture) ? asset('storage/' . $u->info->profile_picture) : null
         ];
 
